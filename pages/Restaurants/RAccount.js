@@ -12,12 +12,12 @@ const Account = ({ user, error }) => {
 
     // Display loading state until user data is fetched (handled by server-side props)
     if (!user) {
-        return <div><LuLoader/></div>;
+        return <div><LuLoader /></div>;
     }
 
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
-        restrauntName: user.restrauntName,
+        restaurantName: user.restaurantName,
         email: user.email,
         address: user.address,
         number: user.number,
@@ -75,8 +75,8 @@ const Account = ({ user, error }) => {
                                 <label>Restaurant Name:</label>
                                 <input
                                     type="text"
-                                    name="restrauntName"
-                                    value={formData.restrauntName}
+                                    name="restaurantName"
+                                    value={formData.restaurantName}
                                     onChange={handleChange}
                                     className="border rounded p-2 w-full"
                                     required
@@ -126,7 +126,7 @@ const Account = ({ user, error }) => {
                         </form>
                     ) : (
                         <>
-                            <p><strong>Restaurant Name:</strong> {formData.restrauntName}</p>
+                            <p><strong>Restaurant Name:</strong> {formData.restaurantName}</p>
                             <p><strong>Email:</strong> {formData.email}</p>
                             <p><strong>Address:</strong> {formData.address}</p>
                             <p><strong>Phone Number:</strong> {formData.number}</p>
