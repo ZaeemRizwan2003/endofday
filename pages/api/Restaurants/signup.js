@@ -1,80 +1,60 @@
+import RegisteredBakeries from '@/models/RBakerymodel';
+import dbConnect from '@/middleware/mongoose';
 
-import dbConnect from "@/middleware/mongoose";
-import bcrypt from "bcrypt";
-import RegisteredBakeries from "@/models/RBakerymodel";
 export default async function handler(req, res) {
-    if (req.method === "POST") {
-        const { restrauntName, email, password, confirmpassword, address, number } = req.body
-        console.log(req.body)
-        await dbConnect()
+    const { method } = req;
 
-        const exist = await RegisteredBakeries.findOne({ email });
-        if (exist) {
-            res.status(422).json({ message: 'User already exists.' });
+    await dbConnect();
+
+    if (method === 'POST') {
+        try {
+            const {
+                restaurantName,
+                email,
+                password,
+                confirmpassword,
+                address,
+                number,
+                option,
+                image,        // Base64 string
+                contentType,  // MIME type
+            } = req.body;
+
+            // Validate required fields
+            if (!restaurantName || !email || !password || !confirmpassword || !address || !number || !option || !image || !contentType) {
+                return res.status(400).json({ message: 'All fields are required.' });
+            }
+
+            // Check if passwords match
+            if (password !== confirmpassword) {
+                return res.status(400).json({ message: "Passwords don't match." });
+            }
+
+            // Convert Base64 string to Buffer
+            // const imageBuffer = Buffer.from(image, 'base64');
+
+            // Create a new bakery instance
+            const newBakery = new RegisteredBakeries({
+                restaurantName,
+                email,
+                password, // Ensure to hash passwords in a real application
+                address,
+                number,
+                option: option === 'both' ? ['pickup', 'delivery'] : [option,],
+                image,
+                imageContentType: contentType,
+            });
+
+            // Save to database
+            await newBakery.save();
+
+            res.status(200).json({ message: 'Signup successful!' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Server error. Please try again.' });
         }
-
-        if (password !== confirmpassword) {
-            res.status(422).json({ message: 'Password and Confirm password do not match' });
-        }
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
-
-        const u = new RegisteredBakeries({
-            restrauntName,
-            email,
-            password: hashedPassword,
-            address,
-            number
-        });
-
-        await u.save();
-        res.status(200).json({ message: 'Signed up successfully.' })
     } else {
-        return res.status(400).json({
-            error: 'this method is not allowed'
-        });
+        res.setHeader('Allow', ['POST']);
+        res.status(405).end(`Method ${method} Not Allowed`);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//         await connectDb();
-//         const { name, email, password, address, number } = req.body;
-
-//         if (!name || !email || !password || !address || !number) {
-//             return res.status(400).json({ message: 'All fields are required.' });
-//         }
-//         try {
-//             const newSignup = new signupSchema({
-//                 restrauntName: name,
-//                 email,
-//                 password,
-//                 address,
-//                 number,
-//             });
-//             await newSignup.save();
-//             console.log(newSignup);
-//             return res.status(200).json({ message: 'Signed up successfully.' });
-//         }
-//         catch (error) {
-//             return res.status(500).json({ message: error.message });
-//         }
-//     }
-//     else {
-//         return res.status(405
-//         ).json({ message: 'Method not allowed' });
-
-//     }
-// }

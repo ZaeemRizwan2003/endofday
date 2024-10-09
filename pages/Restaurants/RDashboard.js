@@ -198,7 +198,7 @@ export async function getServerSideProps(context) {
     if (!user) {
         return {
             redirect: {
-                destination: '/Login',
+                destination: 'Restaurants/RLogin',
                 permanent: false,
             },
         };

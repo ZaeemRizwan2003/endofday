@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState, useEffect, useContext} from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { FaRegMinusSquare } from "react-icons/fa";
 import { FaRegPlusSquare } from "react-icons/fa";
@@ -11,8 +11,8 @@ import { LuLoader } from "react-icons/lu";
 
 const RestaurantMenu = () => {
   const [restaurant, setRestaurant] = useState(null);
-  const {addToCart, incrementItemQuantity, decrementItemQuantity, cart}= useCart();
-  const [addedToCart, setAddedToCart] = useState({}); 
+  const { addToCart, incrementItemQuantity, decrementItemQuantity, cart } = useCart();
+  const [addedToCart, setAddedToCart] = useState({});
   const router = useRouter();
   const { id } = router.query;
 
@@ -23,6 +23,7 @@ const RestaurantMenu = () => {
         .then((response) => setRestaurant(response.data))
         .catch((error) => console.error(error));
     }
+    console.log(restaurant)
   }, [id]);
 
   // useEffect(() => {
@@ -38,21 +39,21 @@ const RestaurantMenu = () => {
     addToCart(itemId, title, price);
     setAddedToCart((prev) => ({ ...prev, [itemId]: true }));
 
-    toast.success(`${title} added to cart successsfully`, {autoClose:1000});
+    toast.success(`${title} added to cart successsfully`, { autoClose: 1000 });
   };
-  
+
   const getItemQuantity = (itemId) => {
     const cartItem = cart.find((cartItem) => cartItem.id === itemId);
     return cartItem ? cartItem.quantity : 1;
   };
 
-  if (!restaurant) return <p> <LuLoader/> </p>;
+  if (!restaurant) return <p> <LuLoader /> </p>;
 
 
   return (
     <>
-    <ToastContainer/>
-      <DashNav/>
+      <ToastContainer />
+      <DashNav />
       <div className="p-14 justify-center">
         <div className="flex mb-8 mt-12">
           <img
@@ -91,33 +92,33 @@ const RestaurantMenu = () => {
 
                 <div className="mt-4 flex items-center justify-between">
                   <div className="flex items-center">
-                    
+
                     {cart ? (
                       <>
-                      <button 
-                    onClick={() => decrementItemQuantity(item._id)}
-                    disabled={getItemQuantity(item._id) <= 1}
-                    // disabled={cart.quantity <= 1}
-                    // disabled={!cart[item._id]?.quantity || cart[item._id]?.quantity <= 1
-                    
-                    >
-                      <FaRegMinusSquare />
-                    </button>
+                        <button
+                          onClick={() => decrementItemQuantity(item._id)}
+                          disabled={getItemQuantity(item._id) <= 1}
+                        // disabled={cart.quantity <= 1}
+                        // disabled={!cart[item._id]?.quantity || cart[item._id]?.quantity <= 1
 
-                    <span className="px-4">
-                    {getItemQuantity(item._id)}
-                    {/* {cart.quantity} */}
-                    {/* {cart[item._id]?.quantity || 1} */}
-                    </span>
+                        >
+                          <FaRegMinusSquare />
+                        </button>
 
-                    <button 
-                    onClick={() => incrementItemQuantity(item._id)}
-                    >
-                      <FaRegPlusSquare />
-                    </button>
-                    </>
-                    ):(
-                      <span className="px-4">1</span> 
+                        <span className="px-4">
+                          {getItemQuantity(item._id)}
+                          {/* {cart.quantity} */}
+                          {/* {cart[item._id]?.quantity || 1} */}
+                        </span>
+
+                        <button
+                          onClick={() => incrementItemQuantity(item._id)}
+                        >
+                          <FaRegPlusSquare />
+                        </button>
+                      </>
+                    ) : (
+                      <span className="px-4">1</span>
                     )}
                   </div>
 

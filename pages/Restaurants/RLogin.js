@@ -25,10 +25,6 @@ const Login = () => {
             });
 
             if (res.status === 200) {
-                // const { token } = res.data;
-                // Save the token in localStorage or cookies
-                // localStorage.setItem('token', token);
-                // Redirect to dashboard after login
                 router.push('/Restaurants/RDashboard');
             }
         } catch (err) {
@@ -40,13 +36,13 @@ const Login = () => {
     return (
         <section className="bg-gray-50 ">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm mb-3">
-          <img
-            className="mx-auto h-10 w-auto"
-            src="/mainlogo.png"
-            alt="EndofDay"
-          />
-        </div>
+                <div className="sm:mx-auto sm:w-full sm:max-w-sm mb-3">
+                    <img
+                        className="mx-auto h-10 w-auto"
+                        src="/mainlogo.png"
+                        alt="EndofDay"
+                    />
+                </div>
                 <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 ">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
