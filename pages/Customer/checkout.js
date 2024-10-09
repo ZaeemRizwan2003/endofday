@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "./cartcontext";
 import { FaRegMinusSquare, FaRegPlusSquare } from "react-icons/fa";
 import { RiDeleteBin2Line } from "react-icons/ri";
-import DashNav from "@/components/CustomerNavbar";
+import DashNav from "@/Components/CustomerNavbar";
 import dynamic from "next/dynamic";
 
 // Dynamically import OSMMap to ensure it's client-side rendered
@@ -39,7 +39,7 @@ const Checkout = () => {
     const fetchCheckoutData = async () => {
       try {
         const userId = localStorage.getItem("userId");
-        const res = await axios.get(`/api/checkout?userId=${userId}`);
+        const res = await axios.get(`/api/Customer/checkout?userId=${userId}`);
         const { addresses, userInfo } = res.data;
 
         setAddresses(addresses);
@@ -65,7 +65,7 @@ const Checkout = () => {
   const handleNewAddress = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      const res = await axios.post("/api/address", {
+      const res = await axios.post("/api/Customer/address", {
         userId,
         newAddress: {
           addressLine: newAddress.addressLine,
@@ -91,8 +91,8 @@ const Checkout = () => {
     };
 
     try {
-      await axios.post("/api/submitOrder", orderData);
-      router.push("/order");
+      await axios.post("/api/Customer/submitOrder", orderData);
+      router.push("/Customer/order");
       // Handle success, e.g., redirect to order confirmation page
     } catch (err) {
       console.error("Order submission failed", err);
@@ -110,7 +110,7 @@ const Checkout = () => {
       const { latitude, longitude } = geoLocation;
       const addressLine = `Lat: ${latitude}, Long: ${longitude}`;
 
-      const res = await axios.post("/api/address", {
+      const res = await axios.post("/api/Customer/address", {
         userId,
         newAddress: {
           addressLine,

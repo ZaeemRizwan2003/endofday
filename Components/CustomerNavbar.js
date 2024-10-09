@@ -5,7 +5,7 @@ import { FaUser } from "react-icons/fa";
 import { FaCartShopping } from "react-icons/fa6";
 import { FaTimes } from "react-icons/fa";
 import { useRouter } from "next/router";
-import { useCart } from "@/pages/cartcontext";
+import { useCart } from "@/pages/Customer/cartcontext";
 import Cart from "./Cart";
 
 const DashNav = ({ search, setSearch, isCheckout }) => {
@@ -17,7 +17,7 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
   const router = useRouter();
 
   const saveCartToServer = async (userId, cart) => {
-    await fetch('/api/cart', {
+    await fetch('/api/Customer/cart', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, cart: cart })
@@ -35,7 +35,7 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
     setUser(null);
 
     // setCart({});  
-    router.push("/login");
+    router.push("/Customer/Clogin");
   };
 
 
@@ -144,7 +144,7 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
           {isCheckout && (
             <button
             className="p-2.5 text-sm font-medium text-purple-800 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 focus:ring-4 focus:outline-none"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/Customer/Cdashboard")}
           >
             Continue Browsing
           </button>
@@ -175,7 +175,7 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
                   <li className="mb-3">
                     <button
                       className="text-purple-700 hover:underline"
-                      onClick={() => router.push("/account-info")}
+                      onClick={() => router.push("/Customer/Caccount-info")}
                     >
                       Account Information
                     </button>
@@ -183,7 +183,7 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
                   <li className="mb-3">
                     <button
                       className="text-purple-700 hover:underline"
-                      onClick={() => router.push("/forgotpass")}
+                      onClick={() => router.push("/Customer/Cforgotpass")}
                     >
                       Change Password
                     </button>

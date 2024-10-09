@@ -1,9 +1,9 @@
-import DashNav from "@/components/CustomerNavbar";
+import DashNav from "@/Components/CustomerNavbar";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-
+import { LuLoader } from "react-icons/lu";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -16,10 +16,10 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/login");
+      router.push("/Customer/Clogin");
     } else {
       axios
-        .get("/api/user-info", {
+        .get("/api/Customer/user-info", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Cache-Control": "no-cache",
@@ -35,7 +35,7 @@ const Dashboard = () => {
 
         .catch((error) => {
           console.log("failed fetch", error);
-          router.push("/login");
+          router.push("/Customer/Clogin");
         });
     }
   }, [router]);
@@ -46,7 +46,7 @@ const Dashboard = () => {
 
     const fetchRestaurants = async () => {
       try {
-        const res = await axios.get(`/api/restaurants`, {
+        const res = await axios.get(`/api/Customer/restaurants`, {
           params: {
             type: activeOption,
             search: search,
@@ -62,7 +62,7 @@ const Dashboard = () => {
   }, [activeOption, user, search]);
 
   if (loading) {
-    return <div>Loading......</div>;
+    return <div> <LuLoader/> </div>;
   }
 
   if (!user) {
@@ -110,19 +110,19 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {restaurants.length > 0 ? (
             restaurants.map((restaurant) => (
-              <Link href={`/restaurant/${restaurant._id}`} key={restaurant._id}>
+              <Link href={`/Customer/restaurant/${restaurant._id}`} key={restaurant._id}>
                 <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow">
-                  <div className="relative w-full h-40 flex justify-center items-center">
+                  <div className="relative w-full h-30 flex justify-center items-center">
                     <img
                       src={restaurant.image}
-                      alt={restaurant.name}
+                      alt={restaurant.restaurantName}
                       className="object-contain w-50 h-40 "
                     />
                   </div>
                   <div className="p-4 bg-purple-200">
-                    <h3 className="text-lg font-semibold">{restaurant.name}</h3>
+                    <h3 className="text-lg font-semibold">{restaurant.restaurantName}</h3>
                     <p className="text-gray-500 text-sm">
-                      {restaurant.location}
+                      {restaurant.address}
                     </p>
                   </div>
                 </div>

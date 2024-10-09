@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useCart } from "@/pages/cartcontext";
+import { useCart } from "@/pages/Customer/cartcontext";
 import { FaRegMinusSquare, FaRegPlusSquare } from "react-icons/fa";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { useRouter } from "next/router";

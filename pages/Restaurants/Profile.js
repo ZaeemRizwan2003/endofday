@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import cookie from 'cookie';
 import axios from 'axios';
+import { LuLoader } from 'react-icons/lu';
 const Profile = () => {
   const [userData, setuserData] = useState(null);
   const [loading, setloading] = useState(true);
@@ -39,7 +40,7 @@ const Profile = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p><LuLoader/></p>;
   }
 
   if (error) {

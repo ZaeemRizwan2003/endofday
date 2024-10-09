@@ -64,9 +64,13 @@ const Signup = () => {
     return (
         <section className="bg-gray-50">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
-                    End Of Day
-                </a>
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm mb-3">
+          <img
+            className="mx-auto h-10 w-auto"
+            src="/mainlogo.png"
+            alt="EndofDay"
+          />
+        </div>
                 {/* Adjusted the width to be wider */}
                 <div className="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-3xl lg:max-w-4xl xl:max-w-5xl ">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -169,7 +173,7 @@ const Signup = () => {
                             </div>
                             <button
                                 type="submit"
-                                className="w-full text-white bg-purple-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                className="w-50 text-white bg-purple-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center justify-center"
                                 disabled={loading}
                             >
                                 {loading ? 'Creating Account...' : 'Create an account'}

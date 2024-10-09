@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { LuLoader } from 'react-icons/lu';
 
 const AccountInfo = () => {
   const [user, setUser] = useState(null);
@@ -10,10 +11,10 @@ const AccountInfo = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push('/login'); // Redirect to login if no token is found
+      router.push('/Customer/Clogin'); // Redirect to login if no token is found
     } else {
       axios
-        .get('/api/user-info', {
+        .get('/api/Customer/user-info', {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
@@ -21,7 +22,7 @@ const AccountInfo = () => {
           setLoading(false); // Stop loading
         })
         .catch(() => {
-          router.push('/login'); // Redirect to login on error
+          router.push('/Customer/Clogin'); // Redirect to login on error
         });
     }
   }, [router]);
@@ -29,7 +30,7 @@ const AccountInfo = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-xl font-semibold text-gray-700">Loading...</p>
+        <p className="text-xl font-semibold text-gray-700"><LuLoader/></p>
       </div>
     );
   }
@@ -58,7 +59,7 @@ const AccountInfo = () => {
         <button
           onClick={() => {
             localStorage.removeItem('token');
-            router.push('/login');
+            router.push('/Customer/Clogin');
           }}
           className="mt-6 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
         >

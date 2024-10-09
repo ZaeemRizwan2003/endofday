@@ -1,13 +1,14 @@
 import axios from 'axios';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { LuLoader } from 'react-icons/lu';
 
 const Restaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/restaurants')
+    axios.get('/api/Customer/restaurants')
       .then(res => {
         setRestaurants(res.data.data);
         setLoading(false);
@@ -18,16 +19,16 @@ const Restaurants = () => {
       });
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><LuLoader/></div>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
       {restaurants.map(restaurant => (
-        <Link key={restaurant._id} href={`/restaurant/${restaurant._id}`}>
+        <Link key={restaurant._id} href={`/Customer/restaurant/${restaurant._id}`}>
         <div key={restaurant._id} className="border p-4 rounded cursor-pointer">
             <img src={restaurant.image} alt="restaurant image" className='w-full h-40 object-cover mb-2'/>
-          <h2 className="text-xl font-bold">{restaurant.name}</h2>
-          <p><strong>Location:</strong> {restaurant.location}</p>
+          <h2 className="text-xl font-bold">{restaurant.restaurantName}</h2>
+          <p><strong>Location:</strong> {restaurant.address}</p>
           <p><strong>Description:</strong> {restaurant.description}</p>
         </div>
         </Link>

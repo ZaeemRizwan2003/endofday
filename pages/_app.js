@@ -1,17 +1,16 @@
 import "@/styles/globals.css";
-import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import { CartProvider } from "./Customer/cartcontext";
+
 export default function App({ Component, pageProps }) {
-
-  return (<>
-    {/* <Navbar /> */}
+  return (
     <CartProvider>
-      <Component {...pageProps} />;
-      <Footer />
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-grow">
+          <Component {...pageProps} />;
+        </main>
+        <Footer />
+      </div>
     </CartProvider>
-  </>
-
-
-  )
+  );
 }

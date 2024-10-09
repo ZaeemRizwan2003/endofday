@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import RegisteredBakeries from "@/models/RBakerymodel";
 import jwt from "jsonwebtoken";
 import cookie from 'cookie';
+
 export default async function handler(req, res) {
     await dbConnect()
 

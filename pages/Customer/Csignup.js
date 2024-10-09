@@ -18,7 +18,7 @@ const Signup = () => {
     setSuccess("");
 
     try {
-      const res = await axios.post("/api/register", {
+      const res = await axios.post("/api/Customer/register", {
         name,
         email,
         password,
@@ -32,7 +32,7 @@ const Signup = () => {
         setPassword("");
 
         setTimeout(()=>{
-          router.push("/login");
+          router.push("/Customer/Clogin");
         },2000);
       }
     } catch (err) {
@@ -47,7 +47,7 @@ const Signup = () => {
           <img
             className="mx-auto h-10 w-auto"
             src="/mainlogo.png"
-            alt="Your Company"
+            alt="EndofDay"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             SIGNUP{" "}
@@ -135,7 +135,7 @@ const Signup = () => {
           <p className="mt-10 text-center text-sm text-gray-500">
             Already a member?
             <Link
-              href="/login"
+              href="/Customer/Clogin"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
               {" "}

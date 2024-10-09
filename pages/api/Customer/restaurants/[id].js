@@ -1,12 +1,12 @@
-import dbConnect from "@/lib/dbconnect";
-import Restaurant from "@/models/Restaurant";
+import dbConnect from "@/middleware/mongoose";
+import RegisteredBakeries from "@/models/RBakerymodel";
 
 export default async function handler(req, res) {
   await dbConnect();
   const { id } = req.query;
 
   try {
-    const restaurant = await Restaurant.findById(id).populate('menu');
+    const restaurant = await RegisteredBakeries.findById(id).populate('menu');
     if (!restaurant) {
       return res.status(404).json({ message: "restaurant not found" });
     }

@@ -3,6 +3,7 @@ import dbConnect from '@/middleware/mongoose'; // Import your DB connection
 import RegisteredBakeries from '@/models/RBakerymodel'; // Import your model
 import { verifyToken } from '@/middleware/auth';
 import DashNav from '@/Components/Navbar';
+import { LuLoader } from 'react-icons/lu';
 const Account = ({ user, error }) => {
     // Handle if there's an error fetching the user
     if (error) {
@@ -11,7 +12,7 @@ const Account = ({ user, error }) => {
 
     // Display loading state until user data is fetched (handled by server-side props)
     if (!user) {
-        return <div>Loading...</div>;
+        return <div><LuLoader/></div>;
     }
 
     const [isEditing, setIsEditing] = useState(false);

@@ -4,9 +4,6 @@ const AddressSchema = new mongoose.Schema({
     addressLine: { type: String, required: true },
     city: { type: String, required: true },
     postalCode: { type: String, required: true },
-    // country: { type: String, required: true },
-    // lat: { type: Number }, // For Google Maps latitude
-    // lng: { type: Number }, // For Google Maps longitude
   });
 
 const CartItemSchema = new mongoose.Schema({

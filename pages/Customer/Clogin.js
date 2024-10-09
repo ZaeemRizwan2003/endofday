@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import axios from 'axios'
+import axios from "axios";
 import { useCart } from "./cartcontext";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,25 +15,25 @@ const Login = () => {
 
   const syncCartToServer = async (userId, cart) => {
     try {
-      const res = await fetch('/api/Customer/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, cart })
+      const res = await fetch("/api/Customer/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, cart }),
       });
-      if (!res.ok) throw new Error('Failed to sync cart');
+      if (!res.ok) throw new Error("Failed to sync cart");
     } catch (error) {
-      console.error('Cart Sync Error:', error);
+      console.error("Cart Sync Error:", error);
     }
   };
 
   const loadCartFromServer = async (userId) => {
     try {
       const res = await fetch(`/api/Customer/cart?userId=${userId}`);
-      if (!res.ok) throw new Error('Failed to load cart');
+      if (!res.ok) throw new Error("Failed to load cart");
       const data = await res.json();
       return data.cart;
     } catch (error) {
-      console.error('Cart Load Error:', error);
+      console.error("Cart Load Error:", error);
       return [];
     }
   };
@@ -49,13 +49,13 @@ const Login = () => {
       });
       const { token, userId } = res.data;
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', userId);
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", userId);
 
       await syncCartToServer(userId, cart);
 
       if (!userId) {
-        console.error('User ID not returned from login API');
+        console.error("User ID not returned from login API");
         return setError("Login failed, please check credentials");
       }
 
@@ -65,8 +65,7 @@ const Login = () => {
       toast.success("Login successful! Redirecting to dashboard...");
       setTimeout(() => {
         router.push("/Customer/Cdashboard");
-      }, 2000);
-
+      }, 1000);
     } catch (err) {
       console.error(err);
       setError("login failed, please check credentials");
@@ -75,13 +74,31 @@ const Login = () => {
   };
 
   return (
-    <div className="mt-11">
+    <div className="mt-6 relative">
+       {/* Buttons for Partner Login and Rider Login at the top-right */}
+  <div className="absolute top-0 right-0 flex space-x-6 mt-4 mr-8">
+  <Link
+    href="/Restaurants/RLogin" // Adjust the path to your partner login page
+    className="font-semibold leading-6 text-purple-800 hover:text-indigo-500"
+  >
+    {" "}
+    Want to become partner?
+  </Link>
+  <Link
+    href="/Rider/Rlogin" // Adjust the path to your rider login page
+    className="font-semibold leading-6 text-purple-800 hover:text-indigo-500"
+  >
+    {" "}
+    Rider?
+  </Link>
+  </div>
+
       <div className="flex min-h-full flex-col justify-center px-6 py-20 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-10 w-auto"
             src="/mainlogo.png"
-            alt="Your Company"
+            alt="EndofDay"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             LOGIN{" "}
@@ -164,6 +181,7 @@ const Login = () => {
               Signup
             </Link>
           </p>
+
         </div>
         <ToastContainer />
       </div>

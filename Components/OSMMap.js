@@ -18,7 +18,7 @@ const OSMMap = ({}) => {
   const [position, setPosition] = useState(null);
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
-const [coords, setCoords] = useState("");
+  const [coords, setCoords] = useState("");
   useEffect(() => {
     setIsClient(true); // Ensure we're running on the client
   }, []);
@@ -31,7 +31,7 @@ const [coords, setCoords] = useState("");
       );
       const data = await response.json();
       setAddress(data.display_name); // Set the fetched address in state
-     setCoords(data.display_name);
+      setCoords(data.display_name);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching address: ", error);
@@ -62,7 +62,6 @@ const [coords, setCoords] = useState("");
           setPosition([lat, lng]);
           reverseGeocode(lat, lng); // Get address from current location
           // setCoords({lat,lng});
-
         },
         () => {
           console.error("Error fetching current location");
@@ -81,9 +80,7 @@ const [coords, setCoords] = useState("");
           >
             Use Current Location
           </button>
-          <p className="mt-4">
-  {coords}
-</p>
+          <p className="mt-4">{coords}</p>
           <MapContainer
             center={position || [33.6844, 73.0479]} // Default to some location if no position is set
             zoom={13}
@@ -94,13 +91,16 @@ const [coords, setCoords] = useState("");
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
-            {position && <Marker position={position} />} {/* Conditionally render the marker */}
+            {position && <Marker position={position} />}{" "}
+            {/* Conditionally render the marker */}
             <MyComponent />
           </MapContainer>
 
           {/* Display the selected address */}
           {loading ? (
-            <p className="mt-4 text-purple-600 font-medium">Loading address...</p>
+            <p className="mt-4 text-purple-600 font-medium">
+              Loading address...
+            </p>
           ) : (
             address && (
               <p className="mt-4 text-purple-600 font-medium">

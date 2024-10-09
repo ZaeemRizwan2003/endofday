@@ -1,5 +1,3 @@
-// components/ListingDetails.js
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -14,7 +12,7 @@ const ListingDetails = () => {
         if (id) {
             const fetchListing = async () => {
                 try {
-                    const res = await axios.get(`/api/foodlisting?id=${id}`);
+                    const res = await axios.get(`/api/Restaurants/foodlisting?id=${id}`);
                     setListing(res.data);
                 } catch (err) {
                     console.error(err);
