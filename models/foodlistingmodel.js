@@ -11,11 +11,11 @@ const foodlistingSchema = new mongoose.Schema({
     },
     manufacturedate: { type: String, required: true },
     description: { type: String, required: true },
-    bakeryowner: {
-        type: mongoose.Schema.Types.ObjectId, // ObjectId to reference 'RegisteredBakeries'
-        ref: 'RegisteredBakeries', // Reference to the RegisteredBakeries model
-        required: true
-    }
+    // bakeryowner: {
+    //     type: mongoose.Schema.Types.ObjectId, // ObjectId to reference 'RegisteredBakeries'
+    //     ref: 'RegisteredBakeries', // Reference to the RegisteredBakeries model
+    //     required: true
+    // }
 }, { timestamps: true });
 
 // Prevent model recompilation during hot reloads

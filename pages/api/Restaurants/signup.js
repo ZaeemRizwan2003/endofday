@@ -1,6 +1,6 @@
 import RegisteredBakeries from '@/models/RBakerymodel';
 import dbConnect from '@/middleware/mongoose';
-
+import bcrypt from "bcrypt";
 export default async function handler(req, res) {
     const { method } = req;
 
@@ -30,6 +30,9 @@ export default async function handler(req, res) {
                 return res.status(400).json({ message: "Passwords don't match." });
             }
 
+            const salt = await bcrypt.genSalt(10)
+            const hashedPassword = await bcrypt.hash(password, salt)
+
             // Convert Base64 string to Buffer
             // const imageBuffer = Buffer.from(image, 'base64');
 
@@ -37,7 +40,7 @@ export default async function handler(req, res) {
             const newBakery = new RegisteredBakeries({
                 restaurantName,
                 email,
-                password, // Ensure to hash passwords in a real application
+                password: hashedPassword,
                 address,
                 number,
                 option: option === 'both' ? ['pickup', 'delivery'] : [option,],

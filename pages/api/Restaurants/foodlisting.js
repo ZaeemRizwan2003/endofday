@@ -3,7 +3,7 @@
 import dbConnect from '@/middleware/mongoose';
 import Listings from '@/models/foodlistingmodel';
 import cookie from 'cookie';
-
+import RegisteredBakeries from '@/models/RBakerymodel';
 export default async function handler(req, res) {
     await dbConnect();
 
@@ -41,6 +41,9 @@ export default async function handler(req, res) {
             }
 
             await newListing.save();
+            await RegisteredBakeries.findByIdAndUpdate(userId, {
+                $push: { menu: newListing._id }
+            });
             return res.status(200).json({ message: 'Listing Added Successfully.' });
         } catch (error) {
             console.error('Error creating listing:', error);
