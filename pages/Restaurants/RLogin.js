@@ -19,7 +19,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post('/api/login', {
+            const res = await axios.post('/api/Restaurants/login', {
                 email: formData.email,
                 password: formData.password,
             });
@@ -29,7 +29,7 @@ const Login = () => {
                 // Save the token in localStorage or cookies
                 // localStorage.setItem('token', token);
                 // Redirect to dashboard after login
-                router.push('/Dashboard');
+                router.push('/Restaurants/RDashboard');
             }
         } catch (err) {
             setError('Invalid email or password. Please try again.');
@@ -85,7 +85,7 @@ const Login = () => {
                             </button>
                             <p className="text-sm text-black font-light">
                                 Don’t have an account yet?{' '}
-                                <Link href="/Signup" className="font-medium text-black hover:underline">
+                                <Link href="/Restaurants/RSignup" className="font-medium text-black hover:underline">
                                     Sign up
                                 </Link>
                             </p>

@@ -35,7 +35,7 @@ const Signup = () => {
         }
 
         try {
-            const response = await axios.post('/api/signup', {
+            const response = await axios.post('/api/Restaurants/signup', {
                 restrauntName: formData.name,
                 email: formData.email,
                 password: formData.password,
@@ -47,7 +47,7 @@ const Signup = () => {
             if (response.status === 200) {
                 setSuccess('Signup successful! Redirecting to login...');
                 setTimeout(() => {
-                    router.push('/Login');
+                    router.push('/Restaurants/RLogin');
                 }, 2000);
             }
         } catch (err) {
@@ -180,7 +180,7 @@ const Signup = () => {
 
                             <p className="text-sm font-light text-black ">
                                 Already have an account?{' '}
-                                <Link href="/Login" className="font-medium text-black hover:underline">
+                                <Link href="/Restaurants/RLogin" className="font-medium text-black hover:underline">
                                     Login here
                                 </Link>
                             </p>

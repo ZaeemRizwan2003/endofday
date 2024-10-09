@@ -10,12 +10,12 @@ const DashNav = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch('/api/logout', {
+            const response = await fetch('/api/Restaurants/logout', {
                 method: 'POST',
                 credentials: 'include',
             });
             if (response.ok) {
-                router.push('/Login');
+                router.push('/Restaurants/RLogin');
             } else {
                 console.error('Logout failed: ', await response.json());
             }
@@ -31,7 +31,7 @@ const DashNav = () => {
         <nav className="bg-white fixed w-full z-20 top-0 start-0 border-b border-gray-200 ">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 {/* Logo */}
-                <Link href="/Dashboard" className="flex items-center space-x-3 rtl:space-x-reverse">
+                <Link href="/Restaurants/RDashboard" className="flex items-center space-x-3 rtl:space-x-reverse">
                     <img src="/mainlogo.png" className="h-8" alt="Logo" />
                 </Link>
 
@@ -66,7 +66,7 @@ const DashNav = () => {
                                     <li className="mb-3">
                                         <button
                                             className="text-purple-700 hover:underline"
-                                            onClick={() => router.push("/Account")}
+                                            onClick={() => router.push("/Restaurants/RAccount")}
                                         >
                                             Account Information
                                         </button>
@@ -74,7 +74,7 @@ const DashNav = () => {
                                     <li className="mb-3">
                                         <button
                                             className="text-purple-700 hover:underline"
-                                            onClick={() => router.push("/Change-Password")}
+                                            onClick={() => router.push("/Restaurants/Change-Password")}
                                         >
                                             Change Password
                                         </button>

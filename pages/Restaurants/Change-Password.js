@@ -13,7 +13,7 @@ const ChangePasswordPage = ({ isAuthenticated }) => {
 
     useEffect(() => {
         if (!isAuthenticated) {
-            router.push('/Login');
+            router.push('/Restaurants/RLogin');
         }
     }, [isAuthenticated]);
 
