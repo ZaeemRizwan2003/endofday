@@ -1,7 +1,7 @@
 
 import dbConnect from "@/middleware/mongoose";
 import bcrypt from "bcrypt";
-import RegisteredBakeries from "@/models/signupmodel";
+import RegisteredBakeries from "@/models/RBakerymodel";
 export default async function handler(req, res) {
     if (req.method === "POST") {
         const { restrauntName, email, password, confirmpassword, address, number } = req.body

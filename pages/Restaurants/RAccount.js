@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import dbConnect from '@/middleware/mongoose'; // Import your DB connection
-import RegisteredBakeries from '@/models/signupmodel'; // Import your model
+import RegisteredBakeries from '@/models/RBakerymodel'; // Import your model
 import { verifyToken } from '@/middleware/auth';
 
 const Account = ({ user, error }) => {

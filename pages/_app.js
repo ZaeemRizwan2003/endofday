@@ -1,14 +1,17 @@
 import "@/styles/globals.css";
 import Navbar from "@/Components/Navbar";
-import { useRouter } from "next/router";
+import Footer from "@/Components/Footer";
+import { CartProvider } from "./Customer/cartcontext";
 export default function App({ Component, pageProps }) {
-  const router = useRouter();
-  const noNavbarRoutes = ['/Login', '/Signup'];
 
   return (<>
-    {!noNavbarRoutes.includes(router.pathname) && <Navbar />}
-    <Component {...pageProps} />;
+    {/* <Navbar /> */}
+    <CartProvider>
+      <Component {...pageProps} />;
+      <Footer />
+    </CartProvider>
   </>
+
 
   )
 }

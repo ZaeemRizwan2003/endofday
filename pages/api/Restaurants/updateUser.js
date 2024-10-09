@@ -1,5 +1,5 @@
 import dbConnect from '@/middleware/mongoose';
-import RegisteredBakeries from '@/models/signupmodel';
+import RegisteredBakeries from '@/models/RBakerymodel';
 import { verifyToken } from '@/middleware/auth';
 
 export default async function handler(req, res) {

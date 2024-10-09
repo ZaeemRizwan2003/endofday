@@ -2,7 +2,7 @@
 
 import dbConnect from "@/middleware/mongoose";
 import bcrypt from "bcrypt";
-import RegisteredBakeries from "@/models/signupmodel";
+import RegisteredBakeries from "@/models/RBakerymodel";
 import jwt from "jsonwebtoken";
 import cookie from 'cookie';
 

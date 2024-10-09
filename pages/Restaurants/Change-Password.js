@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
-import RegisteredBakeries from '@/models/signupmodel';
+import RegisteredBakeries from '@/models/RBakerymodel';
 import dbConnect from '@/middleware/mongoose';
 
 const ChangePasswordPage = ({ isAuthenticated }) => {
