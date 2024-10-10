@@ -13,7 +13,7 @@ const OSMMap = dynamic(() => import("../../Components/OSMMap"), {
 });
 
 const Checkout = () => {
-  const { cart, incrementItemQuantity, decrementItemQuantity, removeFromCart } = useCart();
+  const { cart, incrementItemQuantity, decrementItemQuantity, removeFromCart , clearCart} = useCart();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [newAddress, setNewAddress] = useState({
@@ -82,17 +82,26 @@ const Checkout = () => {
 
   const handleSubmit = async () => {
     const userId = localStorage.getItem("userId");
+    const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
     const orderData = {
       userId,
       address: selectedAddress || (geoLocation ? `Lat: ${geoLocation.latitude}, Long: ${geoLocation.longitude}` : ""),
       userInfo,
-      cart,
+      items:cart,
+      totalAmount,
       paymentMethod,
     };
 
     try {
-      await axios.post("/api/Customer/submitOrder", orderData);
-      router.push("/Customer/order");
+      const response = await axios.post("/api/Customer/order", orderData);
+      const orderId = response.data._id; 
+
+      router.push(`/Customer/OrderConfirm?id=${orderId}`);
+
+      
+      localStorage.removeItem('cart');
+      clearCart();
       // Handle success, e.g., redirect to order confirmation page
     } catch (err) {
       console.error("Order submission failed", err);
@@ -246,11 +255,11 @@ const Checkout = () => {
         {/* Cart Info Section */}
         <h2 className="text-xl font-semibold text-black mt-8">Cart Items</h2>
         <div className="cart-items mt-4">
-          {cart.map((item, index) => (
-            <div key={index} className="flex justify-between items-center border-b py-2">
+          {cart.map((item ) => (
+            <div key={item.itemId} className="flex justify-between items-center border-b py-2">
               <div>
                 <p className="font-semibold">{item.title}</p>
-                <p className="text-sm text-gray-500">Rs.{item.price.toFixed(2)} each</p>
+                <p className="text-sm text-gray-500">Rs.{item.discountedprice} each</p>
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => decrementItemQuantity(item.itemId)}>

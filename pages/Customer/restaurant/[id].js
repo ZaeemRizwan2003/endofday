@@ -75,7 +75,7 @@ const RestaurantMenu = () => {
     return cartItem ? cartItem.quantity : 1; // Return 0 if item is not in the cart
 };
 
-  if (!restaurant) return <p><LuLoader /></p>;
+  if (!restaurant) return <p> Loading....</p>;
 
   return (
     <>
@@ -120,7 +120,7 @@ const RestaurantMenu = () => {
                       <>
                         <button
                           onClick={() => decrementItemQuantity(item._id)}
-                          disabled={getItemQuantity(item._id) <= 1}
+                          // disabled={getItemQuantity(item._id) <= 1}
                         >
                           <FaRegMinusSquare />
                         </button>
@@ -139,7 +139,7 @@ const RestaurantMenu = () => {
                   </div>
                   <button
                     className="bg-purple-800 text-white rounded px-4 py-2"
-                    onClick={() => handleAddToCart(item._id, item.itemname, item.price)}
+                    onClick={() => handleAddToCart(item._id, item.itemname, item.discountedprice)}
                   >
                     Add to Cart
                   </button>

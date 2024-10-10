@@ -65,7 +65,7 @@ const Login = () => {
       toast.success("Login successful! Redirecting to dashboard...");
       setTimeout(() => {
         router.push("/Customer/Cdashboard");
-      }, 1000);
+      }, 1500);
     } catch (err) {
       console.error(err);
       setError("login failed, please check credentials");

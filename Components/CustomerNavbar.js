@@ -183,6 +183,14 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
                   <li className="mb-3">
                     <button
                       className="text-purple-700 hover:underline"
+                      onClick={() => router.push("/Customer/OrderHistory")}
+                    >
+                      Order History
+                    </button>
+                  </li>
+                  <li className="mb-3">
+                    <button
+                      className="text-purple-700 hover:underline"
                       onClick={() => router.push("/Customer/Cforgotpass")}
                     >
                       Change Password

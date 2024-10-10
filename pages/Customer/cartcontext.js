@@ -78,7 +78,7 @@ export const CartProvider = ({ children }) => {
 
   const incrementItemQuantity = async (itemId) => {
     const updatedCart = cart.map((item) =>
-      item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
+      item.itemId === itemId ? { ...item, quantity: item.quantity + 1 } : item
     );
     setCart(updatedCart);
     await syncCartToServer(localStorage.getItem("userId"), updatedCart);
@@ -87,7 +87,7 @@ export const CartProvider = ({ children }) => {
   const decrementItemQuantity = async (itemId) => {
     const updatedCart = cart
       .map((item) =>
-        item.id === itemId ? { ...item, quantity: item.quantity - 1 } : item
+        item.itemId === itemId ? { ...item, quantity: item.quantity - 1 } : item
       )
       .filter((item) => item.quantity > 0); // Remove item if quantity is 0
     setCart(updatedCart);
@@ -95,8 +95,8 @@ export const CartProvider = ({ children }) => {
   };
 
   // Remove item from cart
-  const removeFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
+  const removeFromCart = (itemId) => {
+    setCart(cart.filter((item) => item.itemId !== itemId));
   };
 
   // Clear cart

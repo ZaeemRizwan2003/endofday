@@ -178,66 +178,107 @@ const FoodEducation = () => {
 
 
       {/* Section FE-2: Blog Section */}
-      <section className='blogSection'>
-        <h2>Our Blog</h2>
-        <article className='blogPost'>
-          <h3>Updates</h3>
-          <p>Stay tuned for our latest offerings, from new products to seasonal treats that you can grab at discounted rates. We're constantly expanding our selection to bring you the best from your favorite bakeries and cafes.</p>
-        </article>
-        <article className='blogPost'>
-          <h3>Collaborations</h3>
-          <p>We are thrilled to announce our new partnership with <em>Artisan Bakery</em>, known for its organic, handcrafted pastries. Starting next week, you can enjoy their premium cakes and breads at unbeatable prices. Keep an eye on our blog for exclusive interviews with bakers, behind-the-scenes content, and upcoming partnerships!</p>
-        </article>
-        <article className='blogPost'>
-          <h3>Achievements</h3>
-          <p>We've hit a milestone! Over 100,000 items sold from top bakeries, helping you enjoy high-quality products while reducing food waste. Thanks to our loyal customers and partners for making this possible.</p>
-        </article>
-        <article className='blogPost'>
-          <h3>Industry News</h3>
-          <p>Did you know the bakery industry is focusing more on sustainability? Learn how our partner cafes are adopting eco-friendly packaging and practices, like composting and reducing carbon footprints, while we continue to offer their delicious items at a discount.</p>
-        </article>
+      <section className='bg-gray-100 py-12 px-4'>
+        <h2 className='text-3xl font-bold text-center text-gray-800 mb-8'>Our Blog</h2>
+
+        <div className='space-y-8 max-w-4xl mx-auto'>
+          <article className='bg-white shadow-md rounded-lg p-6'>
+            <h3 className='text-2xl font-semibold text-gray-700 mb-4'>Updates</h3>
+            <p className='text-gray-600'>
+              Stay tuned for our latest offerings, from new products to seasonal treats that you can grab at discounted rates. We're constantly expanding our selection to bring you the best from your favorite bakeries and cafes.
+            </p>
+          </article>
+
+          <article className='bg-white shadow-md rounded-lg p-6'>
+            <h3 className='text-2xl font-semibold text-gray-700 mb-4'>Collaborations</h3>
+            <p className='text-gray-600'>
+              We are thrilled to announce our new partnership with <em className='font-semibold text-gray-800'>Artisan Bakery</em>, known for its organic, handcrafted pastries. Starting next week, you can enjoy their premium cakes and breads at unbeatable prices. Keep an eye on our blog for exclusive interviews with bakers, behind-the-scenes content, and upcoming partnerships!
+            </p>
+          </article>
+
+          <article className='bg-white shadow-md rounded-lg p-6'>
+            <h3 className='text-2xl font-semibold text-gray-700 mb-4'>Achievements</h3>
+            <p className='text-gray-600'>
+              We've hit a milestone! Over 100,000 items sold from top bakeries, helping you enjoy high-quality products while reducing food waste. Thanks to our loyal customers and partners for making this possible.
+            </p>
+          </article>
+
+          <article className='bg-white shadow-md rounded-lg p-6'>
+            <h3 className='text-2xl font-semibold text-gray-700 mb-4'>Industry News</h3>
+            <p className='text-gray-600'>
+              Did you know the bakery industry is focusing more on sustainability? Learn how our partner cafes are adopting eco-friendly packaging and practices, like composting and reducing carbon footprints, while we continue to offer their delicious items at a discount.
+            </p>
+          </article>
+        </div>
       </section>
 
+
       {/* Section FE-3: Allergens and Nutrition Info */}
-      <section className='infoSection'>
-        <h2>Allergens and Nutrition Facts</h2>
-        <p>Find information on common allergens, dietary restrictions, and nutritional facts for various food items.</p>
-        <div className='infoGrid'>
-          <div className='infoBox'>
-            <h4>Gluten-Free</h4>
-            <p>Many of our bakery products contain gluten, but we also offer gluten-free options from select cafes. Check out our gluten-free alternatives for customers with gluten intolerance.</p>
+      <section className='bg-gray-100 py-12 px-4'>
+        <h2 className='text-3xl font-bold text-center text-gray-800 mb-4'>Allergens and Nutrition Facts</h2>
+        <p className='text-lg text-center text-gray-600 mb-8'>
+          Find information on common allergens, dietary restrictions, and nutritional facts for various food items.
+        </p>
+
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto'>
+          <div className='bg-white shadow-lg rounded-lg p-6 flex flex-col'>
+            <h4 className='text-xl font-semibold text-gray-800 mb-2'>Gluten-Free</h4>
+            <p className='text-gray-600'>
+              Many of our bakery products contain gluten, but we also offer gluten-free options from select cafes. Check out our gluten-free alternatives for customers with gluten intolerance.
+            </p>
           </div>
-          <div className='infoBox'>
-            <h4>Nut Allergies</h4>
-            <p>We categorize products based on allergens. If you have a nut allergy, rest assured you can safely enjoy our nut-free options by checking our nut-free labels.</p>
+
+          <div className='bg-white shadow-lg rounded-lg p-6 flex flex-col'>
+            <h4 className='text-xl font-semibold text-gray-800 mb-2'>Nut Allergies</h4>
+            <p className='text-gray-600'>
+              We categorize products based on allergens. If you have a nut allergy, rest assured you can safely enjoy our nut-free options by checking our nut-free labels.
+            </p>
           </div>
-          <div className='infoBox'>
-            <h4>Nutritional Facts</h4>
-            <p>Each product comes with a detailed breakdown of calories, fats, proteins, and sugars, so you can make informed choices while enjoying your favorite treats.</p>
+
+          <div className='bg-white shadow-lg rounded-lg p-6 flex flex-col'>
+            <h4 className='text-xl font-semibold text-gray-800 mb-2'>Nutritional Facts</h4>
+            <p className='text-gray-600'>
+              Each product comes with a detailed breakdown of calories, fats, proteins, and sugars, so you can make informed choices while enjoying your favorite treats.
+            </p>
           </div>
         </div>
       </section>
 
+
       {/* Section FE-4: Food Storage and Waste Reduction */}
-      <section className='sustainabilitySection'>
-        <h2>Sustainability and Food Waste</h2>
-        <p>Learn about food storage tips, shelf life, and best practices to reduce food waste and promote responsible consumption.</p>
-        <article>
-          <h3>Storage Tips</h3>
-          <p>Keep bread fresh for up to 2 days in a paper bag at room temperature or freeze for longer storage. Cakes with buttercream can last up to 5 days in the fridge, or be frozen in airtight containers.</p>
-        </article>
-        <article>
-          <h3>Shelf Life</h3>
-          <p>Our product listings include shelf life details so you can plan your purchases wisely. For example, sourdough bread lasts up to 5 days, while cookies can last up to a week if stored properly.</p>
-        </article>
-        <article>
-          <h3>Minimizing Food Waste</h3>
-          <p>Use stale bread for homemade croutons, bread pudding, or repurpose pastries by reheating or creating layered desserts to avoid waste.</p>
-        </article>
+      <section className='bg-gray-100 py-12 px-4'>
+        <h2 className='text-3xl font-bold text-center text-gray-800 mb-6'>Sustainability and Food Waste</h2>
+        <p className='text-lg text-center text-gray-600 mb-8'>
+          Learn about food storage tips, shelf life, and best practices to reduce food waste and promote responsible consumption.
+        </p>
+
+        <div className='space-y-8 max-w-4xl mx-auto'>
+          <article className='bg-white shadow-md rounded-lg p-6'>
+            <h3 className='text-2xl font-semibold text-gray-700 mb-4'>Storage Tips</h3>
+            <p className='text-gray-600'>
+              Keep bread fresh for up to 2 days in a paper bag at room temperature or freeze for longer storage. Cakes with buttercream can last up to 5 days in the fridge, or be frozen in airtight containers.
+            </p>
+          </article>
+
+          <article className='bg-white shadow-md rounded-lg p-6'>
+            <h3 className='text-2xl font-semibold text-gray-700 mb-4'>Shelf Life</h3>
+            <p className='text-gray-600'>
+              Our product listings include shelf life details so you can plan your purchases wisely. For example, sourdough bread lasts up to 5 days, while cookies can last up to a week if stored properly.
+            </p>
+          </article>
+
+          <article className='bg-white shadow-md rounded-lg p-6'>
+            <h3 className='text-2xl font-semibold text-gray-700 mb-4'>Minimizing Food Waste</h3>
+            <p className='text-gray-600'>
+              Use stale bread for homemade croutons, bread pudding, or repurpose pastries by reheating or creating layered desserts to avoid waste.
+            </p>
+          </article>
+        </div>
       </section>
 
+
       {/* Section FE-5: User Engagement */}
-      <section className='engagementSection'>
+      {/* <section className='engagementSection'>
         <h2>Engage with Us</h2>
         <ul>
           <li>
@@ -253,7 +294,7 @@ const FoodEducation = () => {
             <a href="https://twitter.com/cravingsnmore" target="_blank" rel="noopener noreferrer">Twitter</a>
           </li>
         </ul>
-      </section>
+      </section> */}
 
     </div>
   </>
