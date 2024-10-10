@@ -1,6 +1,6 @@
 // pages/api/contact.js
 import nodemailer from 'nodemailer';
-
+import * as yup from 'yup';
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const { name, email, message } = req.body;

@@ -24,16 +24,20 @@ const AddFoodListing = () => {
             const fetchListing = async () => {
                 try {
                     const res = await axios.get(`/api/Restaurants/getlisting?id=${edit}`);
-                    setFormData({
-                        itemname: res.data.itemname || '',
-                        description: res.data.description || '',
-                        price: res.data.price || '',
-                        discountedprice: res.data.discountedprice || '',
-                        remainingitem: res.data.remainingitem || '',
-                        manufacturedate: res.data.manufacturedate ? new Date(res.data.manufacturedate).toISOString().substr(0, 10) : '', // Format date
-                    });
-                    if (res.data.image && res.data.image.data) {
-                        setPreviewImage(`data:${res.data.image.contentType};base64,${res.data.image.data}`);
+                    if (res.data) {
+                        setFormData({
+                            itemname: res.data.itemname || '',
+                            description: res.data.description || '',
+                            price: res.data.price || '',
+                            discountedprice: res.data.discountedprice || '',
+                            remainingitem: res.data.remainingitem || '',
+                            manufacturedate: res.data.manufacturedate ? new Date(res.data.manufacturedate).toISOString().substr(0, 10) : '', // Format date
+                        });
+                        if (res.data.image && res.data.image.data) {
+                            setPreviewImage(`data:${res.data.image.contentType};base64,${res.data.image.data}`);
+                        }
+                    } else {
+                        setError('Listing not found.');
                     }
                 } catch (err) {
                     console.error(err);

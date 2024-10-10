@@ -112,7 +112,7 @@ const Navbar = () => {
           <ul className="flex justify-center bg-white p-1 space-x-4 font-medium">
             <li>
               <Link
-                href=" "
+                href="/ "
                 className="py-2 px-3 text-black hover:text-purple-700"
               >
                 Home
@@ -120,7 +120,7 @@ const Navbar = () => {
             </li>
             <li>
               <Link
-                href=" "
+                href="/about"
                 className="py-2 px-3 text-black hover:text-purple-700"
               >
                 About

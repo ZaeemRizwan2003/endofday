@@ -1,19 +1,58 @@
-// pages/dashboard.js
 import Navbar from '@/Components/Navbar';
 import React, { useState, useEffect } from 'react';
-import { verifyToken } from '@/middleware/auth';
-import Listings from '@/models/foodlistingmodel';
-import dbConnect from '@/middleware/mongoose';
+import Cookies from 'js-cookie'; // Import js-cookie to manage cookies
 import { useRouter } from 'next/router';
-import Image from 'next/image'; // Import the Next.js Image component
+import Image from 'next/image';
 
-const Dashboard = ({ listings: initialListings }) => {
-    const [listings, setListings] = useState(initialListings);
+const Dashboard = () => {
+    const [listings, setListings] = useState([]); // Initialize as an empty array
     const [reminders, setReminders] = useState([]);
-    const [showModal, setShowModal] = useState(false); // State for modal visibility
-    const [selectedListingId, setSelectedListingId] = useState(null); // State for selected listing ID
+    const [showModal, setShowModal] = useState(false);
+    const [selectedListingId, setSelectedListingId] = useState(null);
 
     const router = useRouter();
+
+    // Fetch listings from the API when the component mounts
+
+    useEffect(() => {
+        const fetchListings = async () => {
+            // Get user ID from cookie
+            const userId = Cookies.get('userId'); // Replace 'userID' with the actual name of your cookie
+
+            if (!userId) {
+                router.push('/Restaurants/RLogin'); // Redirect if no user ID found
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/Restaurants/getlisting?id=${userId}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const processedListings = data.listings.map(listing => {
+                        if (listing.image && listing.image.data && listing.image.contentType) {
+                            const base64Image = listing.image.data.toString('base64');
+                            return {
+                                ...listing,
+                                image: {
+                                    data: base64Image,
+                                    contentType: listing.image.contentType
+                                }
+                            };
+                        }
+                        return listing;
+                    });
+                    setListings(processedListings); // Set fetched listings
+                } else {
+                    console.error('Failed to fetch listings:', data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching listings:', error);
+            }
+        };
+
+        fetchListings();
+    }, [router]);
 
     // Calculate reminders when the component loads
     useEffect(() => {
@@ -56,7 +95,8 @@ const Dashboard = ({ listings: initialListings }) => {
     };
 
     return (
-        <>        <Navbar />
+        <>
+            <Navbar />
             <div className="container mx-auto p-4 mt-20">
                 {/* Add Food Button */}
                 <div className="flex justify-center mb-6">
@@ -85,12 +125,12 @@ const Dashboard = ({ listings: initialListings }) => {
                 {reminders.length === 0 ? (
                     <p className="text-center">No Listings found.</p>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {reminders.map((listing) => (
-                            <div key={listing._id} className="bg-white p-4 shadow-lg rounded-lg border border-gray-200">
+                            <div key={listing._id} className="bg-white p-3 shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200">
                                 {/* Display the image stored in the database */}
                                 {listing.image && listing.image.data && listing.image.contentType && (
-                                    <div className="w-full h-48 relative mb-4">
+                                    <div className="w-full h-36 relative mb-2">
                                         <Image
                                             src={`data:${listing.image.contentType};base64,${listing.image.data}`}
                                             alt={listing.itemname}
@@ -126,8 +166,8 @@ const Dashboard = ({ listings: initialListings }) => {
                                     {/* Delete Button */}
                                     <button
                                         onClick={() => {
-                                            setSelectedListingId(listing._id); // Set the selected listing ID
-                                            setShowModal(true); // Show the confirmation modal
+                                            setSelectedListingId(listing._id);
+                                            setShowModal(true);
                                         }}
                                         className="Btn flex items-center text-red-600 hover:text-red-800"
                                     >
@@ -139,7 +179,7 @@ const Dashboard = ({ listings: initialListings }) => {
                                             width="18"
                                             xmlns="http://www.w3.org/2000/svg"
                                         >
-                                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 1 0v-8a.5.5 0 0 0-.5-.5Z" />
                                         </svg>
                                         <span className="ml-2">Delete</span>
                                     </button>
@@ -188,46 +228,8 @@ const Dashboard = ({ listings: initialListings }) => {
                 )}
             </div>
         </>
-
     );
 };
 
-export async function getServerSideProps(context) {
-    const user = verifyToken(context.req);
-
-    if (!user) {
-        return {
-            redirect: {
-                destination: 'Restaurants/RLogin',
-                permanent: false,
-            },
-        };
-    }
-
-    await dbConnect();
-
-    const listings = await Listings.find({ bakeryowner: user.userId }).lean();
-
-    // Convert image buffers to Base64 strings
-    const processedListings = listings.map(listing => {
-        if (listing.image && listing.image.data && listing.image.contentType) {
-            const base64Image = listing.image.data.toString('base64');
-            return {
-                ...listing,
-                image: {
-                    data: base64Image,
-                    contentType: listing.image.contentType
-                }
-            };
-        }
-        return listing;
-    });
-
-    return {
-        props: {
-            listings: JSON.parse(JSON.stringify(processedListings)),
-        },
-    };
-}
-
+// Remove getServerSideProps as we're fetching listings from the API
 export default Dashboard;

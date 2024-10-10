@@ -1,5 +1,3 @@
-// pages/api/foodlisting.js
-
 import dbConnect from '@/middleware/mongoose';
 import Listings from '@/models/foodlistingmodel';
 import cookie from 'cookie';
