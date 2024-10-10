@@ -1,15 +1,15 @@
 // pages/api/contact.js
 import nodemailer from 'nodemailer';
-import * as yup from 'yup';
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const { name, email, message } = req.body;
 
         // Create a nodemailer transporter
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
+            // host: 'smtp.gmail.com',
+            service: 'Gmail',
+            // port: 587,
+            // secure: false,
             auth: {
                 user: process.env.EMAIL_USER, // your email
                 pass: process.env.EMAIL_PASS, // your email password or app password
