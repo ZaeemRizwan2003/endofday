@@ -9,24 +9,27 @@ export default async function handler(req, res) {
     try {
       const { type, search } = req.query;
       let filter = {};
+      let bakeryFilter = {};
 
       if (type && type !== "all") {
-        filter.type = type;
+        bakeryFilter.option = type;
       }
       
       if (search) {
-        filter.$or = [
+        bakeryFilter.$or = [
           { restaurantName: { $regex: search, $options: "i" } },
-
           { address: { $regex: search, $options: "i" } },
-
-          { itemname : { $regex: search, $options: "i" } },
         ];
       }
 
-      const restaurants = await RegisteredBakeries.find(filter);
+      const restaurants = await RegisteredBakeries.find(bakeryFilter);
 
-      const listings = await Listings.find(filter);
+      let listingFilter = {};
+      if (search) {
+        listingFilter.itemname = { $regex: search, $options: "i" };
+      }
+
+      const listings = await Listings.find(listingFilter).populate('bakeryowner');
 
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       res.setHeader("Pragma", "no-cache");

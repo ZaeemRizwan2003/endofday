@@ -112,14 +112,14 @@ const Dashboard = () => {
             restaurants.map((restaurant) => (
               <Link href={`/Customer/restaurant/${restaurant._id}`} key={restaurant._id}>
                 <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow">
-                  <div className="relative w-full h-30 flex justify-center items-center">
+                  <div className="relative w-full h-25 flex justify-center items-center">
                     <img
                       src={`data:${restaurant.imageContentType};base64,${restaurant.image}`}
                       alt={restaurant.restaurantName}
                       className="object-contain w-50 h-40"
                     />
                   </div>
-                  <div className="p-4 bg-purple-200">
+                  <div className="p-3 bg-purple-200">
                     <h3 className="text-lg font-semibold">{restaurant.restaurantName}</h3>
                     <p className="text-gray-500 text-sm">
                       {restaurant.address}

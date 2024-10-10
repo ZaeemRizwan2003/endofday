@@ -40,7 +40,7 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
 
 
   const getCartItemCount = () => {
-    return Object.keys(cart).length;
+    return cart ? Object.keys(cart).length : 0;
   };
 
   return (
@@ -178,6 +178,14 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
                       onClick={() => router.push("/Customer/Caccount-info")}
                     >
                       Account Information
+                    </button>
+                  </li>
+                  <li className="mb-3">
+                    <button
+                      className="text-purple-700 hover:underline"
+                      onClick={() => router.push("/Customer/OrderHistory")}
+                    >
+                      Order History
                     </button>
                   </li>
                   <li className="mb-3">

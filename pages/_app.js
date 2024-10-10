@@ -7,7 +7,7 @@ export default function App({ Component, pageProps }) {
     <CartProvider>
       <div className="min-h-screen flex flex-col">
         <main className="flex-grow">
-          <Component {...pageProps} />;
+          <Component {...pageProps} />
         </main>
         <Footer />
       </div>

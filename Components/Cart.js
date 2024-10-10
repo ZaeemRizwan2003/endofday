@@ -11,7 +11,7 @@ const Cart = () => {
   const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
 
   const handleCheckout = () => {
-    router.push("/checkout");
+    router.push("/Customer/checkout");
   };
 
    return (
@@ -20,20 +20,20 @@ const Cart = () => {
       {cart.length === 0 && <p className="text-gray-500">Your cart is empty</p>}
       <div className="space-y-4">
         {cart.map(item => (
-          <div key={item.id} className="flex justify-between items-center border-b py-2">
+          <div key={item.itemId} className="flex justify-between items-center border-b py-2">
             <div className="flex items-center space-x-4">
               <span className="font-semibold">{item.title}</span>
               <button
                 className="text-gray-600 hover:text-gray-800"
-                onClick={() => decrementItemQuantity(item.id)}
-                disabled={item.quantity <= 1} // Disable if quantity is 1
+                onClick={() => decrementItemQuantity(item.itemId)}
+                // disabled={item.quantity <= 1} // Disable if quantity is 1
               >
                 <FaRegMinusSquare />
               </button>
               <span className="px-1">{item.quantity}</span>
               <button
                 className="text-gray-600 hover:text-gray-800"
-                onClick={() => incrementItemQuantity(item.id)}
+                onClick={() => incrementItemQuantity(item.itemId)}
               >
                 <FaRegPlusSquare />
               </button>
@@ -43,7 +43,7 @@ const Cart = () => {
               <span className="text-purple-800 font-bold ml-1">Rs.{(item.price * item.quantity).toFixed(2)}</span>
               <button
                 className="text-red-600 hover:text-red-800"
-                onClick={() => removeFromCart(item.id)}
+                onClick={() => removeFromCart(item.itemId)}
               >
                 <RiDeleteBin2Line />
               </button>
