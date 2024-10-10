@@ -62,7 +62,7 @@ const Dashboard = () => {
   }, [activeOption, user, search]);
 
   if (loading) {
-    return <div> <LuLoader/> </div>;
+    return <div> <LuLoader /> </div>;
   }
 
   if (!user) {
@@ -78,8 +78,8 @@ const Dashboard = () => {
           <button
             onClick={() => setActiveOption("all")}
             className={`px-6 py-3 font-medium md:px-4 md:py-2 text-white rounded-lg ${activeOption === "all"
-                ? "bg-purple-800"
-                : "bg-gray-400 hover:bg-gray-500"
+              ? "bg-purple-800"
+              : "bg-gray-400 hover:bg-gray-500"
               }`}
           >
             All
@@ -88,8 +88,8 @@ const Dashboard = () => {
           <button
             onClick={() => setActiveOption("pickup")}
             className={`px-6 py-3 md:px-4 md:py-2 font-medium text-white rounded-lg ${activeOption === "pickup"
-                ? "bg-purple-800"
-                : "bg-gray-400 hover:bg-gray-500"
+              ? "bg-purple-800"
+              : "bg-gray-400 hover:bg-gray-500"
               }`}
           >
             Pickup
@@ -98,8 +98,8 @@ const Dashboard = () => {
           <button
             onClick={() => setActiveOption("delivery")}
             className={`px-6 py-3 md:px-4 md:py-2 font-medium text-white rounded-lg ${activeOption === "delivery"
-                ? "bg-purple-800"
-                : "bg-gray-400 hover:bg-gray-500"
+              ? "bg-purple-800"
+              : "bg-gray-400 hover:bg-gray-500"
               }`}
           >
             Delivery
@@ -114,9 +114,9 @@ const Dashboard = () => {
                 <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow">
                   <div className="relative w-full h-30 flex justify-center items-center">
                     <img
-                      src={restaurant.image}
+                      src={`data:${restaurant.imageContentType};base64,${restaurant.image}`}
                       alt={restaurant.restaurantName}
-                      className="object-contain w-50 h-40 "
+                      className="object-contain w-50 h-40"
                     />
                   </div>
                   <div className="p-4 bg-purple-200">

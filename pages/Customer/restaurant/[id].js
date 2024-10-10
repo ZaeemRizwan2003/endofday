@@ -56,12 +56,6 @@ const RestaurantMenu = () => {
       <DashNav />
       <div className="p-14 justify-center">
         <div className="flex mb-8 mt-12">
-          <img
-            src={restaurant.image}
-            className="w-1/4 h-25 object-cover rounded-lg mr-6 "
-            alt={restaurant.restaurantName}
-          />
-
           <div className="w-2/3">
             <h1 className="text-3xl font-bold text-purple-800 mb-2">
               {restaurant.restaurantName}
@@ -78,8 +72,7 @@ const RestaurantMenu = () => {
               className="flex border rounded-lg overflow-hidden shadow-lg hover:shadow-md transition duration-300"
             >
               <img
-                src={item.image}
-                alt={item.itemname}
+                src={`data:${restaurant.imageContentType};base64,${restaurant.image}`} alt={item.itemname}
                 className="w-1/4 object-cover "
               />
               <div className="p-4 w-3/4">
