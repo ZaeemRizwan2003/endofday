@@ -4,35 +4,35 @@ const AddressSchema = new mongoose.Schema({
     addressLine: { type: String, required: true },
     city: { type: String, required: true },
     postalCode: { type: String, required: true },
-  });
+});
 
 const CartItemSchema = new mongoose.Schema({
     itemId: String,
     title: String,
     price: Number,
     quantity: Number,
-  });
+});
 
-const UserSchema= new mongoose.Schema({
-    name:{
+const UserSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: [true, 'please provide name'],
     },
-    email:{
+    email: {
         type: String,
         required: [true, 'please provie email'],
         unique: true,
-        match:[/.+\@.+\..+/, 'please provde valid email address'],
+        match: [/.+\@.+\..+/, 'please provde valid email address'],
     },
-    password:{
+    password: {
         type: String,
-        required:[true, 'please provide a password'],
+        required: [true, 'please provide a password'],
         minlength: 6,
     },
-    cart:[CartItemSchema],
-    addresses: [AddressSchema], 
-},{timestamps: true});
+    cart: [CartItemSchema],
+    addresses: [AddressSchema],
+}, { timestamps: true });
 
-const User= mongoose.models.User || mongoose.model('User', UserSchema);
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
 
 export default User;

@@ -23,6 +23,14 @@ const signupSchema = new mongoose.Schema(
                 ref: 'Listings', // Reference the Listings model
             },
         ],
+        resetOtp: {
+            type: String,
+            default: null,
+        },
+        otpExpiry: {
+            type: Date,
+            default: null,
+        }
     },
     { timestamps: true }
 );

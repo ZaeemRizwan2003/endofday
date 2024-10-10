@@ -46,6 +46,8 @@ export default async function handler(req, res) {
                 option: option === 'both' ? ['pickup', 'delivery'] : [option,],
                 image,
                 imageContentType: contentType,
+                resetOtp: null,
+                otpExpiry: null,
             });
 
             // Save to database
