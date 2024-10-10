@@ -11,7 +11,7 @@ const Cart = () => {
   const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
 
   const handleCheckout = () => {
-    router.push("/checkout");
+    router.push("/Customer/checkout");
   };
 
    return (

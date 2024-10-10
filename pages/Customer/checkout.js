@@ -8,7 +8,7 @@ import DashNav from "@/Components/CustomerNavbar";
 import dynamic from "next/dynamic";
 
 // Dynamically import OSMMap to ensure it's client-side rendered
-const OSMMap = dynamic(() => import("../components/OSMMap"), {
+const OSMMap = dynamic(() => import("../../Components/OSMMap"), {
   ssr: false,
 });
 
@@ -250,7 +250,7 @@ const Checkout = () => {
             <div key={index} className="flex justify-between items-center border-b py-2">
               <div>
                 <p className="font-semibold">{item.title}</p>
-                <p className="text-sm text-gray-500">${item.price.toFixed(2)} each</p>
+                <p className="text-sm text-gray-500">Rs.{item.price.toFixed(2)} each</p>
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => decrementItemQuantity(item.itemId)}>
@@ -267,7 +267,7 @@ const Checkout = () => {
             </div>
           ))}
           <div className="mt-4 text-right">
-            <p className="text-lg font-semibold">Total: ${totalCartPrice}</p>
+            <p className="text-lg font-semibold">Total: Rs.{totalCartPrice}</p>
           </div>
         </div>
 

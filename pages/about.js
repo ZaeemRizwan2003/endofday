@@ -256,8 +256,6 @@ const FoodEducation = () => {
       </section>
 
     </div>
-
-    <Footer />
   </>
 };
 

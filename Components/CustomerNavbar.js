@@ -40,7 +40,7 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
 
 
   const getCartItemCount = () => {
-    return Object.keys(cart).length;
+    return cart ? Object.keys(cart).length : 0;
   };
 
   return (
