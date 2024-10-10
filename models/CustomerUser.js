@@ -31,6 +31,14 @@ const UserSchema = new mongoose.Schema({
     },
     cart: [CartItemSchema],
     addresses: [AddressSchema],
+    resetOtp: {
+        type: String,
+        default: null,
+    },
+    otpExpiry: {
+        type: Date,
+        default: null,
+    }
 }, { timestamps: true });
 
 const User = mongoose.models.User || mongoose.model('User', UserSchema);

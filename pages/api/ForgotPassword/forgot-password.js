@@ -2,6 +2,7 @@
 import nodemailer from 'nodemailer';
 import dbConnect from '@/middleware/mongoose';
 import RegisteredBakeries from '@/models/RBakerymodel';
+import User from '@/models/CustomerUser';
 import crypto from 'crypto'; // for OTP generation
 
 export default async function handler(req, res) {
@@ -12,7 +13,9 @@ export default async function handler(req, res) {
 
         // Check if user exists
         const user = await RegisteredBakeries.findOne({ email });
-        if (!user) {
+
+        const customer = await User.findOne({ email });
+        if (!user && !customer) {
             return res.status(404).json({ message: 'User not found' });
         }
 
@@ -21,9 +24,16 @@ export default async function handler(req, res) {
 
         const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
         // Store the OTP in the user's record (temporary) with an expiry of 10 minutes
-        user.resetOtp = otp;
-        user.otpExpiry = otpExpiry;
-        await user.save();
+        if (user) {
+            user.resetOtp = otp;
+            user.otpExpiry = otpExpiry;
+            await user.save();
+        }
+        if (customer) {
+            customer.resetOtp = otp;
+            customer.otpExpiry = otpExpiry;
+            await customer.save();
+        }
         // Create a transporter for sending emails
         const transporter = nodemailer.createTransport({
             service: 'Gmail',

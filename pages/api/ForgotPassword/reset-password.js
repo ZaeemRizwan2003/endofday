@@ -2,6 +2,7 @@
 import bcrypt from 'bcrypt';
 import dbConnect from '@/middleware/mongoose';
 import RegisteredBakeries from '@/models/RBakerymodel';
+import User from '@/models/CustomerUser';
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const { email, newPassword } = req.body;
@@ -10,7 +11,8 @@ export default async function handler(req, res) {
 
         // Check if user exists
         const user = await RegisteredBakeries.findOne({ email });
-        if (!user) {
+        const customer = await User.findOne({ email });
+        if (!user && !customer) {
             return res.status(404).json({ message: 'User not found' });
         }
 
@@ -18,12 +20,22 @@ export default async function handler(req, res) {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         // Update the user's password and clear OTP
-        user.password = hashedPassword;
-        user.resetOtp = undefined;
-        user.otpExpiry = undefined;
-        await user.save();
+        if (user) {
+            user.password = hashedPassword;
+            user.resetOtp = undefined;
+            user.otpExpiry = undefined;
+            await user.save();
+            res.status(200).json({ message: 'Password reset successfully' });
+        }
 
-        res.status(200).json({ message: 'Password reset successfully' });
+        if (customer) {
+            customer.password = hashedPassword;
+            customer.resetOtp = undefined;
+            customer.otpExpiry = undefined;
+            await customer.save();
+            res.status(200).json({ message: 'Password reset successfully' });
+        }
+
     } else {
         res.status(405).json({ message: `Method ${req.method} Not Allowed` });
     }

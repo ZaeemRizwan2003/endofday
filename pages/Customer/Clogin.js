@@ -75,23 +75,23 @@ const Login = () => {
 
   return (
     <div className="mt-6 relative">
-       {/* Buttons for Partner Login and Rider Login at the top-right */}
-  <div className="absolute top-0 right-0 flex space-x-6 mt-4 mr-8">
-  <Link
-    href="/Restaurants/RLogin" // Adjust the path to your partner login page
-    className="font-semibold leading-6 text-purple-800 hover:text-indigo-500"
-  >
-    {" "}
-    Want to become partner?
-  </Link>
-  <Link
-    href="/Rider/Rlogin" // Adjust the path to your rider login page
-    className="font-semibold leading-6 text-purple-800 hover:text-indigo-500"
-  >
-    {" "}
-    Rider?
-  </Link>
-  </div>
+      {/* Buttons for Partner Login and Rider Login at the top-right */}
+      <div className="absolute top-0 right-0 flex space-x-6 mt-4 mr-8">
+        <Link
+          href="/Restaurants/RLogin" // Adjust the path to your partner login page
+          className="font-semibold leading-6 text-purple-800 hover:text-indigo-500"
+        >
+          {" "}
+          Want to become partner?
+        </Link>
+        <Link
+          href="/Rider/Rlogin" // Adjust the path to your rider login page
+          className="font-semibold leading-6 text-purple-800 hover:text-indigo-500"
+        >
+          {" "}
+          Rider?
+        </Link>
+      </div>
 
       <div className="flex min-h-full flex-col justify-center px-6 py-20 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -138,7 +138,7 @@ const Login = () => {
                 </label>
                 <div className="text-sm">
                   <Link
-                    href="/Customer/Cforgotpass"
+                    href="/ForgotPassword/Forgot-Password"
                     className="font-semibold text-indigo-600 hover:text-indigo-500"
                   >
                     Forgot password?

@@ -15,7 +15,7 @@ export default function ResetPassword() {
             const res = await axios.post('/api/ForgotPassword/reset-password', { email, newPassword });
             setMessage(res.data.message);
             if (res.status === 200) {
-                router.push('/Restaurants/RLogin'); // Redirect to login after password reset
+                router.push('/Customer/Clogin'); // Redirect to login after password reset
             }
         } catch (error) {
             setMessage('Error resetting password. Please try again.');
