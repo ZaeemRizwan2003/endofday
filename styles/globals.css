@@ -242,3 +242,410 @@ li {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+*:focus {
+    outline: none;
+}
+
+.header-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-wrapper ul {
+    display: flex;
+}
+
+.header-wrapper ul li {
+    list-style-type: none;
+    padding: 5px;
+}
+
+.header-wrapper ul li a {
+    text-decoration: none;
+}
+
+.header-wrapper ul li button {
+    background-color: transparent;
+    border: none;
+    color: #551A8B;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Footer Styles */
+.footer-wrapper {
+    text-align: center;
+    padding: 10px 0;
+    /* Adjust this for smaller height */
+    background-color: white;
+    color: black;
+    position: relative;
+}
+
+.footer-wrapper.dark {
+    background-color: black;
+    /* Black background in dark mode */
+    color: white;
+}
+
+
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: var(--background-color, white);
+    color: var(--text-color, black);
+}
+
+body.dark {
+    --background-color: #121212;
+    --text-color: #ffffff;
+}
+
+
+.dark-mode-btn {
+    position: absolute;
+    bottom: 10px;
+    /* Positioned at the bottom */
+    right: 10px;
+    /* Positioned at the right */
+    padding: 5px 10px;
+    background-color: gray;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.dark-mode-btn:hover {
+    background-color: darkgray;
+}
+
+/* Smaller Footer Height */
+.footer-wrapper p {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    /* Smaller font for more compact footer */
+}
+
+.input-wrapper {
+    margin: 10px;
+}
+
+.input-feild {
+    width: 200px;
+    height: 30px;
+}
+
+.button {
+    width: 200px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.container {
+    text-align: center;
+}
+
+.button-link {
+    border: 0;
+    cursor: pointer;
+    background-color: transparent;
+    color: skyblue;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.input-error {
+    position: absolute;
+    padding: 8px;
+    color: red;
+    font-size: 13px;
+}
+
+table,
+th,
+td {
+    border: 1px solid var(--table-border-color, #000);
+    border-collapse: collapse;
+    padding: 10px;
+    background-color: var(--table-bg-color, white);
+    color: var(--table-text-color, black);
+}
+
+table td button {
+    margin: 5px;
+    background-color: var(--button-bg-color, white);
+    color: var(--button-text-color, black);
+    border: 1px solid var(--button-border-color, #ccc);
+}
+
+table img {
+    width: 80px;
+}
+
+.main-page-banner,
+.restaurant-page-banner {
+    background-image: url("https://a.storyblok.com/f/88809/1150x450/30a9c4f9a6/igevia_header_fastfood01_450.jpg");
+    background-color: rgb(0, 0, 0, 0.6);
+    background-blend-mode: multiply;
+    padding: 30px;
+    height: 230px;
+    color: white;
+    text-align: center;
+}
+
+.main-page-banner .input-wrapper {
+    background-color: var(--banner-input-bg-color, white);
+    padding: 5px;
+    border: 1px solid var(--banner-input-border-color, white);
+    border-radius: 4px;
+    margin: auto;
+    width: 60%;
+}
+
+.main-page-banner .select-input,
+.main-page-banner .select-search {
+    height: 40px;
+    border: none;
+    background-color: var(--input-bg-color, white);
+    color: var(--input-text-color, black);
+    padding-left: 0px;
+    width: 48%;
+    box-sizing: border-box;
+}
+
+.main-page-banner .select-search {
+    border-left: 1px solid var(--input-border-color, white);
+}
+
+.location-list {
+    color: var(--location-list-text-color, #000);
+    list-style-type: none;
+    text-align: left;
+    position: absolute;
+    background-color: var(--location-list-bg-color, #fff);
+    margin: 0;
+    padding: 0;
+    margin-left: -5px;
+    border: 1px solid var(--location-list-border-color, #ccc);
+}
+
+.location-list li {
+    width: 190px;
+    padding: 5px;
+    border-bottom: 1px solid var(--location-list-item-border-color, #ccc);
+    cursor: pointer;
+}
+
+.restaurant-list-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 40px;
+    margin-bottom: 50px;
+}
+
+.restaurant-wrapper {
+    width: 45%;
+    background-color: var(--restaurant-bg-color, orange);
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid var(--restaurant-border-color, #aaa);
+    border-radius: 5px;
+    cursor: pointer;
+    color: var(--restaurant-text-color, black);
+}
+
+.restaurant-wrapper .heading-wrapper,
+.restaurant-wrapper .address-wrapper {
+    padding-left: 15px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.restaurant-wrapper h5 {
+    margin-left: 15px;
+}
+
+.restaurant-page-banner h1 {
+    font-size: 65px;
+}
+
+.auth-container {
+    display: flex;
+}
+
+.login-wrapper,
+.signup-wrapper {
+    height: 450px;
+    border: 1px solid #ffffff;
+    margin: 15px;
+    padding: 5px;
+    width: 50%;
+    text-align: center;
+}
+
+.detail-wrapper {
+    display: flex;
+    background-color: orange;
+}
+
+.detail-wrapper h4 {
+    width: 50%;
+}
+
+.food-item-wrapper {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.food-item-wrapper .list-item {
+    color: orange;
+    font-weight: bold;
+    border-bottom: 1px solid orange;
+    padding: 20px;
+    display: flex;
+    text-transform: capitalize;
+}
+
+.food-item-wrapper .list-item button {
+    color: white;
+    border: none;
+    background-color: orange;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.food-item-wrapper .list-item img {
+    width: 130px;
+    padding: 10px;
+}
+
+.food-item-wrapper .list-item .description {
+    font-weight: lighter;
+}
+.list-item-bloack-1{
+    width: 20%;
+}
+
+.list-item-bloack-2{
+    width: 80%;
+}
+
+.list-item-bloack-3{
+    width: 20%;
+}
+.total-price-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+    border-bottom: 1px solid orange;
+}
+.total-price-wrapper .row{
+    display: flex;
+    justify-content: space-between;
+    margin-left: 20px;
+    margin-right: 20px;
+    color: orange;
+    font-size: 20px;
+    font-weight: bold;
+}
+.total-price-wrapper .block-1{
+    width: 50%;
+    padding-right: 20px;
+}
+.total-price-wrapper .block-2{
+    width: 30%;
+}
+.total-price-wrapper .block-2 button{
+    padding: 10px 25px;
+    border: navajowhite;
+    background-color: orange;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.custom-link {
+    color: white; 
+  }
+  
+  .custom-link:hover {
+    color: grey; 
+  }
+  
+
+/* Dark mode specific styles */
+body.dark table,
+body.dark th,
+body.dark td {
+    --table-bg-color: #333;
+    --table-text-color: #ffffff;
+    --table-border-color: #555;
+}
+
+body.dark button {
+    --button-bg-color: #444;
+    --button-text-color: #ffffff;
+    --button-border-color: #777;
+}
+
+body.dark .main-page-banner .input-wrapper {
+    --banner-input-bg-color: #333;
+    --banner-input-border-color: #555;
+}
+
+body.dark .main-page-banner .select-input,
+body.dark .main-page-banner .select-search {
+    --input-bg-color: #333;
+    --input-text-color: #ffffff;
+    --input-border-color: #555;
+}
+
+body.dark .location-list {
+    --location-list-text-color: #ffffff;
+    --location-list-bg-color: #444;
+    --location-list-border-color: #555;
+}
+
+body.dark .location-list li {
+    --location-list-item-border-color: #666;
+}
+
+body.dark .restaurant-wrapper {
+    --restaurant-bg-color: #444;
+    --restaurant-border-color: #555;
+    --restaurant-text-color: #ffffff;
+}
+
+.home {
+    background-image: url("https://a.storyblok.com/f/88809/1150x450/30a9c4f9a6/igevia_header_fastfood01_450.jpg");
+    background-color: rgb(0, 0, 0, 0.6);
+    background-blend-mode: multiply;
+    padding: 30px;
+    height: 350px;
+    color: white;
+    text-align: center;
+    flex: 1;
+}
+
+.link {
+    color: #ccc;
+    /* Default color */
+}
+
+.link:hover {
+    color: #adc000;
+    /* Hover color */
+}
+
+.link.dark-mode {
+    color: #a0a0a0;
+    /* Dark mode color */
+}
+
+.link.dark-mode:hover {
+    color: #888888;
+    /* Dark mode hover color */
+}

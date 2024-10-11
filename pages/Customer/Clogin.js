@@ -85,7 +85,7 @@ const Login = () => {
           Want to become partner?
         </Link>
         <Link
-          href="/Rider/Rlogin" // Adjust the path to your rider login page
+          href="/Delivery/deliverypartner" // Adjust the path to your rider login page
           className="font-semibold leading-6 text-purple-800 hover:text-indigo-500"
         >
           {" "}
