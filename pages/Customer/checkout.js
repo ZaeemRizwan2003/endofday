@@ -13,7 +13,7 @@ const OSMMap = dynamic(() => import("../../Components/OSMMap"), {
 });
 
 const Checkout = () => {
-  const { cart, incrementItemQuantity, decrementItemQuantity, removeFromCart , clearCart} = useCart();
+  const { cart, incrementItemQuantity, decrementItemQuantity, removeFromCart, clearCart } = useCart();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [newAddress, setNewAddress] = useState({
@@ -88,18 +88,18 @@ const Checkout = () => {
       userId,
       address: selectedAddress || (geoLocation ? `Lat: ${geoLocation.latitude}, Long: ${geoLocation.longitude}` : ""),
       userInfo,
-      items:cart,
+      items: cart,
       totalAmount,
       paymentMethod,
     };
 
     try {
       const response = await axios.post("/api/Customer/order", orderData);
-      const orderId = response.data._id; 
+      const orderId = response.data._id;
 
       router.push(`/Customer/OrderConfirm?id=${orderId}`);
 
-      
+
       localStorage.removeItem('cart');
       clearCart();
       // Handle success, e.g., redirect to order confirmation page
@@ -137,7 +137,7 @@ const Checkout = () => {
   };
 
   const totalCartPrice = cart
-    .reduce((total, item) => total + item.price * item.quantity, 0)
+    .reduce((total, item) => total + 150 + item.price * item.quantity, 0)
     .toFixed(2);
 
   return (
@@ -255,11 +255,11 @@ const Checkout = () => {
         {/* Cart Info Section */}
         <h2 className="text-xl font-semibold text-black mt-8">Cart Items</h2>
         <div className="cart-items mt-4">
-          {cart.map((item ) => (
+          {cart.map((item) => (
             <div key={item.itemId} className="flex justify-between items-center border-b py-2">
               <div>
                 <p className="font-semibold">{item.title}</p>
-                <p className="text-sm text-gray-500">Rs.{item.discountedprice} each</p>
+                <p className="text-sm text-gray-500">Rs.{item.price} each</p>
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => decrementItemQuantity(item.itemId)}>
@@ -276,6 +276,7 @@ const Checkout = () => {
             </div>
           ))}
           <div className="mt-4 text-right">
+            <p>+ Delivery Charges: Rs.150</p>
             <p className="text-lg font-semibold">Total: Rs.{totalCartPrice}</p>
           </div>
         </div>

@@ -1,4 +1,3 @@
-// components/FAQ.js
 import { useState } from 'react';
 import Navbar from '@/Components/HomeNavbar';
 const FAQ = () => {
@@ -50,7 +49,7 @@ const FAQ = () => {
     return (
         <>
             <Navbar />
-            <div className=" mt-24 max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+            <div className=" mt-24 mb-10 max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
                 <h2 className="text-3xl font-bold mb-6 text-center text-purple-800">Frequently Asked Questions</h2>
                 <div className="space-y-4">
                     {faqs.map((faq, index) => (
