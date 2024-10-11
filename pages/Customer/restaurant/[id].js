@@ -42,14 +42,14 @@ const RestaurantMenu = () => {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to fetch cart data');
       }
-  
+
       const data = await response.json();
-      return Array.isArray(data.cartItems) ? data.cartItems : []; 
- // Assuming the response contains cartItems
+      return Array.isArray(data.cartItems) ? data.cartItems : [];
+      // Assuming the response contains cartItems
     } catch (error) {
       console.error("Error loading cart:", error);
       return []; // Return an empty cart if there's an error
@@ -73,7 +73,7 @@ const RestaurantMenu = () => {
     if (!Array.isArray(cart)) return 0; // Return 0 if cart is not an array
     const cartItem = cart.find((cartItem) => cartItem.id === itemId);
     return cartItem ? cartItem.quantity : 1; // Return 0 if item is not in the cart
-};
+  };
 
   if (!restaurant) return <p> Loading....</p>;
 
@@ -96,40 +96,35 @@ const RestaurantMenu = () => {
           {restaurant.menu.map((item) => (
             <div
               key={item._id}
-              className="flex border rounded-lg overflow-hidden shadow-lg hover:shadow-md transition duration-300"
+              className="flex flex-col border rounded-lg overflow-hidden shadow-lg hover:shadow-md transition duration-300"
             >
-              {/* Change to show each item's specific image */}
-              {item.image && item.image.data && item.image.contentType && (
-                <img
-                  src={`data:${item.image.contentType};base64,${item.image.data}`}
-                  alt={item.itemname}
-                  className="w-1/4 object-cover "
-                />
-              )}
-              <div className="p-4 w-3/4">
-                <h2 className="text-xl font-bold text-purple-800 mb-2">
-                  {item.itemname}
-                </h2>
-                <p className="text-gray-600 mb-2">{item.description}</p>
-                <p className="text-red font-bold">Rs.{item.discountedprice}</p>
-                <p className="text-red-800 font-bold line-through">Rs.{item.price}</p>
-
-                <div className="mt-4 flex items-center justify-between">
+              <div className="p-4 flex flex-col justify-between h-full w-full">
+                <div className="flex-grow">
+                  <h2 className="text-xl font-bold text-purple-800 mb-2">
+                    {item.itemname}
+                  </h2>
+                  <p className="text-gray-600 mb-2">{item.description}</p>
+                  <p className="text-red font-bold">Rs.{item.discountedprice}</p>
+                  <p className="text-red-800 font-bold line-through">Rs.{item.price}</p>
+                </div>
+                {/* Updated Section */}
+                <div className="mt-4 flex items-center">
+                  <button
+                    className="bg-purple-800 text-white rounded px-4 py-2 mr-6"
+                    onClick={() =>
+                      handleAddToCart(item._id, item.itemname, item.discountedprice)
+                    }
+                  >
+                    Add to Cart
+                  </button>
                   <div className="flex items-center">
                     {cart ? (
                       <>
-                        <button
-                          onClick={() => decrementItemQuantity(item._id)}
-                          // disabled={getItemQuantity(item._id) <= 1}
-                        >
+                        <button onClick={() => decrementItemQuantity(item._id)}>
                           <FaRegMinusSquare />
                         </button>
-                        <span className="px-4">
-                          {getItemQuantity(item._id)}
-                        </span>
-                        <button
-                          onClick={() => incrementItemQuantity(item._id)}
-                        >
+                        <span className="px-4">{getItemQuantity(item._id)}</span>
+                        <button onClick={() => incrementItemQuantity(item._id)}>
                           <FaRegPlusSquare />
                         </button>
                       </>
@@ -137,17 +132,14 @@ const RestaurantMenu = () => {
                       <span className="px-4">1</span>
                     )}
                   </div>
-                  <button
-                    className="bg-purple-800 text-white rounded px-4 py-2"
-                    onClick={() => handleAddToCart(item._id, item.itemname, item.discountedprice)}
-                  >
-                    Add to Cart
-                  </button>
+
+
                 </div>
               </div>
             </div>
           ))}
         </div>
+
       </div>
     </>
   );
