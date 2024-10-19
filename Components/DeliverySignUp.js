@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const DeliverySignUp = () => {
   const [password, setPassword] = useState('');
-  const [c_password, setC_password] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [area, setArea] = useState('');
   const [contact, setContact] = useState('');
@@ -14,12 +14,12 @@ const DeliverySignUp = () => {
   useEffect(() => {
     const delivery = JSON.parse(localStorage.getItem('delivery'));
     if (delivery) {
-      router.push('deliverydashboard')
+      router.push('/Delivery/deliverydashboard')
     }
   }, [])
 
   const handleSignup = async () => {
-    if (!contact || !password || !c_password || !name || password !== c_password || contact.length !== 11) {
+    if (!contact || !password || !confirmPassword || !name || password !== confirmPassword || contact.length !== 11) {
       setError(true)
       return false
 
@@ -27,9 +27,9 @@ const DeliverySignUp = () => {
       setError(false)
     }
     console.log(contact, password, c_password, name, area);
-    let response = await fetch("http://localhost:3000/api/deliverypartners/signup", {
+    let response = await fetch("/api/deliverypartners/signup", {
       method: "POST",
-      body: JSON.stringify({ contact, password, name, area })
+      body: JSON.stringify({ contact, password, name, area, confirmPassword })
     })
     response = await response.json();
     if (response.success) {
@@ -39,7 +39,7 @@ const DeliverySignUp = () => {
       alert("Success");
       router.push('/Delivery/deliverydashboard')
     } else {
-      alert("Failed to Signup")
+      alert("Failed to Signup" + response.message);
     }
   }
 
@@ -104,7 +104,7 @@ const DeliverySignUp = () => {
                 />
               </div>
               {error && !password && <p className="text-red-500">Please enter valid password</p>}
-              {error && password && password !== c_password && <p className="text-red-500">Password and Confirm Password do not match</p>}
+              {error && password && password !== confirmPassword && <p className="text-red-500">Password and Confirm Password do not match</p>}
             </div>
 
             <div>
@@ -127,7 +127,7 @@ const DeliverySignUp = () => {
                   className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
-              {error && !c_password && <p className="text-red-500">Please enter valid confirm password</p>}
+              {error && !confirmPassword && <p className="text-red-500">Please enter valid confirm password</p>}
               {error && c_password && password !== c_password && <p className="text-red-500">Password and Confirm Password do not match</p>}
             </div>
 

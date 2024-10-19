@@ -1,24 +1,6 @@
-// import dbConnect from "@/middleware/mongoose";
-// import { deliveryPartnersSchema } from "@/models/DeliveryPartner";
-// import bcrypt from "bcrypt";
-// import { NextResponse, userAgent } from "next/server";
-
-// export async function POST(request) {
-//     const payload = await request.json();
-//     let success = false;
-//     await mongoose.connect(connectionStr);
-//     const user = new deliveryPartnersSchema(payload);
-//     const result =await user.save()
-//             if(result) {
-//         success = true;
-//     }
-// return NextResponse.json({ result, success })
-// }
-
 import dbConnect from "@/middleware/mongoose";
 import { deliveryPartnersSchema } from "@/models/DeliveryPartner";
 import bcrypt from "bcrypt";
-import { NextResponse } from "next/server";
 
 export default async function handler(req, res) {
     const { method } = req;
@@ -31,11 +13,12 @@ export default async function handler(req, res) {
                 name,
                 contact,
                 password,
+                confirmPassword,
                 area,
             } = req.body;
 
             // Validate required fields
-            if (!name || !contact || !password || !area ) {
+            if (!name || !contact || !password || !area  || !confirmPassword) {
                 return res.status(400).json({ message: 'All fields are required.' });
             }
 

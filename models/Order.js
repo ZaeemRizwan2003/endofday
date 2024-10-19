@@ -19,7 +19,8 @@ const OrderSchema = new mongoose.Schema({
         required: true,
     },
     address: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
     status: {
@@ -29,7 +30,7 @@ const OrderSchema = new mongoose.Schema({
     deliveryBoy_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'deliveryPartnersSchema',
-        required: true,
+        // required: true,
     }
 }, { timestamps: true });
 
