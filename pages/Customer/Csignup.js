@@ -10,7 +10,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const router= useRouter();
+  const router = useRouter();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -31,9 +31,9 @@ const Signup = () => {
         setEmail("");
         setPassword("");
 
-        setTimeout(()=>{
-          router.push("/Customer/Clogin");
-        },2000);
+        setTimeout(() => {
+          router.push("/Login");
+        }, 2000);
       }
     } catch (err) {
       setError("signup failed, please try again later");
@@ -135,7 +135,7 @@ const Signup = () => {
           <p className="mt-10 text-center text-sm text-gray-500">
             Already a member?
             <Link
-              href="/Customer/Clogin"
+              href="/Login"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
               {" "}

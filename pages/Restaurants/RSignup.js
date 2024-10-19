@@ -89,7 +89,7 @@ const Signup = () => {
             if (response.status === 200) {
                 setSuccess('Signup successful! Redirecting to login...');
                 setTimeout(() => {
-                    router.push('/Restaurants/RLogin');
+                    router.push('/Login');
                 }, 1000);
             }
         } catch (err) {
@@ -295,7 +295,7 @@ const Signup = () => {
 
                             <p className="text-sm font-light text-black ">
                                 Already have an account?{' '}
-                                <Link href="/Restaurants/RLogin" className="font-medium text-black hover:underline">
+                                <Link href="/Login" className="font-medium text-black hover:underline">
                                     Login here
                                 </Link>
                             </p>

@@ -78,7 +78,7 @@ const Login = () => {
       {/* Buttons for Partner Login and Rider Login at the top-right */}
       <div className="absolute top-0 right-0 flex space-x-6 mt-4 mr-8">
         <Link
-          href="/Restaurants/RLogin" // Adjust the path to your partner login page
+          href="/Login" // Adjust the path to your partner login page
           className="font-semibold leading-6 text-purple-800 hover:text-indigo-500"
         >
           {" "}

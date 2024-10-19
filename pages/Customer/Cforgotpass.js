@@ -50,7 +50,7 @@ const forgotpass = () => {
           <p className="mt-10 text-center text-sm text-gray-500">
             Remember your password?
             <Link
-              href="/Customer/Clogin"
+              href="/Login"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
               {" "}
