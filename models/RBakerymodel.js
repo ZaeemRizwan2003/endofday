@@ -23,6 +23,11 @@ const signupSchema = new mongoose.Schema(
                 ref: 'Listings', // Reference the Listings model
             },
         ],
+        usertype: {
+            type: String,
+            default: 'bakery',
+            immutable: true,  // This makes sure the value can't be changed after creation
+        },
         resetOtp: {
             type: String,
             default: null,

@@ -16,7 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/Customer/Clogin");
+      router.push("/Login");
     } else {
       axios
         .get("/api/Customer/user-info", {
@@ -34,7 +34,7 @@ const Dashboard = () => {
         })
         .catch((error) => {
           console.log("failed fetch", error);
-          router.push("/Customer/Clogin");
+          router.push("/Login");
         });
     }
   }, [router]);

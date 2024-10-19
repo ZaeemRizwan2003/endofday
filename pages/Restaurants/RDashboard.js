@@ -20,7 +20,7 @@ const Dashboard = () => {
             const userId = Cookies.get('userId'); // Replace 'userID' with the actual name of your cookie
 
             if (!userId) {
-                router.push('/Restaurants/RLogin'); // Redirect if no user ID found
+                router.push('/Login'); // Redirect if no user ID found
                 return;
             }
 

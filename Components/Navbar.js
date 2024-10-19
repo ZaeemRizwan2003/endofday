@@ -15,7 +15,7 @@ const DashNav = () => {
                 credentials: 'include',
             });
             if (response.ok) {
-                router.push('/Restaurants/RLogin');
+                router.push('/Login');
             } else {
                 console.error('Logout failed: ', await response.json());
             }

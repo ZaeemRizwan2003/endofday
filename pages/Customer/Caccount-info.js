@@ -11,7 +11,7 @@ const AccountInfo = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push('/Customer/Clogin'); // Redirect to login if no token is found
+      router.push('/Login'); // Redirect to login if no token is found
     } else {
       axios
         .get('/api/Customer/user-info', {
@@ -22,7 +22,7 @@ const AccountInfo = () => {
           setLoading(false); // Stop loading
         })
         .catch(() => {
-          router.push('/Customer/Clogin'); // Redirect to login on error
+          router.push('/Login'); // Redirect to login on error
         });
     }
   }, [router]);
@@ -30,7 +30,7 @@ const AccountInfo = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-xl font-semibold text-gray-700"><LuLoader/></p>
+        <p className="text-xl font-semibold text-gray-700"><LuLoader /></p>
       </div>
     );
   }
@@ -59,7 +59,7 @@ const AccountInfo = () => {
         <button
           onClick={() => {
             localStorage.removeItem('token');
-            router.push('/Customer/Clogin');
+            router.push('/Login');
           }}
           className="mt-6 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
         >

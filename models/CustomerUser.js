@@ -29,6 +29,11 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'please provide a password'],
         minlength: 6,
     },
+    usertype: {
+        type: String,
+        default: 'customer',
+        immutable: true,  // This makes sure the value can't be changed after creation
+    },
     cart: [CartItemSchema],
     addresses: [AddressSchema],
     resetOtp: {
