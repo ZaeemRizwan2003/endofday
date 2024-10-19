@@ -32,14 +32,12 @@ const Dashboard = () => {
           setUser(res.data.user);
           setLoading(false);
         })
-
         .catch((error) => {
           console.log("failed fetch", error);
           router.push("/Customer/Clogin");
         });
     }
   }, [router]);
-
 
   useEffect(() => {
     if (!user) return;
@@ -62,7 +60,11 @@ const Dashboard = () => {
   }, [activeOption, user, search]);
 
   if (loading) {
-    return <div> <LuLoader /> </div>;
+    return (
+      <div>
+        <LuLoader />
+      </div>
+    );
   }
 
   if (!user) {
@@ -110,20 +112,28 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {restaurants.length > 0 ? (
             restaurants.map((restaurant) => (
-              <Link href={`/Customer/restaurant/${restaurant._id}`} key={restaurant._id}>
+              <Link
+                href={`/Customer/restaurant/${restaurant._id}`}
+                key={restaurant._id}
+              >
                 <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow">
                   <div className="relative w-full h-25 flex justify-center items-center">
                     <img
                       src={`data:${restaurant.imageContentType};base64,${restaurant.image}`}
                       alt={restaurant.restaurantName}
                       className="object-contain w-50 h-40"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.src = "/placeholder.png"; // Fallback image
+                        e.target.alt = "Image not available";
+                      }}
                     />
                   </div>
                   <div className="p-3 bg-purple-200">
-                    <h3 className="text-lg font-semibold">{restaurant.restaurantName}</h3>
-                    <p className="text-gray-500 text-sm">
-                      {restaurant.address}
-                    </p>
+                    <h3 className="text-lg font-semibold">
+                      {restaurant.restaurantName}
+                    </h3>
+                    <p className="text-gray-500 text-sm">{restaurant.address}</p>
                   </div>
                 </div>
               </Link>
