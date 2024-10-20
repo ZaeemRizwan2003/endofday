@@ -13,7 +13,13 @@ const OSMMap = dynamic(() => import("../../Components/OSMMap"), {
 });
 
 const Checkout = () => {
-  const { cart, incrementItemQuantity, decrementItemQuantity, removeFromCart, clearCart } = useCart();
+  const {
+    cart,
+    incrementItemQuantity,
+    decrementItemQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCart();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [newAddress, setNewAddress] = useState({
@@ -54,7 +60,7 @@ const Checkout = () => {
 
   const handleLocationSelect = (coords) => {
     // Set the geoLocation state from OSMMap component
-    console.log("coords reahed")
+    console.log("coords reahed");
     setGeoLocation(coords);
   };
 
@@ -82,29 +88,45 @@ const Checkout = () => {
 
   const handleSubmit = async () => {
     const userId = localStorage.getItem("userId");
-    const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalAmount = cart.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
 
     const orderData = {
       userId,
-      address: selectedAddress || (geoLocation ? `Lat: ${geoLocation.latitude}, Long: ${geoLocation.longitude}` : ""),
-      userInfo,
       items: cart,
       totalAmount,
-      paymentMethod,
+      address: selectedAddress,
+        // ||
+        // (geoLocation
+        //   ? `Lat: ${geoLocation.latitude}, Long: ${geoLocation.longitude}`
+        //   : ""),
+      // userInfo,
+      // paymentMethod,
     };
 
+    console.log("Order data being sent:", orderData);
     try {
       const response = await axios.post("/api/Customer/order", orderData);
       const orderId = response.data._id;
 
       router.push(`/Customer/OrderConfirm?id=${orderId}`);
 
-
-      localStorage.removeItem('cart');
+      localStorage.removeItem("cart");
       clearCart();
       // Handle success, e.g., redirect to order confirmation page
     } catch (err) {
       console.error("Order submission failed", err);
+      if (err.response) {
+        console.error("Error response data:", err.response.data);
+        console.error("Error response status:", err.response.status);
+        console.error("Error response headers:", err.response.headers);
+      } else if (err.request) {
+        console.error("No response received:", err.request);
+      } else {
+        console.error("Error message:", err.message);
+      }
     }
   };
 
@@ -196,7 +218,9 @@ const Checkout = () => {
             type="email"
             name="email"
             value={userInfo.email}
-            onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+            onChange={(e) =>
+              setUserInfo({ ...userInfo, email: e.target.value })
+            }
             className="p-3 border border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
             placeholder="Email"
           />
@@ -204,7 +228,9 @@ const Checkout = () => {
             type="text"
             name="phone"
             value={userInfo.phone}
-            onChange={(e) => setUserInfo({ ...userInfo, phone: e.target.value })}
+            onChange={(e) =>
+              setUserInfo({ ...userInfo, phone: e.target.value })
+            }
             className="p-3 border border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
             placeholder="Phone"
           />
@@ -219,11 +245,16 @@ const Checkout = () => {
         </div>
 
         {/* Payment Method Section */}
-        <h2 className="text-xl font-semibold text-black mt-8">Payment Method</h2>
+        <h2 className="text-xl font-semibold text-black mt-8">
+          Payment Method
+        </h2>
         <div className="flex gap-4 mt-2">
           <label
-            className={`flex items-center justify-center border-2 rounded-lg p-4 w-full text-center cursor-pointer ${paymentMethod === "COD" ? "border-purple-700 bg-purple-100" : "border-gray-300"
-              }`}
+            className={`flex items-center justify-center border-2 rounded-lg p-4 w-full text-center cursor-pointer ${
+              paymentMethod === "COD"
+                ? "border-purple-700 bg-purple-100"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
@@ -237,8 +268,11 @@ const Checkout = () => {
           </label>
 
           <label
-            className={`flex items-center justify-center border-2 rounded-lg p-4 w-full text-center cursor-pointer ${paymentMethod === "Easypaisa" ? "border-purple-700 bg-purple-100" : "border-gray-300"
-              }`}
+            className={`flex items-center justify-center border-2 rounded-lg p-4 w-full text-center cursor-pointer ${
+              paymentMethod === "Easypaisa"
+                ? "border-purple-700 bg-purple-100"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
@@ -256,7 +290,10 @@ const Checkout = () => {
         <h2 className="text-xl font-semibold text-black mt-8">Cart Items</h2>
         <div className="cart-items mt-4">
           {cart.map((item) => (
-            <div key={item.itemId} className="flex justify-between items-center border-b py-2">
+            <div
+              key={item.itemId}
+              className="flex justify-between items-center border-b py-2"
+            >
               <div>
                 <p className="font-semibold">{item.title}</p>
                 <p className="text-sm text-gray-500">Rs.{item.price} each</p>
@@ -301,21 +338,27 @@ const Checkout = () => {
               type="text"
               placeholder="Address Line"
               value={newAddress.addressLine}
-              onChange={(e) => setNewAddress({ ...newAddress, addressLine: e.target.value })}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, addressLine: e.target.value })
+              }
               className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
             />
             <input
               type="text"
               placeholder="City"
               value={newAddress.city}
-              onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, city: e.target.value })
+              }
               className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
             />
             <input
               type="text"
               placeholder="Postal Code"
               value={newAddress.postalCode}
-              onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, postalCode: e.target.value })
+              }
               className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
             />
             <div className="text-right">
@@ -340,7 +383,9 @@ const Checkout = () => {
       {showMapModal && (
         <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
-            <h2 className="text-xl font-semibold mb-4">Select Your Current Location</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Select Your Current Location
+            </h2>
             <div className="w-full h-96">
               {/* Render the OSM Map component */}
               <OSMMap onLocationSelect={handleLocationSelect} />
