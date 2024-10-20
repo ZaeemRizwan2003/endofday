@@ -1,12 +1,11 @@
 import dbConnect from "@/middleware/mongoose";
 import Order from "@/models/Order";
-
+import User from "@/models/CustomerUser";
 export default async function handler(req, res) {
     await dbConnect();
 
-    // Handle GET request to fetch an order by ID
     if (req.method === "GET") {
-        const { id } = req.query; // Get the order ID from the query
+        const { id } = req.query; 
         try {
             const order = await Order.findById(id).populate({
                 path: 'userId',
@@ -23,23 +22,26 @@ export default async function handler(req, res) {
             return res.status(500).json({ message: "Error fetching order", error });
         }
     } 
-    // Handle POST request to create a new order
+
     else if (req.method === "POST") {
-        const { userId, items, totalAmount, address } = req.body;
+        const { userId, items, totalAmount, addressId } = req.body;
 
         // Validate required fields
-        if (!userId || !items || !totalAmount || !address) {
+        if (!userId || !items || !totalAmount || !addressId) {
             return res.status(400).json({ message: "Missing required fields" });
         }
+
+        try {
+            const user = await User.findById(userId);
+            const selectedAddress = user.addresses.id(addressId); 
 
         const newOrder = new Order({
             userId,
             items,
             totalAmount,
-            address,
+            address: selectedAddress._id,
+            area:selectedAddress.city
         });
-
-        try {
             const savedOrder = await newOrder.save(); // Save the new order
             res.status(201).json(savedOrder); // Return the saved order
         } catch (error) {

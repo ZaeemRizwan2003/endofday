@@ -1,197 +1,217 @@
-import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import DeliveryLogin from "./DeliveryLogin";
 
 const DeliverySignUp = () => {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
-  const [area, setArea] = useState('');
-  const [contact, setContact] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [area, setArea] = useState("");
+  const [contact, setContact] = useState("");
   const [error, setError] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const delivery = JSON.parse(localStorage.getItem('delivery'));
+    const delivery = JSON.parse(localStorage.getItem("delivery"));
     if (delivery) {
-      router.push('/Delivery/deliverydashboard')
+      router.push("/Delivery/deliverydashboard");
     }
-  }, [])
+  }, []);
 
   const handleSignup = async () => {
-    if (!contact || !password || !confirmPassword || !name || password !== confirmPassword || contact.length !== 11) {
-      setError(true)
-      return false
-
+    if (
+      !contact ||
+      !password ||
+      !confirmPassword ||
+      !name ||
+      password !== confirmPassword ||
+      contact.length !== 11
+    ) {
+      setError(true);
+      return false;
     } else {
-      setError(false)
+      setError(false);
     }
-    console.log(contact, password, c_password, name, area);
     let response = await fetch("/api/deliverypartners/signup", {
       method: "POST",
-      body: JSON.stringify({ contact, password, name, area, confirmPassword })
-    })
-    response = await response.json();
-    if (response.success) {
-      const { result } = response;
-      delete result.password;
-      localStorage.setItem("delivery", JSON.stringify(result));
+      headers: {
+        "Content-Type": "application/json", // Specify JSON format
+      },
+      body: JSON.stringify({
+        name,
+        contact,
+        password,
+        confirmPassword,
+        area,
+      }),
+    });
+    const result = await response.json();
+
+    if (response.ok) {
       alert("Success");
-      router.push('/Delivery/deliverydashboard')
+      localStorage.setItem("delivery", JSON.stringify(result));
+      router.push("/Delivery/deliverydashboard");
     } else {
-      alert("Failed to Signup" + response.message);
+      alert("Failed to Signup: " + result.message); // Display the server error message
     }
-  }
+  };
 
   return (
-    <div className="mt-6 relative">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+    <div className="flex items-center justify-center bg-purple-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <img
-          className="mx-auto h-10 w-auto"
+          className="mx-auto h-20 w-auto"
           src="/mainlogo.png"
           alt="EndofDay"
         />
+        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-purple-800">
+          Rider Sign Up
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Become a part of our delivery team
+        </p>
       </div>
-      <div className="flex min-h-full flex-col justify-center px-6 py-10 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            RIDER SIGNUP
-          </h2>
-        </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-            <div>
-              <label
-                htmlFor="contact"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Contact Number
-              </label>
-              <div className="mt-2">
-                <input
-                  id="contact"
-                  name="contact"
-                  type="text"
-                  value={contact}
-                  onChange={(e) => setContact(e.target.value)}
-                  required
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              {error && !contact && <p className="text-red-500">Please enter valid contact</p>}
-              {error && contact && contact.length !== 11 && <p className="text-red-500">Contact Number Must be 11 digit long.</p>}
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Password
-                </label>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              {error && !password && <p className="text-red-500">Please enter valid password</p>}
-              {error && password && password !== confirmPassword && <p className="text-red-500">Password and Confirm Password do not match</p>}
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="c_password"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Confirm Password
-                </label>
-              </div>
-              <div className="mt- 2">
-                <input
-                  id="c_password"
-                  name="c_password"
-                  type="password"
-                  value={c_password}
-                  onChange={(e) => setC_password(e.target.value)}
-                  required
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              {error && !confirmPassword && <p className="text-red-500">Please enter valid confirm password</p>}
-              {error && c_password && password !== c_password && <p className="text-red-500">Password and Confirm Password do not match</p>}
-            </div>
-
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+          <form
+            className="space-y-4 text-start"
+            onSubmit={(e) => e.preventDefault()}
+          >
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                className="block text-sm font-medium text-purple-800 ml-2"
               >
                 Name
               </label>
-              <div className="mt-2">
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              {error && !name && <p className="text-red-500">Please enter valid name</p>}
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="block w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              />
+              {error && !name && (
+                <p className="text-red-600 text-sm mt-1">
+                  Please enter your name
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="contact"
+                className="block text-sm font-medium text-purple-800 ml-2"
+              >
+                Contact Number
+              </label>
+              <input
+                id="contact"
+                name="contact"
+                type="text"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+                required
+                className="block w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              />
+              {error && (!contact || contact.length !== 11) && (
+                <p className="text-red-600 text-sm mt-1">
+                  Contact number must be 11 digits long
+                </p>
+              )}
             </div>
 
             <div>
               <label
                 htmlFor="area"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                className="block text-sm font-medium text-purple-800 ml-2"
               >
                 Area
               </label>
-              <div className="mt-2">
-                <input
-                  id="area"
-                  name="area"
-                  type="text"
-                  value={area}
-                  onChange={(e) => setArea(e.target.value)}
-                  required
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-              {error && !area && < p className="text-red-500">Please enter valid area</p>}
+              <input
+                id="area"
+                name="area"
+                type="text"
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                required
+                className="block w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              />
+              {error && !area && (
+                <p className="text-red-600 text-sm mt-1">
+                  Please enter your area
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-purple-800 ml-2"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="block w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              />
+              {error && !password && (
+                <p className="text-red-600 text-sm mt-1">
+                  Please enter a password
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-purple-800 ml-2"
+              >
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="block w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              />
+              {error && password !== confirmPassword && (
+                <p className="text-red-600 text-sm mt-1">
+                  Passwords do not match
+                </p>
+              )}
             </div>
 
             <div>
               <button
                 type="button"
                 onClick={handleSignup}
-                className="flex w-full justify-center rounded-md bg-purple-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-purple-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="w-full bg-purple-800 hover:bg-purple-700 text-white py-2 px-4 rounded-md shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 focus:outline-none"
               >
                 Sign Up
               </button>
             </div>
 
-            {/* <p className="mt-10 text-center text-sm text-gray-500">
-              Already a member?
-              <Link
-                href="/delivery/deliverypartner"
-                className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-              >
-                Login
-              </Link>
-            </p> */}
+            {/* <div className="mt-6 text-center">
+              <p className="text-sm text-gray-500">
+                Already a member?{' '}
+                <Link className="text-purple-700 hover:underline">
+                <DeliveryLogin/>
+                </Link>
+              </p>
+            </div> */}
           </form>
         </div>
       </div>

@@ -75,6 +75,7 @@ const RestaurantMenu = () => {
     return cartItem ? cartItem.quantity : 1; // Return 0 if item is not in the cart
   };
 
+
   return (
     <>
       <ToastContainer />
