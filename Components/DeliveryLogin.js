@@ -21,104 +21,105 @@ const DeliveryLogin = () => {
       return;
     }
     setError(false);
-    let response = await fetch("http://localhost:3000/api/deliverypartners/login", {
+    let response = await fetch("/api/deliverypartners/login", {
       method: "POST",
-      body: JSON.stringify({ contact: loginMobile, password: loginPassword })
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ mobile: loginMobile, password: loginPassword })
     });
+
     response = await response.json();
+
     if (response.success) {
       const { result } = response;
       delete result.password;
       localStorage.setItem("delivery", JSON.stringify(result));
-      alert("success");
-      router.push('/deliverydashboard')
+      alert("Login successful");
+      router.push('/Delivery/deliverydashboard');
     } else {
-      alert("Login Failed.Please try again with valid Mobile No. and Password")
+      alert("Login failed. Please try again with a valid Mobile Number and Password.");
     }
-  }
+  };
 
   return (
-    <div className="mt-6 relative">
-       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-10 w-auto"
-            src="/mainlogo.png"
-            alt="EndofDay"
-          />
-        </div>
-      <div className="flex min-h-full flex-col justify-center px-6 py-10 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            RIDER LOGIN
-          </h2>
-        </div>
+    <div className="flex items-center justify-center bg-purple-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <img className="mx-auto h-20 w-auto" src="/mainlogo.png" alt="EndofDay" />
+        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-purple-800">
+          Rider Login
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Welcome back to your delivery dashboard
+        </p>
+      </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+          <form className="space-y-4 text-start" onSubmit={(e) => e.preventDefault()}>
+
             <div>
               <label
                 htmlFor="mobile"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                className="block text-sm font-medium text-purple-800 ml-2"
               >
                 Mobile Number
               </label>
-              <div className="mt-2">
-                <input
-                  id="mobile"
-                  name="mobile"
-                  type="text"
-                  value={loginMobile}
-                  onChange={(e) => setLoginMobile(e.target.value)}
-                  required
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
+              <input
+                id="mobile"
+                name="mobile"
+                type="text"
+                value={loginMobile}
+                onChange={(e) => setLoginMobile(e.target.value)}
+                required
+                className="block w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              />
+              {error && !loginMobile && (
+                <p className="text-red-600 text-sm mt-1">Please enter a valid mobile number</p>
+              )}
             </div>
 
             <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Password
-                </label>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  required
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-purple-800 ml-2"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                required
+                className="block w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              />
+              {error && !loginPassword && (
+                <p className="text-red-600 text-sm mt-1">Please enter a password</p>
+              )}
             </div>
 
             <div>
               <button
                 type="button"
                 onClick={handleLogin}
-                className="flex w-full justify-center rounded-md bg-purple-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-purple-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="w-full bg-purple-800 hover:bg-purple-700 text-white py-2 px-4 rounded-md shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 focus:outline-none"
               >
                 Log in
               </button>
             </div>
 
-            {error && <p className="text-red-500">Please enter valid Mobile No. and Password</p>}
           </form>
-
-          {/* <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?
-            <Link
-              href="/delivery/deliverypartner"
-              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-            >
-              Signup
-            </Link>
-          </p> */}
+{/* 
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500">
+              Don't have an account?{' '}
+              <a href="/Delivery/deliverysignup" className="text-purple-700 hover:underline">
+                Sign up
+              </a>
+            </p>
+          </div> */}
         </div>
       </div>
     </div>

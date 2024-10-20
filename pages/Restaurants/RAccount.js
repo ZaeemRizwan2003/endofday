@@ -10,11 +10,6 @@ const Account = ({ user, error }) => {
         return <div>Error: {error}</div>;
     }
 
-    // Display loading state until user data is fetched (handled by server-side props)
-    if (!user) {
-        return <div><LuLoader /></div>;
-    }
-
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         restaurantName: user.restaurantName,

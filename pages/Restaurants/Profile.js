@@ -39,9 +39,6 @@ const Profile = () => {
 
   }, []);
 
-  if (loading) {
-    return <p><LuLoader/></p>;
-  }
 
   if (error) {
     return <p>Error: {error}</p>;

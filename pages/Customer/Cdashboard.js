@@ -59,13 +59,6 @@ const Dashboard = () => {
     fetchRestaurants();
   }, [activeOption, user, search]);
 
-  if (loading) {
-    return (
-      <div>
-        <LuLoader />
-      </div>
-    );
-  }
 
   if (!user) {
     return <div>error: user not found</div>;

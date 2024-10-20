@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 
 const deliveryPartnersModel = new mongoose.Schema({
     name: {type:String, required:true},
-    contact:{type:Number,required:true},
+    contact:{type:String,required:true},
     password: {type:String, required:true},
     area:{type:String, required:true},
-    orderId:{
+    orderId:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order',
-        required:true,
-    }
+        required: false,
+    }]
 }, { timestamps: true });
 
-export const deliveryPartnersSchema = mongoose.models.deliverypartners || mongoose.model("deliverypartners", deliveryPartnersModel, "deliverypartners");
+export const deliveryPartnersSchema = mongoose.models.Deliverypartner || mongoose.model("Deliverypartner", deliveryPartnersModel, "deliverypartners");
 

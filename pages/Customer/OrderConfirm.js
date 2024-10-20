@@ -27,7 +27,6 @@ const OrderPage = () => {
     fetchOrders();
   }, [id]);
 
-  if (loading) return <p>loading...</p>;
 
   if (!order || Object.keys(order).length === 0) {
     return <p>No order found.</p>;

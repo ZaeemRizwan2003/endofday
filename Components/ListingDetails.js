@@ -24,7 +24,7 @@ const ListingDetails = () => {
     }, [id]);
 
     if (error) return <p className="text-red-500">{error}</p>;
-    if (!listing) return <p>Loading...</p>;
+
 
     return (
         <div className="max-w-3xl mx-auto mt-10">
