@@ -75,8 +75,6 @@ const RestaurantMenu = () => {
     return cartItem ? cartItem.quantity : 1; // Return 0 if item is not in the cart
   };
 
-  if (!restaurant) return <p> Loading....</p>;
-
   return (
     <>
       <ToastContainer />
@@ -84,65 +82,72 @@ const RestaurantMenu = () => {
       <div className="p-14 justify-center">
         <div className="flex mb-8 mt-12">
           <div className="w-2/3">
-            <h1 className="text-3xl font-bold text-purple-800 mb-2">
-              {restaurant.restaurantName}
-            </h1>
-            <p className="text-lg mb-2">{restaurant.address}</p>
-            <p className="text-gray-600">{restaurant.description}</p>
+            {restaurant ? (
+              <>
+                <h1 className="text-3xl font-bold text-purple-800 mb-2">
+                  {restaurant.restaurantName}
+                </h1>
+                <p className="text-lg mb-2">{restaurant.address}</p>
+                <p className="text-gray-600">{restaurant.description}</p>
+              </>
+            ) : (
+              <p>Loading restaurant details...</p> // Add a loading or fallback message
+            )}
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {restaurant.menu.map((item) => (
-            <div
-              key={item._id}
-              className="flex flex-col border rounded-lg overflow-hidden shadow-lg hover:shadow-md transition duration-300"
-            >
-              <div className="p-4 flex flex-col justify-between h-full w-full">
-                <div className="flex-grow">
-                  <h2 className="text-xl font-bold text-purple-800 mb-2">
-                    {item.itemname}
-                  </h2>
-                  <p className="text-gray-600 mb-2">{item.description}</p>
-                  <p className="text-red font-bold">Rs.{item.discountedprice}</p>
-                  <p className="text-red-800 font-bold line-through">Rs.{item.price}</p>
-                </div>
-                {/* Updated Section */}
-                <div className="mt-4 flex items-center">
-                  <button
-                    className="bg-purple-800 text-white rounded px-4 py-2 mr-6"
-                    onClick={() =>
-                      handleAddToCart(item._id, item.itemname, item.discountedprice, item.remainingitem)
-                    }
-                  >
-                    Add to Cart
-                  </button>
-                  <div className="flex items-center">
-                    {cart ? (
-                      <>
-                        <button onClick={() => decrementItemQuantity(item._id)}>
-                          <FaRegMinusSquare />
-                        </button>
-                        <span className="px-4">{getItemQuantity(item._id)}</span>
-                        <button onClick={() => incrementItemQuantity(item._id, item.remainingitem)}>
-                          <FaRegPlusSquare />
-                        </button>
-                      </>
-                    ) : (
-                      <span className="px-4">1</span>
-                    )}
+          {restaurant && restaurant.menu ? (
+            restaurant.menu.map((item) => (
+              <div
+                key={item._id}
+                className="flex flex-col border rounded-lg overflow-hidden shadow-lg hover:shadow-md transition duration-300"
+              >
+                <div className="p-4 flex flex-col justify-between h-full w-full">
+                  <div className="flex-grow">
+                    <h2 className="text-xl font-bold text-purple-800 mb-2">
+                      {item.itemname}
+                    </h2>
+                    <p className="text-gray-600 mb-2">{item.description}</p>
+                    <p className="text-red font-bold">Rs.{item.discountedprice}</p>
+                    <p className="text-red-800 font-bold line-through">Rs.{item.price}</p>
                   </div>
-
-
+                  <div className="mt-4 flex items-center">
+                    <button
+                      className="bg-purple-800 text-white rounded px-4 py-2 mr-6"
+                      onClick={() =>
+                        handleAddToCart(item._id, item.itemname, item.discountedprice, item.remainingitem)
+                      }
+                    >
+                      Add to Cart
+                    </button>
+                    <div className="flex items-center">
+                      {cart ? (
+                        <>
+                          <button onClick={() => decrementItemQuantity(item._id)}>
+                            <FaRegMinusSquare />
+                          </button>
+                          <span className="px-4">{getItemQuantity(item._id)}</span>
+                          <button onClick={() => incrementItemQuantity(item._id, item.remainingitem)}>
+                            <FaRegPlusSquare />
+                          </button>
+                        </>
+                      ) : (
+                        <span className="px-4">1</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>Loading menu...</p> // Add a loading or fallback message
+          )}
         </div>
-
       </div>
     </>
   );
+
 };
 
 export default RestaurantMenu;
