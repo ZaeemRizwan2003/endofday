@@ -5,8 +5,8 @@ import { RiDeleteBin2Line } from "react-icons/ri";
 import { useRouter } from "next/router";
 
 const Cart = () => {
-  const { cart,  incrementItemQuantity, decrementItemQuantity, removeFromCart, clearCart } = useCart();
-  const router= useRouter();
+  const { cart, incrementItemQuantity, decrementItemQuantity, removeFromCart, clearCart } = useCart();
+  const router = useRouter();
 
   const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
 
@@ -14,7 +14,7 @@ const Cart = () => {
     router.push("/Customer/checkout");
   };
 
-   return (
+  return (
     <div className="fixed top-0 right-0 w-86 h-full bg-white shadow-lg z-50 p-6 rounded-lg border">
       <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
       {cart.length === 0 && <p className="text-gray-500">Your cart is empty</p>}
@@ -26,14 +26,14 @@ const Cart = () => {
               <button
                 className="text-gray-600 hover:text-gray-800"
                 onClick={() => decrementItemQuantity(item.itemId)}
-                // disabled={item.quantity <= 1} // Disable if quantity is 1
+              // disabled={item.quantity <= 1} // Disable if quantity is 1
               >
                 <FaRegMinusSquare />
               </button>
               <span className="px-1">{item.quantity}</span>
               <button
                 className="text-gray-600 hover:text-gray-800"
-                onClick={() => incrementItemQuantity(item.itemId)}
+                onClick={() => incrementItemQuantity(item.itemId, item.remainingitem)}
               >
                 <FaRegPlusSquare />
               </button>

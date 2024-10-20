@@ -112,7 +112,7 @@ const RestaurantMenu = () => {
                   <button
                     className="bg-purple-800 text-white rounded px-4 py-2 mr-6"
                     onClick={() =>
-                      handleAddToCart(item._id, item.itemname, item.discountedprice)
+                      handleAddToCart(item._id, item.itemname, item.discountedprice, item.remainingitem)
                     }
                   >
                     Add to Cart
@@ -124,7 +124,7 @@ const RestaurantMenu = () => {
                           <FaRegMinusSquare />
                         </button>
                         <span className="px-4">{getItemQuantity(item._id)}</span>
-                        <button onClick={() => incrementItemQuantity(item._id)}>
+                        <button onClick={() => incrementItemQuantity(item._id, item.remainingitem)}>
                           <FaRegPlusSquare />
                         </button>
                       </>
