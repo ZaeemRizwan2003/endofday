@@ -28,41 +28,6 @@ export const CartProvider = ({ children }) => {
     }
   }, [cart]);
 
-  const addToCart = async (itemId, title, price, remainingitem) => {
-    if (!Array.isArray(cart)) {
-      console.error("Cart is not an array");
-      setCart([]); // Reset to empty array if something went wrong
-      return;
-    }
-
-    const existingItemIndex = cart.findIndex((cartItem) => cartItem.itemId === itemId);
-    let updatedCart;
-
-    if (existingItemIndex >= 0) {
-      const currentQuantity = cart[existingItemIndex].quantity;
-
-      if (currentQuantity + 1 > remainingitem) {
-        alert("Cannot add more than the available stock");
-        return;
-      }
-
-      updatedCart = [...cart];
-      updatedCart[existingItemIndex].quantity += 1; // Increment quantity if item exists
-      setCart(updatedCart);
-    } else {
-      if (remainingitem < 1) {
-        alert("Item out of stock");
-        return;
-      }
-
-      const newItem = { itemId, title, price, quantity: 1 };
-      updatedCart = [...cart, newItem];
-      setCart(updatedCart);
-    }
-
-    await syncCartToServer(localStorage.getItem("userId"), updatedCart);
-  };
-
   const syncCartToServer = async (userId, cart) => {
     try {
       const response = await fetch("/api/Customer/cart", {
@@ -70,10 +35,7 @@ export const CartProvider = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId,
-          cart,
-        }),
+        body: JSON.stringify({ userId, cart }),
       });
 
       if (!response.ok) {
@@ -87,10 +49,45 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const addToCart = async (itemId, title, price, remainingitem) => {
+    if (!Array.isArray(cart)) {
+      console.error("Cart is not an array");
+      setCart([]); // Reset to empty array if something went wrong
+      return;
+    }
+
+    const existingItem = cart.find((cartItem) => cartItem.itemId === itemId);
+
+    if (existingItem) {
+      if (existingItem.quantity >= remainingitem) {
+        alert("Cannot add more than the available stock");
+        return;
+      }
+
+      const updatedCart = cart.map((cartItem) =>
+        cartItem.itemId === itemId
+          ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          : cartItem
+      );
+      setCart(updatedCart);
+      await syncCartToServer(localStorage.getItem("userId"), updatedCart);
+    } else {
+      if (remainingitem < 1) {
+        alert("Item is out of stock");
+        return;
+      }
+
+      const newItem = { itemId, title, price, quantity: 1 };
+      const updatedCart = [...cart, newItem];
+      setCart(updatedCart);
+      await syncCartToServer(localStorage.getItem("userId"), updatedCart);
+    }
+  };
+
   const incrementItemQuantity = async (itemId, remainingitem) => {
     const itemInCart = cart.find((item) => item.itemId === itemId);
 
-    if (itemInCart.quantity + 1 > remainingitem) {
+    if (itemInCart.quantity >= remainingitem) {
       alert("Cannot add more than the available stock");
       return;
     }
@@ -112,12 +109,10 @@ export const CartProvider = ({ children }) => {
     await syncCartToServer(localStorage.getItem("userId"), updatedCart);
   };
 
-  // Remove item from cart
   const removeFromCart = (itemId) => {
     setCart(cart.filter((item) => item.itemId !== itemId));
   };
 
-  // Clear cart
   const clearCart = () => {
     setCart([]);
   };
