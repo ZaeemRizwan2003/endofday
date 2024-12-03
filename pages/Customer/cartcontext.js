@@ -49,6 +49,14 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const isStockAvailable = (itemId, remainingitem) => {
+    const existingItem = cart.find((cartItem) => cartItem.itemId === itemId);
+    if (existingItem && existingItem.quantity >= remainingitem) {
+      return false; // No stock available
+    }
+    return true; // Stock available
+  };
+
   const addToCart = async (itemId, title, price, remainingitem) => {
     if (!Array.isArray(cart)) {
       console.error("Cart is not an array");
@@ -56,14 +64,15 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
+    // Validate stock before adding
+    if (!isStockAvailable(itemId, remainingitem)) {
+      alert("Cannot add more than the available stock");
+      return;
+    }
+
     const existingItem = cart.find((cartItem) => cartItem.itemId === itemId);
 
     if (existingItem) {
-      if (existingItem.quantity >= remainingitem) {
-        alert("Cannot add more than the available stock");
-        return;
-      }
-
       const updatedCart = cart.map((cartItem) =>
         cartItem.itemId === itemId
           ? { ...cartItem, quantity: cartItem.quantity + 1 }
@@ -72,11 +81,6 @@ export const CartProvider = ({ children }) => {
       setCart(updatedCart);
       await syncCartToServer(localStorage.getItem("userId"), updatedCart);
     } else {
-      if (remainingitem < 1) {
-        alert("Item is out of stock");
-        return;
-      }
-
       const newItem = { itemId, title, price, quantity: 1 };
       const updatedCart = [...cart, newItem];
       setCart(updatedCart);
@@ -85,9 +89,8 @@ export const CartProvider = ({ children }) => {
   };
 
   const incrementItemQuantity = async (itemId, remainingitem) => {
-    const itemInCart = cart.find((item) => item.itemId === itemId);
-
-    if (itemInCart.quantity >= remainingitem) {
+    // Validate stock before incrementing
+    if (!isStockAvailable(itemId, remainingitem)) {
       alert("Cannot add more than the available stock");
       return;
     }
@@ -104,7 +107,7 @@ export const CartProvider = ({ children }) => {
       .map((item) =>
         item.itemId === itemId ? { ...item, quantity: item.quantity - 1 } : item
       )
-      .filter((item) => item.quantity > 0); // Remove item if quantity is 0
+      .filter((item) => item.quantity > 0); // Remove item if quantity becomes 0
     setCart(updatedCart);
     await syncCartToServer(localStorage.getItem("userId"), updatedCart);
   };

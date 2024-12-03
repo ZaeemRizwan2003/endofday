@@ -93,17 +93,16 @@ const Checkout = () => {
       0
     );
 
+    if (!selectedAddress) {
+      alert("Please select an address.");
+      return;
+    }
+
     const orderData = {
       userId,
       items: cart,
       totalAmount,
-      address: selectedAddress,
-        // ||
-        // (geoLocation
-        //   ? `Lat: ${geoLocation.latitude}, Long: ${geoLocation.longitude}`
-        //   : ""),
-      // userInfo,
-      // paymentMethod,
+      addressId: selectedAddress, // Corrected key
     };
 
     console.log("Order data being sent:", orderData);
@@ -112,21 +111,12 @@ const Checkout = () => {
       const orderId = response.data._id;
 
       router.push(`/Customer/OrderConfirm?id=${orderId}`);
-
-      localStorage.removeItem("cart");
-      clearCart();
-      // Handle success, e.g., redirect to order confirmation page
+      clearCart(); // Clear cart after successful order placement
     } catch (err) {
-      console.error("Order submission failed", err);
-      if (err.response) {
-        console.error("Error response data:", err.response.data);
-        console.error("Error response status:", err.response.status);
-        console.error("Error response headers:", err.response.headers);
-      } else if (err.request) {
-        console.error("No response received:", err.request);
-      } else {
-        console.error("Error message:", err.message);
-      }
+      console.error(
+        "Order submission failed",
+        err.response?.data || err.message
+      );
     }
   };
 
