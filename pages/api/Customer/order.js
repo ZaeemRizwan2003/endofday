@@ -45,12 +45,18 @@ export default async function handler(req, res) {
 
             const assignedRider = availableRiders[0]; 
 
+            // const orderData = {
+            //     userId,
+            //     items: cart,
+            //     totalAmount,
+            //     addressId: selectedAddress, // Corrected key
+            //   };
+          
         const newOrder = new Order({
             userId,
             items,
             totalAmount,
             address: selectedAddress._id,
-            area: selectedAddress.area,
             deliveryBoy_id: assignedRider._id,
         });
             const savedOrder = await newOrder.save(); // Save the new order

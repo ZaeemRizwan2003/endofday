@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const AddressSchema = new mongoose.Schema({
   addressLine: { type: String, required: true },
-  area: { type: String, required: true },
+  area: { type: String },
   city: { type: String, required: true },
   postalCode: { type: String, required: true },
 });

@@ -52,7 +52,7 @@ const OrderPage = () => {
           {/* <p>Address: {order.address.addressLine}</p> */}
           {selectedAddress ? (
             <p>
-              Address: {selectedAddress.addressLine}, {selectedAddress.city},{" "}
+              Address: {selectedAddress.addressLine}, {selectedAddress.area},{selectedAddress.city},{" "}
               {selectedAddress.postalCode}
             </p>
           ) : (

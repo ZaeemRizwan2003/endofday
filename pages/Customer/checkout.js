@@ -50,7 +50,7 @@ const Checkout = () => {
         const { addresses, userInfo } = res.data;
 
         setAddresses(addresses);
-        setUserInfo({ ...userInfo, phone: "", city: "" }); // Let the user input phone and city
+        setUserInfo({ ...userInfo, phone: ""}); // Let the user input phone and city
 
         if(addresses.length>0){
           setSelectedAddress(addresses[0]._id);
@@ -80,8 +80,8 @@ const Checkout = () => {
         userId,
         newAddress: {
           addressLine: newAddress.addressLine,
-          city: newAddress.city,
           area: newAddress.area,
+          city: newAddress.city,
           postalCode: newAddress.postalCode,
         },
       });
@@ -141,8 +141,8 @@ const Checkout = () => {
         userId,
         newAddress: {
           addressLine,
-          city: "Current Location",
           area: "",
+          city: "Current Location",
           postalCode: "",
         },
       });
@@ -177,7 +177,7 @@ const Checkout = () => {
               {addresses.length > 0 ? (
                 addresses.map((address, index) => (
                   <option key={index} value={address._id}>
-                    {address.addressLine}, {address.city}, {address.postalCode}
+                    {address.addressLine},{address.area}, {address.city}, {address.postalCode}
                   </option>
                 ))
               ) : (
@@ -337,6 +337,15 @@ const Checkout = () => {
               value={newAddress.addressLine}
               onChange={(e) =>
                 setNewAddress({ ...newAddress, addressLine: e.target.value })
+              }
+              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+            />
+             <input
+              type="text"
+              placeholder="Area"
+              value={newAddress.area}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, area: e.target.value })
               }
               className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
             />

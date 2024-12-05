@@ -43,8 +43,8 @@ export default async function handler(req, res) {
 
       user.addresses.push({
         addressLine: newAddress.addressLine,
-        city: newAddress.city,
         area: newAddress.area,
+        city: newAddress.city,
         postalCode: newAddress.postalCode
       }); //add new address
 
