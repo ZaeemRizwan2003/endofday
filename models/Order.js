@@ -29,7 +29,7 @@ const OrderSchema = new mongoose.Schema({
     },
     deliveryBoy_id:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'deliveryPartnersSchema',
+        ref: 'deliverypartners',
         // required: true,
     }
 }, { timestamps: true });

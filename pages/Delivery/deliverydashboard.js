@@ -1,7 +1,7 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DeliveryHeader from "@/Components/DeliveryHeader";
+import axios from "axios";
 
 const Page = () => {
   const [myOrders, setMyOrders] = useState([]);
@@ -13,8 +13,11 @@ const Page = () => {
 
   const getmyOrders = async () => {
     const deliveryData = JSON.parse(localStorage.getItem("delivery"));
-    let response = await fetch(
-      `/api/deliverypartners/orders-assign/${deliveryData._id}`
+    if(!deliveryData)return router.push("/Delivery/deliverypartner");
+
+    try{
+    const response = await axios.get(
+      `/api/deliverypartners/orders-assign?driverId=${deliveryData._id}`
     );
 
     if (!response.ok) {
@@ -22,14 +25,17 @@ const Page = () => {
       return; // Exit the function if there's an error
     }
 
-    const data = await response.json(); // Parse the JSON response
+    // const data = await response.json(); // Parse the JSON response
 
-    if (data.success) {
-      setMyOrders(data.result);
+    if (response.data.success) {
+      setMyOrders(response.data.orders);
     } else {
       console.error("Failed to fetch orders:", data.message);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+  }
+};
 
   useEffect(() => {
     const delivery = JSON.parse(localStorage.getItem('delivery'));
@@ -38,27 +44,25 @@ const Page = () => {
     }
   }, []);
 
-  const fetchAssignedOrders = async (driverId) => {
-    const res = await axios.get(
-      `/api/deliverypartners/orders-assign?driverId=${driverId}`
-    );
-    return res.data;
-  };
+  // const fetchAssignedOrders = async (driverId) => {
+  //   const res = await axios.get(
+  //     `/api/deliverypartners/orders-assign?driverId=${driverId}`
+  //   );
+  //   return res.data;
+  // };
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const response = await axios.put(
+      await axios.put(
         "/api/deliverypartners/update-status",
         {
           orderId,
           status: newStatus,
         }
       );
-      if (response.data.message) {
-        console.log(response.data.message);
-        getmyOrders();
-        // Optionally, fetch updated orders
-      }
+
+      getmyOrders();
+    
     } catch (error) {
       console.error("Error updating order status:", error);
     }

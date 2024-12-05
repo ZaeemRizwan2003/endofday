@@ -4,6 +4,7 @@ import DashNav from "@/Components/CustomerNavbar";
 import Navbar from "@/Components/HomeNavbar";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { FaTrashCan } from "react-icons/fa6";
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -48,6 +49,15 @@ const OrderHistory = () => {
     }
   };
 
+  const handleClearHistory = async () => {
+    try {
+      await axios.delete(`/api/Customer/clearhistory?userId=${userId}`);
+      setOrders([]);
+    } catch (error) {
+      console.error("Error clearing history:", error);
+    }
+  };
+
   const handleReviewOrder = (orderId) => {
     // Navigate to the review page with the order ID as a query parameter
     router.push(`/Customer/ReviewOrder?orderId=${orderId}`);
@@ -56,7 +66,7 @@ const OrderHistory = () => {
   return (
     <>
       <DashNav />
-      <div className="mt-16 container mx-auto p-4">
+      <div className="mt-16 container mx-auto p-4 relative">
         <h1 className="text-2xl font-bold text-purple-800 mb-4">
           Order History
           <Link legacyBehavior href="/Customer/Cdashboard">
@@ -65,6 +75,12 @@ const OrderHistory = () => {
             </a>
           </Link>
         </h1>
+        <button
+          onClick={handleClearHistory}
+          className="absolute top-4 right-4 text-red-600 hover:underline text-sm"
+        >
+          Clear History
+        </button>
         <div className="mt-4">
           {orders.length === 0 ? (
             <p className="text-gray-600">No orders found.</p>
@@ -82,19 +98,19 @@ const OrderHistory = () => {
                   Address: {order.address}
                 </p>
                 <h3 className="mt-2 font-bold">Items:</h3>
-                <ul className="list-disc pl-5">
+                <ul className="pl-5">
                   {order.items.map((item) => (
                     <li key={item.itemId}>
                       {item.title} - Quantity: {item.quantity}
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-between items-center mt-4">
+                <div className="flex justify-end items-center mt-4 space-x-2">
                   <button
                     onClick={() => handleDeleteOrder(order._id)}
-                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                    className="text-red-600 hover:text-red-800 transition"
                   >
-                    Delete Order
+                    <FaTrashCan className="w-6 h-6"/>
                   </button>
                   <button
                     onClick={() => handleReviewOrder(order._id)}

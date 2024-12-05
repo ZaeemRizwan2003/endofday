@@ -8,6 +8,7 @@ const DeliverySignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [area, setArea] = useState("");
+  const [city, setCity] = useState("");
   const [contact, setContact] = useState("");
   const [error, setError] = useState(false);
   const router = useRouter();
@@ -44,6 +45,7 @@ const DeliverySignUp = () => {
         password,
         confirmPassword,
         area,
+        city,
       }),
     });
     const result = await response.json();
@@ -144,6 +146,29 @@ const DeliverySignUp = () => {
               {error && !area && (
                 <p className="text-red-600 text-sm mt-1">
                   Please enter your area
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="city"
+                className="block text-sm font-medium text-purple-800 ml-2"
+              >
+                City
+              </label>
+              <input
+                id="city"
+                name="city"
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+                className="block w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              />
+              {error && !city && (
+                <p className="text-red-600 text-sm mt-1">
+                  Please enter your city
                 </p>
               )}
             </div>

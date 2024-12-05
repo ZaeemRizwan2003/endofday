@@ -6,6 +6,8 @@ const deliveryPartnersModel = new mongoose.Schema(
     contact: { type: String, required: true },
     password: { type: String, required: true },
     area: { type: String, required: true },
+    city: { type: String, required: true },
+
     orderId: [
       {
         type: mongoose.Schema.Types.ObjectId,
