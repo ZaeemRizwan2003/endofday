@@ -68,8 +68,8 @@ const RestaurantMenu = () => {
     }
   };
 
-  const handleAddToCart = (itemId, title, price) => {
-    addToCart(itemId, title, price);
+  const handleAddToCart = (itemId, title, price, bakeryId) => {
+    addToCart(itemId, title, price, bakeryId);
     setAddedToCart((prev) => ({ ...prev, [itemId]: true }));
     toast.success(`${title} added to cart successfully`, {
       autoClose: 1000,
@@ -148,7 +148,8 @@ const RestaurantMenu = () => {
                               item._id,
                               item.itemname,
                               item.discountedprice,
-                              item.remainingitem
+                              item.remainingitem,
+                              item.bakeryId
                             )
                           }
                         >

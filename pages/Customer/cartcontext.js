@@ -27,25 +27,36 @@ export const CartProvider = ({ children }) => {
       localStorage.setItem("cart", JSON.stringify(cart));
     }
   }, [cart]);
-
   const syncCartToServer = async (userId, cart) => {
     try {
+      // Ensure the cart contains bakeryId for all items
+      const enrichedCart = cart.map((item) => {
+        if (!item.bakeryId) {
+          console.warn(`Missing bakeryId for item: ${item.itemId}`);
+        }
+        return item;
+      });
+
       const response = await fetch("/api/Customer/cart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId, cart }),
+        body: JSON.stringify({ userId, cart: enrichedCart }), // Send enriched cart with bakeryId
       });
 
       if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error("Server responded with an error:", errorResponse.message);
         throw new Error("Failed to sync cart to server");
       }
 
       const data = await response.json();
-      console.log("Cart synced to server:", data);
+      console.log("Cart synced to server successfully:", data);
+      return data; // Return the server response if needed
     } catch (error) {
-      console.error("Error syncing cart to server:", error);
+      console.error("Error syncing cart to server:", error.message);
+      throw error; // Rethrow error to handle it further up the call stack
     }
   };
 
@@ -57,7 +68,7 @@ export const CartProvider = ({ children }) => {
     return true; // Stock available
   };
 
-  const addToCart = async (itemId, title, price, remainingitem) => {
+  const addToCart = async (itemId, title, price, remainingitem, bakeryId) => {
     if (!Array.isArray(cart)) {
       console.error("Cart is not an array");
       setCart([]); // Reset to empty array if something went wrong
@@ -81,7 +92,7 @@ export const CartProvider = ({ children }) => {
       setCart(updatedCart);
       await syncCartToServer(localStorage.getItem("userId"), updatedCart);
     } else {
-      const newItem = { itemId, title, price, quantity: 1 };
+      const newItem = { itemId, title, price, quantity: 1, bakeryId };
       const updatedCart = [...cart, newItem];
       setCart(updatedCart);
       await syncCartToServer(localStorage.getItem("userId"), updatedCart);

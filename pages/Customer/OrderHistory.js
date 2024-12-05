@@ -48,9 +48,10 @@ const OrderHistory = () => {
     }
   };
 
-  const handleReviewOrder = (orderId) => {
-    // Navigate to the review page with the order ID as a query parameter
-    router.push(`/Customer/ReviewOrder?orderId=${orderId}`);
+  const handleReviewOrder = (bakeryId) => {
+    // Navigate to the review page with the bakery ID as a query parameter
+    router.push(`/Customer/ReviewPage?bakeryId=${bakeryId}`);
+    // router.push(`/Customer/ReviewPage?bakeryId=674f2c6684ad510a3be3ff3c`);
   };
 
   return (

@@ -17,10 +17,10 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
   const router = useRouter();
 
   const saveCartToServer = async (userId, cart) => {
-    await fetch('/api/Customer/cart', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, cart: cart })
+    await fetch("/api/Customer/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, cart: cart }),
     });
   };
 
@@ -34,10 +34,9 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
     setIsLoggedIn(false);
     setUser(null);
 
-    // setCart({});  
+    // setCart({});
     router.push("/Login");
   };
-
 
   const getCartItemCount = () => {
     return cart ? Object.keys(cart).length : 0;
@@ -69,8 +68,8 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
                       <path
                         stroke="currentColor"
                         stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"
                       />
                     </svg>
@@ -99,8 +98,8 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
                     <path
                       stroke="currentColor"
                       stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                     />
                   </svg>
