@@ -29,10 +29,9 @@ const OrderSchema = new mongoose.Schema(
       type: String,
       default: "Pending", // Possible values: Pending, Completed, Cancelled
     },
-
     deliveryBoy_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "deliveryPartnersSchema",
+      ref: "deliverypartners",
       // required: true,
     },
   },

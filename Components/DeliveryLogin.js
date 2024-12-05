@@ -32,9 +32,10 @@ const DeliveryLogin = () => {
     response = await response.json();
 
     if (response.success) {
-      const { result } = response;
-      delete result.password;
-      localStorage.setItem("delivery", JSON.stringify(result));
+      const { userData, token } = response;
+      delete userData.password;
+      localStorage.setItem("delivery", JSON.stringify(userData));
+      localStorage.setItem("deliveryToken", token);
       alert("Login successful");
       router.push('/Delivery/deliverydashboard');
     } else {

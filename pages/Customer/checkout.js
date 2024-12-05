@@ -25,6 +25,7 @@ const Checkout = () => {
   const [newAddress, setNewAddress] = useState({
     addressLine: "",
     city: "",
+    area:"",
     postalCode: "",
   });
   const [showModal, setShowModal] = useState(false);
@@ -50,6 +51,10 @@ const Checkout = () => {
 
         setAddresses(addresses);
         setUserInfo({ ...userInfo, phone: "", city: "" }); // Let the user input phone and city
+
+        if(addresses.length>0){
+          setSelectedAddress(addresses[0]._id);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -76,6 +81,7 @@ const Checkout = () => {
         newAddress: {
           addressLine: newAddress.addressLine,
           city: newAddress.city,
+          area: newAddress.area,
           postalCode: newAddress.postalCode,
         },
       });
@@ -136,6 +142,7 @@ const Checkout = () => {
         newAddress: {
           addressLine,
           city: "Current Location",
+          area: "",
           postalCode: "",
         },
       });
