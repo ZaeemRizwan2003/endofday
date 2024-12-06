@@ -1,4 +1,3 @@
-// pages/admin/blogs.js
 import { useState } from "react";
 
 export default function BlogAdmin() {
@@ -7,14 +6,14 @@ export default function BlogAdmin() {
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     const blogData = { title, thumbnail, description, content };
 
@@ -27,70 +26,114 @@ export default function BlogAdmin() {
 
       if (response.ok) {
         const newBlog = await response.json();
-        setSuccess('Blog created successfully!');
+        setSuccess("Blog created successfully!");
         // Reset form
-        setTitle('');
-        setThumbnail('');
-        setDescription('');
-        setContent('');
+        setTitle("");
+        setThumbnail("");
+        setDescription("");
+        setContent("");
         alert("Blog created successfully!");
       } else {
-        setError('Failed to create blog.');
+        setError("Failed to create blog.");
         alert("Failed to create blog.");
       }
-    } 
-    catch (error) {
-        setError('An error occurred. Please try again.');
-     
+    } catch (error) {
+      setError("An error occurred. Please try again.");
       alert("An error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container">
-      <h1>Create a New Blog</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="container mx-auto p-6 max-w-3xl">
+      <h1 className="text-3xl font-bold text-center mb-6">Create a New Blog</h1>
+      
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Title */}
         <div>
-          <label>Title:</label>
+          <label htmlFor="title" className="block text-lg font-medium text-gray-700">Title</label>
           <input
+            id="title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
+
+        {/* Thumbnail URL */}
         <div>
-          <label>Thumbnail URL:</label>
+          <label htmlFor="thumbnail" className="block text-lg font-medium text-gray-700">Thumbnail URL</label>
           <input
+            id="thumbnail"
             type="text"
             value={thumbnail}
             onChange={(e) => setThumbnail(e.target.value)}
             required
+            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
+
+        {/* Description */}
         <div>
-          <label>Description:</label>
+          <label htmlFor="description" className="block text-lg font-medium text-gray-700">Description</label>
           <textarea
+            id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
-          ></textarea>
+            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            rows={4}
+          />
         </div>
+
+        {/* Content */}
         <div>
-          <label>Content:</label>
+          <label htmlFor="content" className="block text-lg font-medium text-gray-700">Content</label>
           <textarea
+            id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             required
-          ></textarea>
+            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            rows={6}
+          />
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating Blog...' : 'Create Blog'}
-        </button>
+
+        {/* Submit Button */}
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-2 px-4 font-semibold text-white rounded-lg focus:outline-none ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-purple-700 hover:bg-purple-600 focus:ring-4 focus:ring-purple-300"
+            }`}
+          >
+            {loading ? (
+              <div className="animate-spin border-4 border-t-transparent border-purple-500 rounded-full w-6 h-6 mx-auto" />
+            ) : (
+              "Create Blog"
+            )}
+          </button>
+        </div>
       </form>
 
-      {error && <p className="error">{error}</p>}
-      {success && <p className="success">{success}</p>}
+      {/* Feedback Messages */}
+      {error && (
+        <div className="mt-4 text-red-600 p-3 border border-red-400 rounded-md bg-red-50">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mt-4 text-green-600 p-3 border border-green-400 rounded-md bg-green-50">
+          {success}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
+import HomeNavbar from '@/Components/HomeNavbar';
 
 export default function BlogPost({ blog }) {
   const [likes, setLikes] = useState(blog.likes);
@@ -31,7 +32,8 @@ catch (error) {
 }
   };
 
-  return (
+  return <>
+    <HomeNavbar/>
     <div className="min-h-screen bg-white py-10">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-4xl font-bold text-purple-700">{blog.title}</h1>
@@ -70,7 +72,7 @@ catch (error) {
         </div>
       </div>
     </div>
-  );
+    </>
 }
 
 export async function getServerSideProps({ params }) {
