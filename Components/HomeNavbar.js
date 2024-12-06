@@ -128,7 +128,7 @@ const Navbar = () => {
             </li>
             <li>
               <Link
-                href="/about "
+                href="/blogs"
                 className="py-2 px-3 text-black hover:text-purple-700"
               >
                 Blogs
