@@ -23,7 +23,7 @@ const OrderSchema = new mongoose.Schema(
     address: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      // required: true,
     },
     status: {
       type: String,

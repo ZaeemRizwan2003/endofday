@@ -1,24 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter } from "next/router";
 
-const ReviewPage = ({ bakeryId }) => {
+const ReviewPage = () => {
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [message, setMessage] = useState("");
+  const [itemId, setItemId] = useState(null);
+  const [bakeryowner, setbakeryowner] = useState("");
 
-  const userId = localStorage.getItem("userId"); // Assuming the user is logged in
+  const router = useRouter();
+  const { orderId } = router.query;
+  const userId = localStorage.getItem("userId");
+
+  // Fetch data when the page loads
+  useEffect(() => {
+    if (orderId) {
+      axios
+        .get(`/api/Customer/postReview?orderId=${orderId}`)
+        .then((response) => {
+          const { itemId, bakeryowner } = response.data;
+          setItemId(itemId);
+          setbakeryowner(bakeryowner);
+        })
+        .catch((error) => {
+          console.error("Error fetching order details:", error);
+          setMessage("Failed to fetch order details.");
+        });
+    }
+  }, [orderId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!rating || !review) {
-      setMessage("Please provide both a rating and a review.");
+    if (!rating || !review || !itemId || !bakeryowner) {
+      setMessage("Please fill in all required fields.");
       return;
     }
 
     try {
       const response = await axios.post("/api/Customer/postReview", {
-        bakeryId,
+        itemId,
+        bakeryowner,
         userId,
         rating,
         review,
@@ -98,12 +121,3 @@ const ReviewPage = ({ bakeryId }) => {
 };
 
 export default ReviewPage;
-
-// Example to pass bakeryId from the server
-// For dynamic bakeryId, use something like getServerSideProps
-export const getServerSideProps = async (context) => {
-  const { bakeryId } = context.query; // Assuming bakeryId is passed as a query parameter
-  return {
-    props: { bakeryId },
-  };
-};

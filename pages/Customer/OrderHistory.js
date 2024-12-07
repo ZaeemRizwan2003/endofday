@@ -60,7 +60,7 @@ const OrderHistory = () => {
 
   const handleReviewOrder = (orderId) => {
     // Navigate to the review page with the order ID as a query parameter
-    router.push(`/Customer/ReviewOrder?orderId=${orderId}`);
+    router.push(`/Customer/ReviewPage?orderId=${orderId}`);
   };
 
   return (
