@@ -1,10 +1,13 @@
 import { useState } from "react";
 
 export default function BlogAdmin() {
-  const [title, setTitle] = useState("");
-  const [thumbnail, setThumbnail] = useState("");
-  const [description, setDescription] = useState("");
-  const [content, setContent] = useState("");
+  const [mode, setMode] = useState("manual"); // 'manual' or 'pdf'
+  const [title, setTitle] = useState(""); // For both modes
+  const [description, setDescription] = useState(""); // For both modes
+  const [content, setContent] = useState(""); // Manual mode only
+  const [thumbnailUrl, setThumbnailUrl] = useState(""); // Optional URL for thumbnail
+  const [thumbnailFile, setThumbnailFile] = useState(null); // Optional file for thumbnail
+  const [pdf, setPdf] = useState(null); // For PDF upload
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -15,31 +18,46 @@ export default function BlogAdmin() {
     setError("");
     setSuccess("");
 
-    const blogData = { title, thumbnail, description, content };
+    const formData = new FormData();
+    formData.append("mode", mode);
+    formData.append("title", title); // Title is required for both modes
+    formData.append("description", description); // Description is required for both modes
+
+    if (thumbnailFile) {
+      formData.append("thumbnail", thumbnailFile); // Add thumbnail file if provided
+    } else if (thumbnailUrl.trim()) {
+      formData.append("thumbnailUrl", thumbnailUrl); // Add thumbnail URL if provided
+    }
+
+    if (mode === "manual") {
+      formData.append("content", content); // Add content for manual mode
+    } else if (mode === "pdf" && pdf) {
+      formData.append("pdf", pdf); // Add the PDF file
+    } else {
+      setError("Please upload a PDF or select manual entry.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/Blog/getblogs", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(blogData),
+        body: formData,
       });
 
       if (response.ok) {
-        const newBlog = await response.json();
         setSuccess("Blog created successfully!");
-        // Reset form
         setTitle("");
-        setThumbnail("");
         setDescription("");
         setContent("");
-        alert("Blog created successfully!");
+        setThumbnailUrl("");
+        setThumbnailFile(null);
+        setPdf(null);
       } else {
         setError("Failed to create blog.");
-        alert("Failed to create blog.");
       }
     } catch (error) {
       setError("An error occurred. Please try again.");
-      alert("An error occurred.");
     } finally {
       setLoading(false);
     }
@@ -48,92 +66,132 @@ export default function BlogAdmin() {
   return (
     <div className="container mx-auto p-6 max-w-3xl">
       <h1 className="text-3xl font-bold text-center mb-6">Create a New Blog</h1>
-      
-      {/* Form */}
+
+      {/* Mode Selection */}
+      <div className="mb-6">
+        <label className="text-lg font-medium mr-4">Choose Mode:</label>
+        <label className="mr-4">
+          <input
+            type="radio"
+            value="manual"
+            checked={mode === "manual"}
+            onChange={() => setMode("manual")}
+            className="mr-2"
+          />
+          Manual Entry
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="pdf"
+            checked={mode === "pdf"}
+            onChange={() => setMode("pdf")}
+            className="mr-2"
+          />
+          Upload PDF
+        </label>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
         <div>
-          <label htmlFor="title" className="block text-lg font-medium text-gray-700">Title</label>
+          <label htmlFor="title" className="block text-lg font-medium text-gray-700">
+            Blog Title
+          </label>
           <input
             id="title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-        </div>
-
-        {/* Thumbnail URL */}
-        <div>
-          <label htmlFor="thumbnail" className="block text-lg font-medium text-gray-700">Thumbnail URL</label>
-          <input
-            id="thumbnail"
-            type="text"
-            value={thumbnail}
-            onChange={(e) => setThumbnail(e.target.value)}
-            required
-            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="mt-2 w-full px-4 py-2 border rounded-lg"
           />
         </div>
 
         {/* Description */}
         <div>
-          <label htmlFor="description" className="block text-lg font-medium text-gray-700">Description</label>
+          <label htmlFor="description" className="block text-lg font-medium text-gray-700">
+            Blog Description
+          </label>
           <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
-            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-            rows={4}
+            rows={3}
+            className="mt-2 w-full px-4 py-2 border rounded-lg"
           />
         </div>
 
-        {/* Content */}
+        {/* Thumbnail Upload or URL */}
         <div>
-          <label htmlFor="content" className="block text-lg font-medium text-gray-700">Content</label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-            rows={6}
+          <label className="block text-lg font-medium text-gray-700">Thumbnail</label>
+          <p className="text-sm text-gray-500 mt-1">You can either upload an image or provide a URL.</p>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setThumbnailFile(e.target.files[0])}
+            className="mt-2 w-full px-4 py-2 border rounded-lg"
+          />
+          <p className="text-sm text-gray-500 text-center my-2">OR</p>
+          <input
+            type="text"
+            value={thumbnailUrl}
+            onChange={(e) => setThumbnailUrl(e.target.value)}
+            placeholder="Enter image URL"
+            className="mt-2 w-full px-4 py-2 border rounded-lg"
           />
         </div>
 
-        {/* Submit Button */}
+        {/* Manual Mode Fields */}
+        {mode === "manual" && (
+          <div>
+            <label htmlFor="content" className="block text-lg font-medium text-gray-700">
+              Blog Content
+            </label>
+            <textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
+              rows={5}
+              className="mt-2 w-full px-4 py-2 border rounded-lg"
+            />
+          </div>
+        )}
+
+        {/* PDF Upload (for PDF Mode Only) */}
+        {mode === "pdf" && (
+          <div>
+            <label htmlFor="pdf" className="block text-lg font-medium text-gray-700">
+              Upload Blog PDF
+            </label>
+            <input
+              id="pdf"
+              type="file"
+              accept=".pdf"
+              onChange={(e) => setPdf(e.target.files[0])}
+              required
+              className="mt-2 w-full px-4 py-2 border rounded-lg"
+            />
+          </div>
+        )}
+
         <div className="flex justify-center">
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 px-4 font-semibold text-white rounded-lg focus:outline-none ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-purple-700 hover:bg-purple-600 focus:ring-4 focus:ring-purple-300"
+            className={`w-full py-2 px-4 font-semibold text-white rounded-lg ${
+              loading ? "bg-gray-400 cursor-not-allowed" : "bg-purple-700 hover:bg-purple-600"
             }`}
           >
-            {loading ? (
-              <div className="animate-spin border-4 border-t-transparent border-purple-500 rounded-full w-6 h-6 mx-auto" />
-            ) : (
-              "Create Blog"
-            )}
+            {loading ? "Creating Blog..." : "Create Blog"}
           </button>
         </div>
       </form>
 
-      {/* Feedback Messages */}
-      {error && (
-        <div className="mt-4 text-red-600 p-3 border border-red-400 rounded-md bg-red-50">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="mt-4 text-green-600 p-3 border border-green-400 rounded-md bg-green-50">
-          {success}
-        </div>
-      )}
+      {error && <p className="text-red-500 mt-4">{error}</p>}
+      {success && <p className="text-green-500 mt-4">{success}</p>}
     </div>
   );
 }
