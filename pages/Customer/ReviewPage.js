@@ -8,13 +8,14 @@ const ReviewPage = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [message, setMessage] = useState("");
   const [itemId, setItemId] = useState(null);
-  const [bakeryowner, setbakeryowner] = useState("");
+  const [bakeryOwner, setBakeryOwner] = useState("");
 
   const router = useRouter();
   const { orderId } = router.query;
-  const userId = localStorage.getItem("userId");
+  const userId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
-  // Fetch data when the page loads
+  // Fetch order details
   useEffect(() => {
     if (orderId) {
       axios
@@ -22,7 +23,7 @@ const ReviewPage = () => {
         .then((response) => {
           const { itemId, bakeryowner } = response.data;
           setItemId(itemId);
-          setbakeryowner(bakeryowner);
+          setBakeryOwner(bakeryowner);
         })
         .catch((error) => {
           console.error("Error fetching order details:", error);
@@ -33,24 +34,29 @@ const ReviewPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!rating || !review || !itemId || !bakeryowner) {
+
+    if (!rating || !review || !itemId || !bakeryOwner) {
       setMessage("Please fill in all required fields.");
       return;
     }
 
     try {
-      const response = await axios.post("/api/Customer/postReview", {
-        itemId,
-        bakeryowner,
-        userId,
-        rating,
-        review,
-      });
+      const response = await axios.post(
+        `/api/Customer/postReview?orderId=${orderId}`,
+        {
+          itemId,
+          bakeryOwner,
+          userId,
+          rating,
+          review,
+        }
+      );
 
       if (response.status === 200) {
         setMessage("Review submitted successfully!");
         setReview("");
         setRating(0);
+        setTimeout(() => router.push("/Customer/OrderHistory"), 2000);
       }
     } catch (error) {
       console.error("Error submitting review:", error);
@@ -59,23 +65,19 @@ const ReviewPage = () => {
   };
 
   const renderStars = () => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <span
-          key={i}
-          className={`cursor-pointer text-2xl ${
-            i <= (hoverRating || rating) ? "text-yellow-500" : "text-gray-400"
-          }`}
-          onClick={() => setRating(i)}
-          onMouseEnter={() => setHoverRating(i)}
-          onMouseLeave={() => setHoverRating(0)}
-        >
-          ★
-        </span>
-      );
-    }
-    return stars;
+    return Array.from({ length: 5 }, (_, i) => (
+      <span
+        key={i + 1}
+        className={`cursor-pointer text-2xl ${
+          i + 1 <= (hoverRating || rating) ? "text-yellow-500" : "text-gray-400"
+        }`}
+        onClick={() => setRating(i + 1)}
+        onMouseEnter={() => setHoverRating(i + 1)}
+        onMouseLeave={() => setHoverRating(0)}
+      >
+        ★
+      </span>
+    ));
   };
 
   return (

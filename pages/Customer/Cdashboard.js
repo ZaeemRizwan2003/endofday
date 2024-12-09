@@ -5,6 +5,14 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { LuLoader } from "react-icons/lu"; // Icon for loading spinner
 
+// Import FontAwesome icons
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faStar,
+  faStarHalfAlt,
+  faStar as faStarOutline,
+} from "@fortawesome/free-solid-svg-icons";
+
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,6 +69,50 @@ const Dashboard = () => {
 
     fetchRestaurants();
   }, [activeOption, user, search]);
+
+  const renderStars = (avgRating) => {
+    const totalStars = 5;
+    const filledStars = Math.floor(avgRating); // Get the whole number part of the average rating
+    const halfStar = avgRating - filledStars >= 0.5; // Check if there is a half-star
+    const emptyStars = totalStars - filledStars - (halfStar ? 1 : 0); // Remaining stars will be empty
+
+    const stars = [];
+
+    // Add filled stars
+    for (let i = 0; i < filledStars; i++) {
+      stars.push(
+        <FontAwesomeIcon
+          key={`filled-${i}`}
+          icon={faStar}
+          className="text-yellow-500 w-5 h-5"
+        />
+      );
+    }
+
+    // Add half star if needed
+    if (halfStar) {
+      stars.push(
+        <FontAwesomeIcon
+          key="half-star"
+          icon={faStarHalfAlt}
+          className="text-yellow-500 w-5 h-5"
+        />
+      );
+    }
+
+    // Add empty stars
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(
+        <FontAwesomeIcon
+          key={`empty-${i}`}
+          icon={faStarOutline}
+          className="text-gray-400 w-5 h-5"
+        />
+      );
+    }
+
+    return stars;
+  };
 
   if (!user) {
     return <div>Error: User not found</div>;
@@ -144,6 +196,15 @@ const Dashboard = () => {
                       <p className="text-gray-500 text-sm">
                         {restaurant.address}
                       </p>
+                      {/* Display the average rating */}
+                      <div className="flex items-center mt-2">
+                        <div className="flex">
+                          {renderStars(restaurant.avgRating)}
+                        </div>
+                        <p className="text-gray-600 text-lg font-semibold mr-2">
+                          {restaurant.avgRating}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </Link>

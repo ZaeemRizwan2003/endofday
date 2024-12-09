@@ -14,7 +14,7 @@ export default async function handler(req, res) {
       if (type && type !== "all") {
         bakeryFilter.option = type;
       }
-      
+
       if (search) {
         bakeryFilter.$or = [
           { restaurantName: { $regex: search, $options: "i" } },
@@ -24,18 +24,34 @@ export default async function handler(req, res) {
 
       const restaurants = await RegisteredBakeries.find(bakeryFilter);
 
+      // Calculate the average rating for each restaurant
+      const restaurantsWithAvgRating = restaurants.map((restaurant) => {
+        const totalRatings = restaurant.reviews.reduce(
+          (acc, review) => acc + review.rating,
+          0
+        );
+        const avgRating =
+          restaurant.reviews.length > 0
+            ? (totalRatings / restaurant.reviews.length).toFixed(1)
+            : 0; // Average rounded to 1 decimal place
+        return { ...restaurant.toObject(), avgRating };
+      });
+
       let listingFilter = {};
       if (search) {
         listingFilter.itemname = { $regex: search, $options: "i" };
       }
 
-      const listings = await Listings.find(listingFilter).populate('bakeryowner');
+      const listings = await Listings.find(listingFilter).populate(
+        "bakeryowner"
+      );
 
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       res.setHeader("Pragma", "no-cache");
       res.setHeader("Expires", "0");
 
-      res.status(200).json({ success: true, data: restaurants }) || res.status(200).json({ success: true, data: listings });
+      res.status(200).json({ success: true, data: restaurantsWithAvgRating }) ||
+        res.status(200).json({ success: true, data: listings });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }

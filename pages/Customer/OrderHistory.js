@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DashNav from "@/Components/CustomerNavbar";
-import Navbar from "@/Components/HomeNavbar";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FaTrashCan } from "react-icons/fa6";
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
-  const [userId, setUserId] = useState(null); // Assuming userId is stored in localStorage
+  const [userId, setUserId] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchUserId = () => {
-      const id = localStorage.getItem("userId"); // Get userId from localStorage
-      setUserId(id); // Set userId in state
+      const id = localStorage.getItem("userId");
+      setUserId(id);
     };
 
     fetchUserId();
@@ -59,7 +58,6 @@ const OrderHistory = () => {
   };
 
   const handleReviewOrder = (orderId) => {
-    // Navigate to the review page with the order ID as a query parameter
     router.push(`/Customer/ReviewPage?orderId=${orderId}`);
   };
 
@@ -112,12 +110,18 @@ const OrderHistory = () => {
                   >
                     <FaTrashCan className="w-6 h-6" />
                   </button>
-                  <button
-                    onClick={() => handleReviewOrder(order._id)}
-                    className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
-                  >
-                    Review Order
-                  </button>
+                  {order.reviewStatus === "Reviewed" ? (
+                    <span className="text-green-600 font-semibold">
+                      Reviewed
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleReviewOrder(order._id)}
+                      className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
+                    >
+                      Review Order
+                    </button>
+                  )}
                 </div>
               </div>
             ))

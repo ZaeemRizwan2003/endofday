@@ -23,7 +23,6 @@ const OrderSchema = new mongoose.Schema(
     address: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      // required: true,
     },
     status: {
       type: String,
@@ -32,7 +31,11 @@ const OrderSchema = new mongoose.Schema(
     deliveryBoy_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "deliverypartners",
-      // required: true,
+    },
+    reviewStatus: {
+      type: String,
+      enum: ["Reviewed", "Not Reviewed"],
+      default: "Not Reviewed",
     },
   },
   { timestamps: true }
