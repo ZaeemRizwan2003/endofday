@@ -143,7 +143,7 @@ const HomePage = () => {
             efficient food industry. Sign up today to get started!
           </p>
           <a
-            href="/Customer/Csignup"
+            href="/Customer/Signup"
             className="bg-white text-purple-800 py-3 px-8 rounded-full font-semibold hover:bg-gray-100 transition duration-300 animate-bounce"
           >
             Get Started
