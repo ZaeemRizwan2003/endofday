@@ -114,10 +114,6 @@ const Dashboard = () => {
     return stars;
   };
 
-  if (!user) {
-    return <div>Error: User not found</div>;
-  }
-
   return (
     <>
       <DashNav search={search} setSearch={setSearch} />

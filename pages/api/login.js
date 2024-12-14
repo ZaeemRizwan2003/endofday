@@ -1,5 +1,5 @@
 import dbConnect from "@/middleware/mongoose";
-import bcrypt from "bcryptjs"; // Ensure correct bcrypt package
+import bcrypt from "bcryptjs";
 import RegisteredBakeries from "@/models/RBakerymodel";
 import User from "@/models/CustomerUser";
 import DeliveryPartner from "@/models/DeliveryPartner";
@@ -97,11 +97,12 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: true,
         token,
+        userId: user._id,
         userType,
         userData,
       });
     } catch (error) {
-      console.error(error);
+      console.error("Login error: ", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   } else {

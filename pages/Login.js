@@ -27,18 +27,19 @@ const Login = () => {
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userId);
 
+        // Redirect based on userType
         if (userType === "bakery") {
           router.push("/Restaurants/RDashboard");
         } else if (userType === "listing") {
           router.push("/Customer/Cdashboard");
         } else if (userType === "delivery") {
           localStorage.setItem("delivery", JSON.stringify(formData));
-
           router.push("/Delivery/deliverydashboard");
         }
       }
     } catch (err) {
       setError("Invalid email, phone number, or password. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
