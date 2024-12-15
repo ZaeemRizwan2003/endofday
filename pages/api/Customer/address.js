@@ -62,6 +62,26 @@ export default async function handler(req, res) {
         .json({ success: false, message: "Error adding address" });
     }
 
+  }else if (method === "PATCH") {
+    const { userId, addressId } = req.body;
+  
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+  
+      // Set all other addresses to non-default
+      user.addresses.forEach((address) => {
+        address.isDefault = address._id.toString() === addressId;
+      });
+  
+      await user.save();
+  
+      return res.status(200).json({ success: true, message: "Default address updated" });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: "Error updating default address" });
+    }
   } else {
     res.status(405).json({ success: false, message: "Method not allowed" });
   }

@@ -28,20 +28,6 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-
-  //  useEffect(()=>{
-  //   const userId=localStorage.getItem("userId");
-  //   if(userId){
-  //     fetchUserCart();
-  //   }
-  //  },[]);
-
-  // useEffect(() => {
-  //   if (cart && Array.isArray(cart)) {
-  //     localStorage.setItem("cart", JSON.stringify(cart));
-  //   }
-  // }, [cart]);
-
   const syncCartToServer = async (userId, cart) => {
     if(!userId) return;
 
@@ -86,12 +72,6 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (itemId, title, price, remainingitem, bakeryId) => {
-    if (!Array.isArray(cart)) {
-      console.error("Cart is not an array");
-      setCart([]); // Reset to empty array if something went wrong
-      return;
-    }
-
     // Validate stock before adding
     if (!isStockAvailable(itemId, remainingitem)) {
       alert("Cannot add more than the available stock");
@@ -100,21 +80,26 @@ export const CartProvider = ({ children }) => {
 
     const existingItem = cart.find((cartItem) => cartItem.itemId === itemId);
 
-    if (existingItem) {
-      const updatedCart = cart.map((cartItem) =>
+      const updatedCart = existingItem
+       ? cart.map((cartItem) =>
         cartItem.itemId === itemId
           ? { ...cartItem, quantity: cartItem.quantity + 1 }
           : cartItem
-      );
+      )
+    : [...cart, { itemId, title, price, quantity: 1, bakeryId }];
+
       setCart(updatedCart);
-      await syncCartToServer(localStorage.getItem("userId"), updatedCart);
-    } else {
-      const newItem = { itemId, title, price, quantity: 1, bakeryId };
-      const updatedCart = [...cart, newItem];
-      setCart(updatedCart);
-      await syncCartToServer(localStorage.getItem("userId"), updatedCart);
-    }
-  };
+        const userId = localStorage.getItem("userId");
+    await syncCartToServer(userId, updatedCart);
+    };
+
+  //   } else {
+  //     const newItem = { itemId, title, price, quantity: 1, bakeryId };
+  //     const updatedCart = [...cart, newItem];
+  //     setCart(updatedCart);
+  //     await syncCartToServer(localStorage.getItem("userId"), updatedCart);
+  //   }
+  // };
 
   const incrementItemQuantity = async (itemId, remainingitem) => {
     // Validate stock before incrementing
@@ -140,12 +125,17 @@ export const CartProvider = ({ children }) => {
     await syncCartToServer(localStorage.getItem("userId"), updatedCart);
   };
 
-  const removeFromCart = (itemId) => {
-    setCart(cart.filter((item) => item.itemId !== itemId));
+  const removeFromCart = async (itemId) => {
+     const updatedCart = cart.filter((item) => item.itemId !== itemId);
+    setCart(updatedCart);
+    const userId = localStorage.getItem("userId");
+    await syncCartToServer(userId, updatedCart);
   };
 
-  const clearCart = () => {
+  const clearCart = async () => {
     setCart([]);
+    const userId = localStorage.getItem("userId");
+    await syncCartToServer(userId, []);
   };
 
   useEffect(() => {

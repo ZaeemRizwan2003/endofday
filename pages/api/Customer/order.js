@@ -1,7 +1,6 @@
 import dbConnect from "@/middleware/mongoose";
 import Order from "@/models/Order";
 import User from "@/models/CustomerUser";
-import DeliveryPartner from "@/models/DeliveryPartner";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -37,24 +36,6 @@ export default async function handler(req, res) {
       const user = await User.findById(userId);
       const selectedAddress = user.addresses.id(addressId);
 
-      //   const availableRiders = await DeliveryPartner.find({
-      //     area: selectedAddress.city,
-      //   });
-
-      //   if (availableRiders.length === 0) {
-      //     return res
-      //       .status(404)
-      //       .json({ message: "No available riders in this area" });
-      //   }
-
-      //   const assignedRider = availableRiders[0];
-
-      // const orderData = {
-      //     userId,
-      //     items: cart,
-      //     totalAmount,
-      //     addressId: selectedAddress, // Corrected key
-      //   };
 
       const newOrder = new Order({
         userId,
@@ -63,9 +44,7 @@ export default async function handler(req, res) {
         address: selectedAddress._id,
         // deliveryBoy_id: assignedRider._id,
       });
-      const savedOrder = await newOrder.save(); // Save the new order
-      //   assignedRider.orderId.push(savedOrder._id);
-      //   await assignedRider.save();
+      const savedOrder = await newOrder.save(); // 
 
       res.status(201).json(savedOrder); // Return the saved order
     } catch (error) {

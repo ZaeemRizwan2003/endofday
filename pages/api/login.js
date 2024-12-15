@@ -15,6 +15,7 @@ export default async function handler(req, res) {
     try {
       let user = null;
       let userType = null;
+      let cart = [];
 
       // Determine if identifier is email or phone number
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
@@ -28,6 +29,11 @@ export default async function handler(req, res) {
 
         user = bakeryUser || listingUser;
         userType = bakeryUser ? "bakery" : "listing";
+
+        if (userType === "listing" && listingUser) {
+          cart = listingUser.cart || [];
+        }
+
       } else {
         // Check DeliveryPartner collection by phone number
         const deliveryUser = await DeliveryPartner.findOne({
@@ -100,6 +106,7 @@ export default async function handler(req, res) {
         userId: user._id,
         userType,
         userData,
+        cart,
       });
     } catch (error) {
       console.error("Login error: ", error);

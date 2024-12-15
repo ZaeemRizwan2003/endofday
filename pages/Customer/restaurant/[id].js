@@ -82,8 +82,7 @@ const RestaurantMenu = () => {
   };
 
   const getItemQuantity = (itemId) => {
-    if (!Array.isArray(cart)) return 0;
-    const cartItem = cart.find((cartItem) => cartItem.id === itemId);
+    const cartItem = cart.find((item) => item.itemId === itemId);
     return cartItem ? cartItem.quantity : 1;
   };
 

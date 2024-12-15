@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { useCart } from "./cartcontext";
 import { FaRegMinusSquare, FaRegPlusSquare } from "react-icons/fa";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import DashNav from "@/Components/CustomerNavbar";
-import dynamic from "next/dynamic";
 import { loadStripe } from "@stripe/stripe-js";
+import { fetchAddresses, addNewAddress, setDefaultAddress } from "./Addresses";
+import AddressList from "@/Components/AddressList";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 );
-
-// Dynamically import OSMMap to ensure it's client-side rendered
-const OSMMap = dynamic(() => import("../../Components/OSMMap"), {
-  ssr: false,
-});
 
 const Checkout = () => {
   const {
@@ -25,6 +21,7 @@ const Checkout = () => {
     removeFromCart,
     clearCart,
   } = useCart();
+
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [newAddress, setNewAddress] = useState({
@@ -33,7 +30,6 @@ const Checkout = () => {
     postalCode: "",
   });
   const [showModal, setShowModal] = useState(false);
-  const [showMapModal, setShowMapModal] = useState(false); // For new address modal
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
@@ -41,7 +37,6 @@ const Checkout = () => {
     city: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [geoLocation, setGeoLocation] = useState(null);
 
   const router = useRouter();
 
@@ -54,7 +49,14 @@ const Checkout = () => {
         const { addresses, userInfo } = res.data;
 
         setAddresses(addresses);
-        setUserInfo({ ...userInfo, phone: "", city: "" }); // Let the user input phone and city
+
+        if (addresses.length > 0) {
+          const defaultAddress =
+            addresses.find((address) => address.isDefault) || addresses[0];
+          setSelectedAddress(defaultAddress._id);
+        }
+
+        setUserInfo({ ...userInfo, phone: "" }); // Let the user input phone and city
       } catch (err) {
         console.error(err);
       }
@@ -63,32 +65,23 @@ const Checkout = () => {
     fetchCheckoutData();
   }, []);
 
-  const handleLocationSelect = (coords) => {
-    // Set the geoLocation state from OSMMap component
-    console.log("coords reahed");
-    setGeoLocation(coords);
-  };
-
-  const handleAddressChange = (e) => {
-    setSelectedAddress(e.target.value);
-  };
-
   const handleNewAddress = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-      const res = await axios.post("/api/Customer/address", {
-        userId,
-        newAddress: {
-          addressLine: newAddress.addressLine,
-          city: newAddress.city,
-          postalCode: newAddress.postalCode,
-        },
-      });
-      setAddresses([...addresses, res.data.newAddress]);
-      setShowModal(false); // Close the modal
-    } catch (error) {
-      console.error("Failed to add new address", error);
-    }
+    const userId = localStorage.getItem("userId");
+    const addedAddress = await addNewAddress(userId, newAddress);
+    setAddresses([...addresses, {...addedAddress,isDefault:false}]);
+    setShowModal(false);
+  };
+
+  const handleSetDefaultAddress = async (addressId) => {
+    const userId = localStorage.getItem("userId");
+    await setDefaultAddress(userId, addressId);
+    setAddresses((prev) =>
+      prev.map((addr) => ({
+        ...addr,
+        isDefault: addr._id === addressId,
+      }))
+    );
+    setSelectedAddress(addressId);
   };
 
   const handleSubmit = async () => {
@@ -105,7 +98,6 @@ const Checkout = () => {
 
     const orderData = {
       userId,
-
       items: cart,
       totalAmount,
       addressId: selectedAddress, // Corrected key
@@ -116,41 +108,14 @@ const Checkout = () => {
       const response = await axios.post("/api/Customer/order", orderData);
       const orderId = response.data._id;
 
+      clearCart();
       router.push(`/Customer/OrderConfirm?id=${orderId}`);
-      clearCart(); // Clear cart after successful order placement
+
     } catch (err) {
       console.error(
         "Order submission failed",
         err.response?.data || err.message
       );
-    }
-  };
-
-  const handleSaveCurrentLocation = async () => {
-    if (!geoLocation) {
-      console.log("No location selected");
-      return;
-    }
-
-    try {
-      const userId = localStorage.getItem("userId");
-      const { latitude, longitude } = geoLocation;
-      const addressLine = `Lat: ${latitude}, Long: ${longitude}`;
-
-      const res = await axios.post("/api/Customer/address", {
-        userId,
-        newAddress: {
-          addressLine,
-          city: "Current Location",
-          postalCode: "",
-        },
-      });
-
-      setAddresses((prevAddresses) => [...prevAddresses, res.data.newAddress]);
-      setSelectedAddress(res.data.newAddress._id);
-      setShowMapModal(false); // Close the map modal after saving
-    } catch (error) {
-      console.error("Failed to save current location", error);
     }
   };
 
@@ -185,6 +150,7 @@ const Checkout = () => {
     .reduce((total, item) => total + 150 + item.price * item.quantity, 0)
     .toFixed(2);
 
+
   return (
     <div>
       <DashNav isCheckout={true} />
@@ -194,37 +160,18 @@ const Checkout = () => {
         {/* Address Section */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-black">Select Address</h2>
-          <div className="mt-2">
-            <select
-              value={selectedAddress}
-              onChange={handleAddressChange}
-              className="w-full p-3 border border-purple-300 rounded-lg text-black bg-white focus:outline-none focus:border-purple-500"
-            >
-              {addresses.length > 0 ? (
-                addresses.map((address, index) => (
-                  <option key={index} value={address._id}>
-                    {address.addressLine}, {address.city}, {address.postalCode}
-                  </option>
-                ))
-              ) : (
-                <option value="">No addresses available</option>
-              )}
-            </select>
-          </div>
+          <AddressList
+          addresses={addresses}
+          handleSetDefaultAddress={handleSetDefaultAddress}
+          />
 
           <button
             className="mt-4 p-2 bg-purple-700 text-white rounded hover:bg-purple-700"
-            onClick={() => setShowModal(true)} // Show modal for new address
+            onClick={() => setShowModal(true)}
           >
             Add New Address
           </button>
-          <button
-            className="mt-4 ml-4 p-2 bg-purple-700 text-white rounded hover:bg-purple-700"
-            onClick={() => setShowMapModal(true)} // Show modal for current location
-          >
-            Use Current Location
-          </button>
-        </div>
+          </div>
 
         {/* User Info Section */}
         <h2 className="text-xl font-semibold text-black mt-8">User Info</h2>
@@ -385,35 +332,6 @@ const Checkout = () => {
                 onClick={handleNewAddress}
               >
                 Save Address
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal for Map Selection */}
-      {showMapModal && (
-        <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
-            <h2 className="text-xl font-semibold mb-4">
-              Select Your Current Location
-            </h2>
-            <div className="w-full h-96">
-              {/* Render the OSM Map component */}
-              <OSMMap onLocationSelect={handleLocationSelect} />
-            </div>
-            <div className="text-right mt-4">
-              <button
-                className="bg-gray-300 text-black py-2 px-4 rounded-lg mr-4"
-                onClick={() => setShowMapModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-purple-700 text-white py-2 px-4 rounded-lg"
-                onClick={handleSaveCurrentLocation}
-              >
-                Save Location
               </button>
             </div>
           </div>

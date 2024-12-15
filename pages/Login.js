@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { useCart } from "./Customer/cartcontext";
 
 const Login = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { fetchUserCart } = useCart();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,10 +24,14 @@ const Login = () => {
       const res = await axios.post("/api/login", formData);
 
       if (res.status === 200) {
-        const { token, userId, userType } = res.data;
+        const { token, userId, userType} = res.data;
 
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userId);
+
+        if (userType === "listing") {
+          await fetchUserCart(userId); // Set cart for the customer
+        }
 
         // Redirect based on userType
         if (userType === "bakery") {
