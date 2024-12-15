@@ -1,5 +1,5 @@
 import dbConnect from "@/middleware/mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import RegisteredBakeries from "@/models/RBakerymodel";
 import User from "@/models/CustomerUser";
 import DeliveryPartner from "@/models/DeliveryPartner";
@@ -10,32 +10,41 @@ export default async function handler(req, res) {
   await dbConnect();
 
   if (req.method === "POST") {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
     try {
-      // Execute all searches in parallel
-      //   , deliveryUser
-      const [bakeryUser, listingUser] = await Promise.all([
-        RegisteredBakeries.findOne({ email }),
-        User.findOne({ email }),
-        DeliveryPartner.findOne({ email }),
-        // DeliveryPartner.findOne({ email }),
-      ]);
-
-      // Determine which user was found and set the user type
-      let user = bakeryUser || listingUser || deliveryUser;
-      //   || deliveryUser;
+      let user = null;
       let userType = null;
 
-      if (bakeryUser) {
-        userType = "bakery";
-      } else if (listingUser) {
-        userType = "listing";
-      } else if (deliveryUser) {
+      // Determine if identifier is email or phone number
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+
+      if (isEmail) {
+        // Check both RegisteredBakeries and Users collections
+        const [bakeryUser, listingUser] = await Promise.all([
+          RegisteredBakeries.findOne({ email: identifier }),
+          User.findOne({ email: identifier }),
+        ]);
+
+        user = bakeryUser || listingUser;
+        userType = bakeryUser ? "bakery" : "listing";
+      } else {
+        // Check DeliveryPartner collection by phone number
+        const deliveryUser = await DeliveryPartner.findOne({
+          contact: identifier,
+        });
+
+        if (!deliveryUser) {
+          return res
+            .status(404)
+            .json({ message: "Delivery partner not found" });
+        }
+
+        user = deliveryUser;
         userType = "delivery";
       }
 
-      // If no user is found, return 404
+      // If no user found in any collection
       if (!user) {
         return res
           .status(404)
@@ -50,14 +59,18 @@ export default async function handler(req, res) {
           .json({ message: "Invalid credentials. Try again." });
       }
 
-      // Sign JWT token with user type
+      // Generate JWT token
       const token = jwt.sign(
-        { userId: user._id, userType }, // Include userType in the token
+        { userId: user._id, userType },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
 
-      // Set cookies for auth token, userId, and userType
+      // Exclude password from user data response
+      const userData = { ...user._doc };
+      delete userData.password;
+
+      // Set cookies for the client
       res.setHeader("Set-Cookie", [
         cookie.serialize("authToken", token, {
           httpOnly: true,
@@ -73,7 +86,6 @@ export default async function handler(req, res) {
           path: "/",
         }),
         cookie.serialize("userType", userType, {
-          // Store user type in a cookie
           secure: process.env.NODE_ENV === "production",
           maxAge: 3600,
           sameSite: "strict",
@@ -81,11 +93,17 @@ export default async function handler(req, res) {
         }),
       ]);
 
-      // Return token and userId in response
-      res.status(200).json({ token, userId: user._id, userType });
+      // Return successful response
+      return res.status(200).json({
+        success: true,
+        token,
+        userId: user._id,
+        userType,
+        userData,
+      });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("Login error: ", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
   } else {
     res.status(405).json({ message: "Method not allowed" });

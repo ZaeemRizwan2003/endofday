@@ -27,12 +27,13 @@ const OrderPage = () => {
     fetchOrders();
   }, [id]);
 
-
   if (!order || Object.keys(order).length === 0) {
     return <p>No order found.</p>;
   }
 
-   const selectedAddress = order.userId.addresses.find(address => address._id.toString() === order.address.toString());
+  const selectedAddress = order.userId.addresses.find(
+    (address) => address._id.toString() === order.address.toString()
+  );
 
   return (
     <div className="flex items-center justify-center">
@@ -52,8 +53,8 @@ const OrderPage = () => {
           {/* <p>Address: {order.address.addressLine}</p> */}
           {selectedAddress ? (
             <p>
-              Address: {selectedAddress.addressLine}, {selectedAddress.area},{selectedAddress.city},{" "}
-              {selectedAddress.postalCode}
+              Address: {selectedAddress.addressLine}, {selectedAddress.area},
+              {selectedAddress.city}, {selectedAddress.postalCode}
             </p>
           ) : (
             <p>No address found for this order.</p>

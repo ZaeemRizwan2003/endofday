@@ -6,6 +6,11 @@ import { FaRegMinusSquare, FaRegPlusSquare } from "react-icons/fa";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import DashNav from "@/Components/CustomerNavbar";
 import dynamic from "next/dynamic";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+);
 
 // Dynamically import OSMMap to ensure it's client-side rendered
 const OSMMap = dynamic(() => import("../../Components/OSMMap"), {
@@ -149,6 +154,33 @@ const Checkout = () => {
     }
   };
 
+  const handleStripePayment = async () => {
+    const stripe = await stripePromise;
+    const userId = localStorage.getItem("userId");
+
+    if (!selectedAddress) {
+      alert("Please select an address");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "/api/Customer/create-checkout-session",
+        {
+          userId,
+          items: cart,
+          totalAmount: totalCartPrice,
+          addressId: selectedAddress,
+        }
+      );
+
+      const sessionId = response.data.id;
+      await stripe.redirectToCheckout({ sessionId });
+    } catch (error) {
+      console.error("Stripe payment failed", error);
+    }
+  };
+
   const totalCartPrice = cart
     .reduce((total, item) => total + 150 + item.price * item.quantity, 0)
     .toFixed(2);
@@ -259,21 +291,10 @@ const Checkout = () => {
           </label>
 
           <label
-            className={`flex items-center justify-center border-2 rounded-lg p-4 w-full text-center cursor-pointer ${
-              paymentMethod === "Easypaisa"
-                ? "border-purple-700 bg-purple-100"
-                : "border-gray-300"
-            }`}
+            onClick={handleStripePayment}
+            className="flex items-center justify-center border-2 rounded-lg p-4 w-full text-center cursor-pointer border-gray-300 hover:border-purple-700 hover:bg-purple-100"
           >
-            <input
-              type="radio"
-              name="payment"
-              value="Easypaisa"
-              checked={paymentMethod === "Easypaisa"}
-              onChange={() => setPaymentMethod("Easypaisa")}
-              className="hidden"
-            />
-            Easypaisa
+            Pay Online
           </label>
         </div>
 
