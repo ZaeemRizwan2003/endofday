@@ -28,6 +28,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("cart");
     setIsLoggedIn(false);
     setUser(null);
     router.push("/login");

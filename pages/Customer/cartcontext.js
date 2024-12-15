@@ -5,29 +5,46 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      try {
-        const parsedCart = JSON.parse(storedCart);
-        if (Array.isArray(parsedCart)) {
-          setCart(parsedCart);
-        } else {
-          setCart([]); // Reset if it's not an array
-        }
-      } catch (error) {
-        console.error("Error parsing stored cart data:", error);
-        setCart([]); // Reset to empty array on error
+    const fetchUserCart = async (userId) => {
+      if (!userId) {
+        setCart([]);
+        return;
       }
-    }
-  }, []);
 
-  useEffect(() => {
-    if (cart && Array.isArray(cart)) {
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
-  }, [cart]);
+        try {
+          const response = await fetch(`/api/Customer/cart?userId=${userId}`);
+          if (response.ok) {
+            const { cart } = await response.json();
+            setCart(cart || []); // Set the cart for the logged-in user
+            localStorage.setItem("cart", JSON.stringify(cart || []));
+
+          } else {
+            console.error("Failed to fetch cart for user:", userId);
+            setCart([]); // Reset cart on error
+          }
+        } catch (error) {
+          console.error("Error fetching cart:", error);
+          setCart([]); // Reset cart on error
+        }
+    };
+
+
+  //  useEffect(()=>{
+  //   const userId=localStorage.getItem("userId");
+  //   if(userId){
+  //     fetchUserCart();
+  //   }
+  //  },[]);
+
+  // useEffect(() => {
+  //   if (cart && Array.isArray(cart)) {
+  //     localStorage.setItem("cart", JSON.stringify(cart));
+  //   }
+  // }, [cart]);
+
   const syncCartToServer = async (userId, cart) => {
+    if(!userId) return;
+
     try {
       // Ensure the cart contains bakeryId for all items
       const enrichedCart = cart.map((item) => {
@@ -135,6 +152,16 @@ export const CartProvider = ({ children }) => {
     console.log("Cart updated:", cart);
   }, [cart]);
 
+  const handleUserChange = () => {
+    const userId = localStorage.getItem("userId");
+    fetchUserCart(userId);
+  };
+
+  useEffect(() => {
+    handleUserChange();
+  }, []);
+
+
   return (
     <CartContext.Provider
       value={{
@@ -145,6 +172,7 @@ export const CartProvider = ({ children }) => {
         decrementItemQuantity,
         removeFromCart,
         clearCart,
+        fetchUserCart,
       }}
     >
       {children}

@@ -3,9 +3,9 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { LuLoader } from "react-icons/lu"; // Icon for loading spinner
+import { LuLoader } from "react-icons/lu";
+import useSearch from "@/hooks/useSearch";
 
-// Import FontAwesome icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -17,8 +17,16 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [restaurants, setRestaurants] = useState([]);
-  const [activeOption, setActiveOption] = useState("all");
-  const [search, setSearch] = useState("");
+  const {
+    results,
+    search,
+    setSearch,
+    activeOption,
+    setActiveOption,
+    page,
+    setPage,
+    totalPages,
+  } = useSearch();
   const router = useRouter();
 
   useEffect(() => {
@@ -47,28 +55,6 @@ const Dashboard = () => {
     }
   }, [router]);
 
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchRestaurants = async () => {
-      setLoading(true); // Start loading
-      try {
-        const res = await axios.get(`/api/Customer/restaurants`, {
-          params: {
-            type: activeOption,
-            search: search,
-          },
-        });
-        setRestaurants(res.data.data || []);
-      } catch (error) {
-        console.error("Failed to fetch restaurants:", error);
-      } finally {
-        setLoading(false); // Stop loading
-      }
-    };
-
-    fetchRestaurants();
-  }, [activeOption, user, search]);
 
   const renderStars = (avgRating) => {
     const totalStars = 5;
@@ -114,9 +100,7 @@ const Dashboard = () => {
     return stars;
   };
 
-  if (!user) {
-    return <div>Error: User not found</div>;
-  }
+
 
   return (
     <>
@@ -125,40 +109,20 @@ const Dashboard = () => {
       <div className="p-20">
         {/* Options Buttons */}
         <div className="p-4 flex justify-center space-x-4 mb-8">
-          <button
-            onClick={() => setActiveOption("all")}
-            className={`px-6 py-3 font-medium md:px-4 md:py-2 text-white rounded-lg ${
-              activeOption === "all"
-                ? "bg-purple-800"
-                : "bg-gray-400 hover:bg-gray-500"
-            }`}
-          >
-            All
-          </button>
-
-          <button
-            onClick={() => setActiveOption("pickup")}
-            className={`px-6 py-3 md:px-4 md:py-2 font-medium text-white rounded-lg ${
-              activeOption === "pickup"
-                ? "bg-purple-800"
-                : "bg-gray-400 hover:bg-gray-500"
-            }`}
-          >
-            Pickup
-          </button>
-
-          <button
-            onClick={() => setActiveOption("delivery")}
-            className={`px-6 py-3 md:px-4 md:py-2 font-medium text-white rounded-lg ${
-              activeOption === "delivery"
-                ? "bg-purple-800"
-                : "bg-gray-400 hover:bg-gray-500"
-            }`}
-          >
-            Delivery
-          </button>
+          {["all", "pickup", "delivery"].map((option) => (
+            <button
+              key={option}
+              onClick={() => setActiveOption(option)}
+              className={`px-6 py-3 font-medium text-white rounded-lg ${
+                activeOption === option
+                  ? "bg-purple-800"
+                  : "bg-gray-400 hover:bg-gray-500"
+              }`}
+            >
+              {option.charAt(0).toUpperCase() + option.slice(1)}
+            </button>
+          ))}
         </div>
-
         {/* Loading State */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -170,8 +134,8 @@ const Dashboard = () => {
         ) : (
           /* Restaurant Grid */
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {restaurants.length > 0 ? (
-              restaurants.map((restaurant) => (
+            {results.restaurants.length > 0 ? (
+              results.restaurants.map((restaurant) => (
                 <Link
                   href={`/Customer/restaurant/${restaurant._id}`}
                   key={restaurant._id}
@@ -214,6 +178,24 @@ const Dashboard = () => {
             )}
           </div>
         )}
+       
+        <div className="flex justify-center mt-4">
+          <button
+            className="px-4 py-2 bg-gray-200 rounded-l disabled:opacity-50"
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span className="px-4 py-2">{`Page ${page} of ${totalPages}`}</span>
+          <button
+            className="px-4 py-2 bg-gray-200 rounded-r disabled:opacity-50"
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </>
   );

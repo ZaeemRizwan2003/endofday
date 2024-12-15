@@ -101,7 +101,7 @@ const Login = () => {
                             </button>
                             <p className="text-sm text-black font-light">
                                 Don’t have an account yet?{' '}
-                                <Link href="/Restaurants/Signup" className="font-medium text-black hover:underline">
+                                <Link href="/Customer/Signup" className="font-medium text-black hover:underline">
                                     Sign up
                                 </Link>
                             </p>

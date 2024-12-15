@@ -47,20 +47,27 @@ const Login = () => {
         email,
         password,
       });
-      const { token, userId } = res.data;
+      const { token, userId, cart } = res.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("userId", userId);
 
-      await syncCartToServer(userId, cart);
+      const serverCart = await fetch(
+        `/api/Customer/cart?userId=${userId}`
+      )
+        .then((res) => 
+          (res.ok ? res.json() : { cart: [] }));
+           setCart(serverCart.cart || []);
 
-      if (!userId) {
-        console.error("User ID not returned from login API");
-        return setError("Login failed, please check credentials");
-      }
+      // await syncCartToServer(userId, cart);
 
-      const serverCart = await loadCartFromServer(userId);
-      setCart(serverCart);
+      // if (!userId) {
+      //   console.error("User ID not returned from login API");
+      //   return setError("Login failed, please check credentials");
+      // }
+
+      // const serverCart = await loadCartFromServer(userId);
+      // setCart(serverCart);
 
       toast.success("Login successful! Redirecting to dashboard...");
       setTimeout(() => {
@@ -181,7 +188,6 @@ const Login = () => {
               Signup
             </Link>
           </p>
-
         </div>
         <ToastContainer />
       </div>

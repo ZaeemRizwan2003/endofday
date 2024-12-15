@@ -7,22 +7,37 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
-      const { type, search } = req.query;
-      let filter = {};
-      let bakeryFilter = {};
+      const { type = "all", search = "", page = 1, limit = 10 } = req.query;
 
-      if (type && type !== "all") {
-        bakeryFilter.option = type;
+      const skip = (page - 1) * limit;
+      
+      let bakeryFilter = {};
+      if (search) {
+        bakeryFilter.$or= [
+            { restaurantName: { $regex: search, $options: "i" } }, // Search by restaurant name
+            { address: { $regex: search, $options: "i" } }, // Search by address
+          ];
+        }
+      
+
+      if (type !== "all") {
+        bakeryFilter.option = type; // Filter by type
       }
 
       if (search) {
-        bakeryFilter.$or = [
-          { restaurantName: { $regex: search, $options: "i" } },
-          { address: { $regex: search, $options: "i" } },
-        ];
-      }
+        const listingFilter = { itemname: { $regex: search, $options: "i" } };
+        const matchingListings = await Listings.find(listingFilter).select("bakeryowner").lean();
+        const matchingBakeryIds = matchingListings.map((listing) => listing.bakeryowner);
 
-      const restaurants = await RegisteredBakeries.find(bakeryFilter);
+        if (matchingBakeryIds.length > 0) {
+          bakeryFilter.$or.push({ _id: { $in: matchingBakeryIds } });
+        }
+      }
+      // Step 3: Fetch bakeries with the combined filter
+      const restaurants = await RegisteredBakeries.find(bakeryFilter)
+        .populate("menu") // Populate menu for detailed results
+        .skip(skip)
+        .limit(parseInt(limit));
 
       // Calculate the average rating for each restaurant
       const restaurantsWithAvgRating = restaurants.map((restaurant) => {
@@ -37,22 +52,21 @@ export default async function handler(req, res) {
         return { ...restaurant.toObject(), avgRating };
       });
 
-      let listingFilter = {};
-      if (search) {
-        listingFilter.itemname = { $regex: search, $options: "i" };
-      }
+      const totalRestaurants = await RegisteredBakeries.countDocuments(bakeryFilter);
 
-      const listings = await Listings.find(listingFilter).populate(
-        "bakeryowner"
-      );
-
-      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-      res.setHeader("Pragma", "no-cache");
-      res.setHeader("Expires", "0");
-
-      res.status(200).json({ success: true, data: restaurantsWithAvgRating }) ||
-        res.status(200).json({ success: true, data: listings });
+    res.status(200).json({
+        success: true,
+        data: {
+          restaurants: restaurantsWithAvgRating,
+        },
+        meta: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          totalRestaurants,
+        },
+      });
     } catch (error) {
+      console.error("Error fetching restaurants:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   } else {

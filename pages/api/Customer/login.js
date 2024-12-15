@@ -25,7 +25,9 @@ export default async function handler(req, res) {
       { expiresIn: '1h' }
     );
 
-    res.status(200).json({ token, userId: user._id });
+    res.status(200).json({ token, userId: user._id , cart:user.cart ||[],
+      
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
