@@ -10,17 +10,22 @@ export default function AdminDashboard() {
         <DashboardCard
           title="Manage Restaurants"
           color="bg-blue-500"
-          link="/Admin/Manage-restaurants"
+          link="/Admin/ManageRestaurants/Manage-restaurants"
         />
         <DashboardCard
           title="Manage Customers"
           color="bg-green-500"
-          link="/manage-customers"
+          link="/Admin/ManageCustomers/Manage-customers"
         />
         <DashboardCard
           title="Manage Delivery Riders"
           color="bg-yellow-500"
-          link="/manage-delivery-riders"
+          link="/Admin/ManageRiders/manage-delivery-riders"
+        />
+        <DashboardCard
+          title="Manage Blogs"
+          color="bg-purple-500"
+          link="/Admin/Blogs/ManageBlogs"
         />
         <DashboardCard
           title="Manage Notification Requests"
@@ -34,7 +39,7 @@ export default function AdminDashboard() {
 
 function DashboardCard({ title, color, link }) {
   return (
-    <Link href={link}>
+    <Link legacyBehavior href={link}>
       <div
         className={`p-8 ${color} text-white rounded-lg shadow-lg hover:scale-105 transform transition duration-300 ease-in-out cursor-pointer`}
       >
