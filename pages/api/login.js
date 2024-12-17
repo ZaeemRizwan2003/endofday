@@ -33,7 +33,6 @@ export default async function handler(req, res) {
         if (userType === "listing" && listingUser) {
           cart = listingUser.cart || [];
         }
-
       } else {
         // Check DeliveryPartner collection by phone number
         const deliveryUser = await DeliveryPartner.findOne({
