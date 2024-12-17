@@ -4,7 +4,10 @@ const AddressSchema = new mongoose.Schema({
   addressLine: { type: String, required: true },
   area: { type: String },
   city: { type: String, required: true },
-  postalCode: { type: String, required: true },
+  postalCode: { type: String, default:"" },
+  isDefault:{type:Boolean, default:false},
+  lat: {type: Number},
+  lng: {type: Number},
 });
 
 const CartItemSchema = new mongoose.Schema({

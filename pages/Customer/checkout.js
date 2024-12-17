@@ -8,6 +8,7 @@ import DashNav from "@/Components/CustomerNavbar";
 import { loadStripe } from "@stripe/stripe-js";
 import { fetchAddresses, addNewAddress, setDefaultAddress } from "./Addresses";
 import AddressList from "@/Components/AddressList";
+import MapModal from "@/Components/MapModal";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -16,6 +17,7 @@ const stripePromise = loadStripe(
 const Checkout = () => {
   const {
     cart,
+    setCart,
     incrementItemQuantity,
     decrementItemQuantity,
     removeFromCart,
@@ -37,6 +39,7 @@ const Checkout = () => {
     city: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [showMapModal, setShowMapModal] = useState(false);
 
   const router = useRouter();
 
@@ -68,7 +71,7 @@ const Checkout = () => {
   const handleNewAddress = async () => {
     const userId = localStorage.getItem("userId");
     const addedAddress = await addNewAddress(userId, newAddress);
-    setAddresses([...addresses, {...addedAddress,isDefault:false}]);
+    setAddresses([...addresses, { ...addedAddress, isDefault: false }]);
     setShowModal(false);
   };
 
@@ -82,6 +85,36 @@ const Checkout = () => {
       }))
     );
     setSelectedAddress(addressId);
+  };
+
+  const handleSaveLocation = async (location) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("User ID is missing from localStorage");
+      return;
+    }
+
+    try {
+      const response = await axios.post("/api/Customer/map-address", {
+        userId,
+        location,
+      });
+      console.log("API response:", response.data);
+
+      if (response.data.success && response.data.newAddress) {
+        setAddresses((prevAddresses) => [...prevAddresses, response.data.newAddress]);
+        setShowMapModal(false);
+        alert("Location saved successfully!");
+
+      } else {
+        console.error("Unexpected API response:", response.data);
+        alert("Failed to save location. Please try again.");
+      }
+
+    } catch (error) {
+      console.error("Failed to save location", error);
+      alert("Failed to save location. Please try again.");
+    }
   };
 
   const handleSubmit = async () => {
@@ -109,8 +142,8 @@ const Checkout = () => {
       const orderId = response.data._id;
 
       clearCart();
+      setCart([]);
       router.push(`/Customer/OrderConfirm?id=${orderId}`);
-
     } catch (err) {
       console.error(
         "Order submission failed",
@@ -150,7 +183,6 @@ const Checkout = () => {
     .reduce((total, item) => total + 150 + item.price * item.quantity, 0)
     .toFixed(2);
 
-
   return (
     <div>
       <DashNav isCheckout={true} />
@@ -161,17 +193,24 @@ const Checkout = () => {
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-black">Select Address</h2>
           <AddressList
-          addresses={addresses}
-          handleSetDefaultAddress={handleSetDefaultAddress}
+            addresses={addresses}
+            handleSetDefaultAddress={handleSetDefaultAddress}
           />
 
           <button
-            className="mt-4 p-2 bg-purple-700 text-white rounded hover:bg-purple-700"
+            className="mt-4 p-2 bg-purple-700 text-white rounded hover:bg-purple-800"
             onClick={() => setShowModal(true)}
           >
             Add New Address
           </button>
-          </div>
+
+          <button
+            className="bg-blue-600 mt-4 ml-2 p-2  text-white rounded hover:bg-blue-700"
+            onClick={() => setShowMapModal(true)}
+          >
+            Use Maps
+          </button>
+        </div>
 
         {/* User Info Section */}
         <h2 className="text-xl font-semibold text-black mt-8">User Info</h2>
@@ -287,6 +326,13 @@ const Checkout = () => {
           </button>
         </div>
       </div>
+
+      {showMapModal && (
+        <MapModal
+          onClose={() => setShowMapModal(false)} // Close modal
+          onSaveLocation={handleSaveLocation} // Save location
+        />
+      )}
 
       {/* Modal for New Address */}
       {showModal && (
