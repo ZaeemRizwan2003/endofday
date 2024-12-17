@@ -50,6 +50,12 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    favorites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Listings", 
+      },
+    ],
   },
   { timestamps: true }
 );
