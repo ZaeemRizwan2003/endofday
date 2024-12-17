@@ -200,11 +200,15 @@ const Checkout = () => {
               onChange={handleAddressChange}
               className="w-full p-3 border border-purple-300 rounded-lg text-black bg-white focus:outline-none focus:border-purple-500"
             >
+              <option key="" value="">Select Address</option>
               {addresses.length > 0 ? (
                 addresses.map((address, index) => (
+                  <>
+                  
                   <option key={index} value={address._id}>
                     {address.addressLine}, {address.city}, {address.postalCode}
                   </option>
+                  </>
                 ))
               ) : (
                 <option value="">No addresses available</option>

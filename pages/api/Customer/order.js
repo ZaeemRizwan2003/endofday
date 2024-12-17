@@ -36,36 +36,32 @@ export default async function handler(req, res) {
     try {
       const user = await User.findById(userId);
       const selectedAddress = user.addresses.id(addressId);
+      
+        const availableRiders = await DeliveryPartner.find({
+          city: selectedAddress.city,
+        });
 
-      //   const availableRiders = await DeliveryPartner.find({
-      //     area: selectedAddress.city,
-      //   });
 
-      //   if (availableRiders.length === 0) {
-      //     return res
-      //       .status(404)
-      //       .json({ message: "No available riders in this area" });
-      //   }
+        if (availableRiders.length === 0) {
+          return res
+            .status(404)
+            .json({ message: "No available riders in this area" });
+        }
 
-      //   const assignedRider = availableRiders[0];
 
-      // const orderData = {
-      //     userId,
-      //     items: cart,
-      //     totalAmount,
-      //     addressId: selectedAddress, // Corrected key
-      //   };
+        const assignedRider = availableRiders[0];
 
       const newOrder = new Order({
         userId,
         items,
         totalAmount,
         address: selectedAddress._id,
-        // deliveryBoy_id: assignedRider._id,
+        deliveryBoy_id: assignedRider._id,
       });
+
       const savedOrder = await newOrder.save(); // Save the new order
-      //   assignedRider.orderId.push(savedOrder._id);
-      //   await assignedRider.save();
+      assignedRider.orderId.push(savedOrder._id);
+      await assignedRider.save();
 
       res.status(201).json(savedOrder); // Return the saved order
     } catch (error) {
