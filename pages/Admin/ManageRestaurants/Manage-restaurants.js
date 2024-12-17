@@ -7,7 +7,7 @@ export default function ManageRestaurants() {
   useEffect(() => {
     async function fetchRestaurants() {
       try {
-        const response = await fetch("/api/Admin/displayallrestaurants");
+        const response = await fetch("/api/Admin/Restaurants/displayallrestaurants");
         const data = await response.json();
 
         // Log the data to check if it's structured correctly

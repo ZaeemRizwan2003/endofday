@@ -3,6 +3,7 @@ import { FaRegHeart, FaRegCommentDots } from 'react-icons/fa';
 
 const BlogCard = ({ id, title, thumbnail, description, likes, comments }) => {
   return (
+    <Link legacyBehavior href={`/blog/${id}`}>
     <div className="group bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Thumbnail */}
       <img
@@ -35,6 +36,7 @@ const BlogCard = ({ id, title, thumbnail, description, likes, comments }) => {
         </div>
       </div>
     </div>
+    </Link>
   );
 };
 
