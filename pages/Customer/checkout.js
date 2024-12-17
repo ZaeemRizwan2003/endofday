@@ -345,55 +345,62 @@ const Checkout = () => {
         </div>
       </div>
 
-      {/* Modal for New Address */}
-      {showModal && (
-        <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="modal-content bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
-            <input
-              type="text"
-              placeholder="Address Line"
-              value={newAddress.addressLine}
-              onChange={(e) =>
-                setNewAddress({ ...newAddress, addressLine: e.target.value })
-              }
-              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-            />
-            <input
-              type="text"
-              placeholder="City"
-              value={newAddress.city}
-              onChange={(e) =>
-                setNewAddress({ ...newAddress, city: e.target.value })
-              }
-              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-            />
-            <input
-              type="text"
-              placeholder="Postal Code"
-              value={newAddress.postalCode}
-              onChange={(e) =>
-                setNewAddress({ ...newAddress, postalCode: e.target.value })
-              }
-              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-            />
-            <div className="text-right">
-              <button
-                className="bg-gray-300 text-black py-2 px-4 rounded-lg mr-4"
-                onClick={() => setShowModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-purple-700 text-white py-2 px-4 rounded-lg"
-                onClick={handleNewAddress}
-              >
-                Save Address
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      // Modal for New Address
+{showModal && (
+  <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="modal-content bg-white p-6 rounded-lg shadow-lg">
+      <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
+      
+      <input
+        type="text"
+        placeholder="Address Line"
+        value={newAddress.addressLine}
+        onChange={(e) =>
+          setNewAddress({ ...newAddress, addressLine: e.target.value })
+        }
+        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+      />
+      
+      {/* Dropdown for City Selection */}
+      <select
+        value={newAddress.city}
+        onChange={(e) =>
+          setNewAddress({ ...newAddress, city: e.target.value })
+        }
+        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+      >
+        <option value="">Select City</option>
+        <option value="Rawalpindi">Rawalpindi</option>
+        <option value="Islamabad">Islamabad</option>
+      </select>
+
+      <input
+        type="text"
+        placeholder="Postal Code"
+        value={newAddress.postalCode}
+        onChange={(e) =>
+          setNewAddress({ ...newAddress, postalCode: e.target.value })
+        }
+        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+      />
+      
+      <div className="text-right">
+        <button
+          className="bg-gray-300 text-black py-2 px-4 rounded-lg mr-4"
+          onClick={() => setShowModal(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-purple-700 text-white py-2 px-4 rounded-lg"
+          onClick={handleNewAddress}
+        >
+          Save Address
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Modal for Map Selection */}
       {showMapModal && (

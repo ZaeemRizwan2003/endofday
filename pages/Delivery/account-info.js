@@ -58,6 +58,9 @@ const AccountInfo = () => {
           <p className="mb-4">
             <span className="font-semibold text-gray-700">Area:</span> {user.area}
           </p>
+          <p className="mb-4">
+            <span className="font-semibold text-gray-700">City:</span> {user.city}
+          </p>
           {/* Add more user info fields as needed */}
         </div>
         <button
