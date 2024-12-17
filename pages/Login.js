@@ -24,7 +24,7 @@ const Login = () => {
       const res = await axios.post("/api/login", formData);
 
       if (res.status === 200) {
-        const { token, userId, userType} = res.data;
+        const { token, userId, userType } = res.data;
 
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userId);
