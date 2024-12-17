@@ -73,6 +73,14 @@ const DashNav = () => {
                   <li className="mb-3">
                     <button
                       className="text-purple-700 hover:underline"
+                      onClick={() => router.push("/Restaurants/ShowRequests")}
+                    >
+                      Notification Requests
+                    </button>
+                  </li>
+                  <li className="mb-3">
+                    <button
+                      className="text-purple-700 hover:underline"
                       onClick={() =>
                         router.push("/Restaurants/Change-Password")
                       }
@@ -90,6 +98,7 @@ const DashNav = () => {
                       Reviews
                     </button>
                   </li>
+
                   <li>
                     <button
                       className="text-red-600 hover:underline"

@@ -22,6 +22,11 @@ export default function AdminDashboard() {
           color="bg-yellow-500"
           link="/manage-delivery-riders"
         />
+        <DashboardCard
+          title="Manage Notification Requests"
+          color="bg-purple-500"
+          link="/Admin/RequestApproval"
+        />
       </div>
     </div>
   );
