@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import Navbar from "@/Components/Navbar";
+import { FaSpinner } from "react-icons/fa";
+
 const NotificationRequests = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,9 +41,12 @@ const NotificationRequests = () => {
   }, [router]);
 
   if (loading) {
-    return <div>Loading notifications...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <FaSpinner className="animate-spin text-6xl text-blue-500" />
+      </div>
+    );
   }
-
   if (error) {
     return <div>Error: {error}</div>;
   }

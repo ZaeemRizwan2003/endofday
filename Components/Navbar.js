@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { FaUser, FaTimes } from "react-icons/fa";
 import { useRouter } from "next/router";
+import { FaUser, FaTimes, FaBell } from "react-icons/fa";
 
 const DashNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu toggle
@@ -38,6 +38,10 @@ const DashNav = () => {
 
         {/* Buttons and icons */}
         <div className="flex md:order-2 space-x-3 rtl:space-x-reverse">
+          <FaBell
+            className="pl-2 mt-1 w-8 h-8 text-yellow-500 cursor-pointer"
+            onClick={() => router.push("/Restaurants/ShowRequests")} // Redirect or show notifications
+          />
           {/* User Account Menu */}
           <FaUser
             className="pl-2 mt-1 w-8 h-8 text-purple-800 cursor-pointer"

@@ -1,19 +1,23 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaRegMinusSquare, FaRegPlusSquare } from "react-icons/fa";
+import {
+  FaRegMinusSquare,
+  FaRegPlusSquare,
+  FaHeart,
+  FaRegHeart,
+} from "react-icons/fa";
 import DashNav from "@/Components/CustomerNavbar";
 import { useCart } from "../cartcontext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { LuLoader } from "react-icons/lu";
-import { FaHeart } from "react-icons/fa";
-import { FaRegHeart } from "react-icons/fa";
 
 const RestaurantMenu = () => {
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState([]);
+  const [avgRating, setAvgRating] = useState(0);
 
   const {
     addToCart,
@@ -41,7 +45,33 @@ const RestaurantMenu = () => {
       axios
         .get(`/api/Customer/restaurants/${id}`)
         .then((response) => {
-          setRestaurant(response.data);
+          const restaurantData = response.data;
+          console.log(restaurantData);
+
+          // Filter out listings older than 24 hours
+          const filteredMenu = restaurantData.menu.filter((item) => {
+            const updatedAt = new Date(item.updatedAt);
+            const currentTime = new Date();
+            const timeDifference = currentTime - updatedAt;
+            const hoursDifference = timeDifference / (1000 * 60 * 60); // Convert to hours
+            return hoursDifference <= 24; // Keep only listings within the last 24 hours
+          });
+
+          // Calculate average rating
+          const totalRating = restaurantData.reviews.reduce(
+            (acc, review) => acc + review.rating,
+            0
+          );
+          const avgRating = totalRating / restaurantData.reviews.length;
+
+          setRestaurant({
+            ...restaurantData,
+            menu: filteredMenu, // Set filtered menu items
+          });
+          setAvgRating(avgRating);
+
+          console.log("Average Rating:", avgRating); // Log the average rating
+
           setLoading(false); // Stop loading
         })
         .catch((error) => {
@@ -152,6 +182,10 @@ const RestaurantMenu = () => {
               <div className="w-full bg-gray-100 p-4">
                 <h1 className="text-3xl font-bold text-purple-800 mb-2">
                   {restaurant?.restaurantName}
+                  <span className="ml-4 text-yellow-500 font-semibold">
+                    {avgRating.toFixed(1)} {/* Display the average rating */}
+                    <span className="text-gray-400">/ 5</span>
+                  </span>
                   <button
                     className="ml-10 p-2 text-white rounded hover:underline transition text-base justify-end bg-purple-800"
                     onClick={() =>
@@ -161,6 +195,7 @@ const RestaurantMenu = () => {
                     Reviews
                   </button>
                 </h1>
+
                 <p className="text-lg mb-2">{restaurant?.address}</p>
                 <p className="text-gray-600">{restaurant?.description}</p>
               </div>
@@ -213,45 +248,39 @@ const RestaurantMenu = () => {
                               item._id,
                               item.itemname,
                               item.discountedprice,
-                              item.remainingitem,
                               item.bakeryId
                             )
                           }
+                          disabled={addedToCart[item._id]}
                         >
                           Add to Cart
                         </button>
-                        <div className="flex items-center">
-                          {cart ? (
-                            <>
-                              <button
-                                onClick={() => decrementItemQuantity(item._id)}
-                              >
-                                <FaRegMinusSquare />
-                              </button>
-                              <span className="px-4">
-                                {getItemQuantity(item._id)}
-                              </span>
-                              <button
-                                onClick={() =>
-                                  incrementItemQuantity(
-                                    item._id,
-                                    item.remainingitem
-                                  )
-                                }
-                              >
-                                <FaRegPlusSquare />
-                              </button>
-                            </>
-                          ) : (
-                            <span className="px-4">1</span>
-                          )}
-                        </div>
+
+                        {addedToCart[item._id] && (
+                          <div className="flex items-center">
+                            <button
+                              className="text-red-600 text-xl mr-2"
+                              onClick={() => decrementItemQuantity(item._id)}
+                            >
+                              <FaRegMinusSquare />
+                            </button>
+                            <span className="font-semibold">
+                              {getItemQuantity(item._id)}
+                            </span>
+                            <button
+                              className="text-green-600 text-xl ml-2"
+                              onClick={() => incrementItemQuantity(item._id)}
+                            >
+                              <FaRegPlusSquare />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p>No menu items available.</p>
+                <p className="text-gray-600">No menu items available</p>
               )}
             </div>
           </>

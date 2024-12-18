@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRouter } from "next/router"; // Import useRouter for navigation
+import { useRouter } from "next/router";
 
 export default function NotificationForm() {
   const [formData, setFormData] = useState({
@@ -7,7 +7,7 @@ export default function NotificationForm() {
     message: "",
   });
 
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,26 +15,44 @@ export default function NotificationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/Notification/createresnotification", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(formData),
-    });
 
-    const data = await res.json();
-    alert(data.message || "Request submitted");
+    try {
+      // Get userId directly from localStorage
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        alert("User ID is missing. Please log in again.");
+        return;
+      }
+
+      const res = await fetch("/api/Notification/createresnotification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          userId: userId, // Send userId in headers
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Notification request submitted successfully!");
+        router.push("/Restaurants/RDashboard"); // Redirect on success
+      } else {
+        alert(data.error || "Failed to submit request");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An unexpected error occurred");
+    }
   };
 
   const goBackToDashboard = () => {
-    router.push("/Restaurants/RDashboard"); // Redirect to the dashboard page
+    router.push("/Restaurants/RDashboard");
   };
 
   return (
     <div className="relative">
-      {/* Go Back Button */}
       <button
         onClick={goBackToDashboard}
         className="absolute top-4 right-4 px-6 py-2 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 focus:outline-none"
@@ -42,7 +60,6 @@ export default function NotificationForm() {
         Go Back to Dashboard
       </button>
 
-      {/* Notification Form */}
       <form
         onSubmit={handleSubmit}
         className="max-w-lg mx-auto mt-10 p-8 bg-white shadow-lg rounded-lg"

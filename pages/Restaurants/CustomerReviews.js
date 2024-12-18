@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { LuLoader } from "react-icons/lu"; // Loader icon
-import DashNav from "@/Components/CustomerNavbar";
-
+import DashNav from "@/Components/Navbar";
 const RestaurantUserReviews = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
