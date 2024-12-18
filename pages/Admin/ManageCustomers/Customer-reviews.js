@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import Link from "next/link";
 import { FaStar, FaArrowLeft } from "react-icons/fa"; // Import star and arrow icons
+import AdminLayout from "@/Components/AdminLayout";
 
 export default function CustomerReviews() {
   const [reviews, setReviews] = useState([]);
@@ -37,6 +38,7 @@ export default function CustomerReviews() {
   }, [userId]);
 
   return (
+    <AdminLayout>
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header Section */}
       <div className="flex items-center justify-between mb-6">
@@ -101,5 +103,6 @@ export default function CustomerReviews() {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 }

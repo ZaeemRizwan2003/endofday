@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import AdminLayout from "@/Components/AdminLayout";
 
 export default function ManageCustomers() {
   const [customers, setCustomers] = useState([]);
@@ -100,6 +101,7 @@ export default function ManageCustomers() {
   };
 
   return (
+  <AdminLayout>
     <div className="min-h-screen bg-gray-100 p-6">
       {/* Page Title */}
       <div className="mb-6 flex justify-between items-center">
@@ -122,7 +124,7 @@ export default function ManageCustomers() {
           </p>
         </div>
       ) : customers.length > 0 ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {customers.map((customer) => (
             <div
               key={customer._id}
@@ -171,10 +173,10 @@ export default function ManageCustomers() {
                     </p>
                   </div>
 
-                  <div className="flex space-x-4">
+                  <div className=" mt-5 flex space-x-2">
                     <Link legacyBehavior 
                       href={`/Admin/ManageCustomers/Customer-orders?userId=${customer._id}`}
-                      className="text-blue-500 hover:text-blue-700 font-medium transition"
+                      className="text-blue-500 hover:text-blue-700 font-medium transition text-underline"
                     >
                       View Orders
                     </Link>
@@ -253,5 +255,6 @@ export default function ManageCustomers() {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 }

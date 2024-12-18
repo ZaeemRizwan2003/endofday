@@ -1,3 +1,4 @@
+import AdminLayout from "@/Components/AdminLayout";
 import React, { useState, useEffect } from "react";
 
 export default function ManageRestaurants() {
@@ -43,7 +44,10 @@ export default function ManageRestaurants() {
 
     fetchRestaurants();
   }, []);
+
+
   return (
+    <AdminLayout>
     <div className="min-h-screen bg-gray-100 p-6">
       {/* Page Title */}
       <div className="mb-6 flex justify-between items-center">
@@ -107,5 +111,6 @@ export default function ManageRestaurants() {
         ))}
       </div>
     </div>
+    </AdminLayout>
   );
 }

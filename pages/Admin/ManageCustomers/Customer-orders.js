@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import AdminLayout from "@/Components/AdminLayout";
 
 export default function CustomerOrders() {
   const [orders, setOrders] = useState([]);
@@ -34,6 +35,7 @@ export default function CustomerOrders() {
   }, [userId]);
 
   return (
+    <AdminLayout>
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Page Header */}
       <div className="flex justify-between items-center mb-6">
@@ -122,5 +124,6 @@ export default function CustomerOrders() {
         </div>
       )}
     </div>
+  </AdminLayout>
   );
 }

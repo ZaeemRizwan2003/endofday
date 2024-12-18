@@ -3,6 +3,7 @@ import Link from "next/link";
 import axios from "axios";
 import BlogCard from "@/Components/BlogCard";
 import { FaEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
+import AdminLayout from "@/Components/AdminLayout";
 
 export default function ManageBlogs() {
   const [blogs, setBlogs] = useState([]);
@@ -101,6 +102,7 @@ export default function ManageBlogs() {
   };
 
   return (
+    <AdminLayout>
     <div className="min-h-screen bg-gray-100 p-6">
       {/* Page Title */}
       <div className="flex justify-between items-center mb-6">
@@ -237,5 +239,7 @@ export default function ManageBlogs() {
       )}
 
     </div>
+
+    </AdminLayout>
   );
 }

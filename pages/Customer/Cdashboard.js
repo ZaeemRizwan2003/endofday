@@ -174,7 +174,7 @@ const Dashboard = () => {
                 </Link>
               ))
             ) : (
-              <p>No restaurants available for {activeOption}.</p>
+              <p>Fetching {activeOption}.......</p>
             )}
           </div>
         )}

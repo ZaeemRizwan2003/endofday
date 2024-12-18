@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import AdminLayout from "@/Components/AdminLayout";
 const RequestApproval = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +77,7 @@ const RequestApproval = () => {
   }
 
   return (
+    <AdminLayout>
     <div className="container mx-auto p-4 mt-20">
       <Link
         legacyBehavior
@@ -142,6 +144,7 @@ const RequestApproval = () => {
         </ul>
       )}
     </div>
+    </AdminLayout>
   );
 };
 
