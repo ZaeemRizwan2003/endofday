@@ -6,11 +6,15 @@ import DashNav from "@/Components/CustomerNavbar";
 import { useCart } from "../cartcontext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { LuLoader } from "react-icons/lu"; // Spinner icon
+import { LuLoader } from "react-icons/lu";
+import { FaHeart } from "react-icons/fa";
+import { FaRegHeart } from "react-icons/fa";
 
 const RestaurantMenu = () => {
   const [restaurant, setRestaurant] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state for spinner
+  const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState([]);
+
   const {
     addToCart,
     incrementItemQuantity,
@@ -86,11 +90,53 @@ const RestaurantMenu = () => {
     return cartItem ? cartItem.quantity : 1;
   };
 
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      axios
+        .get(`/api/Customer/favorites?userId=${userId}`)
+        .then((response) => setFavorites(response.data.favorites))
+        .catch((error) => console.error("Error fetching favorites:", error));
+    }
+  }, []);
+
+  // Toggle Favorite Function
+  const toggleFavorite = async (listingId) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    const isFavorite = favorites.some((fav) => fav._id === listingId);
+
+    try {
+      if (isFavorite) {
+        // Remove from favorites
+        await axios.delete("/api/Customer/favorites", {
+          data: { userId, listingId },
+        });
+
+        setFavorites((prev) => prev.filter((fav) => fav._id !== listingId));
+        toast.success("Removed from favorites!", { autoClose: 1000 });
+      } else {
+        // Add to favorites
+        await axios.post("/api/Customer/favorites", { userId, listingId });
+
+        setFavorites((prev) => [...prev, { _id: listingId }]);
+        toast.success("Added to favorites!", { autoClose: 1000 });
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      toast.error("Failed to update favorites");
+    }
+  };
+
+  const isFavorite = (listingId) =>
+    favorites.some((fav) => fav._id === listingId);
+
   return (
     <>
       <ToastContainer />
       <DashNav />
-      <div className="p-14 justify-center">
+      <div className="p-20 justify-center">
         {loading ? (
           // Loading spinner while fetching data
           <div className="flex justify-center items-center h-64">
@@ -103,11 +149,11 @@ const RestaurantMenu = () => {
           <>
             {/* Restaurant Details */}
             <div className="flex mb-8 mt-12">
-              <div className="w-2/3">
+              <div className="w-full bg-gray-100 p-4">
                 <h1 className="text-3xl font-bold text-purple-800 mb-2">
                   {restaurant?.restaurantName}
                   <button
-                    className="ml-4 px-4 py-2 bg-purple-800 text-white rounded hover:bg-purple-600 transition"
+                    className="ml-10 p-2 text-white rounded hover:underline transition text-base justify-end bg-purple-800"
                     onClick={() =>
                       router.push(`/Customer/RestaurantReview?id=${id}`)
                     }
@@ -128,7 +174,19 @@ const RestaurantMenu = () => {
                     key={item._id}
                     className="flex flex-col border rounded-lg overflow-hidden shadow-lg hover:shadow-md transition duration-300"
                   >
-                    <div className="p-4 flex flex-col justify-between h-full w-full">
+                    <div className="relative group border rounded-lg shadow-lg p-4 flex flex-col justify-between h-full">
+                      <div className="absolute top-2 right-2">
+                        <button
+                          onClick={() => toggleFavorite(item._id)}
+                          className="mt-4 self-start"
+                        >
+                          {isFavorite(item._id) ? (
+                            <FaHeart className="text-red-600 text-2xl" />
+                          ) : (
+                            <FaRegHeart className="text-gray-400 text-2xl" />
+                          )}
+                        </button>
+                      </div>
                       <div className="flex-grow">
                         <h2 className="text-xl font-bold text-purple-800 mb-2">
                           {item.itemname}
