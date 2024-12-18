@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-
+import Link from "next/link";
 const RequestApproval = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +77,13 @@ const RequestApproval = () => {
 
   return (
     <div className="container mx-auto p-4 mt-20">
+      <Link
+        legacyBehavior
+        href="/Admin/AdminDashboard"
+        className="text-blue-600 hover:text-blue-800"
+      >
+        &larr; Back to Dashboard
+      </Link>
       <h1 className="text-2xl font-bold mb-4 text-center">
         Notification Requests
       </h1>

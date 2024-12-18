@@ -24,13 +24,13 @@ export default function AdminDashboard() {
         />
         <DashboardCard
           title="Manage Blogs"
-          color="bg-purple-500"
+          color="bg-pink-500"
           link="/Admin/Blogs/ManageBlogs"
         />
         <DashboardCard
           title="Manage Notification Requests"
           color="bg-purple-500"
-          link="/Admin/RequestApproval"
+          link="/Admin/Notification/RequestApproval"
         />
       </div>
     </div>

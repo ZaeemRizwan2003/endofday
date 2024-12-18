@@ -6,6 +6,10 @@ const NotificationRequestSchema = new mongoose.Schema({
     ref: "BakeryOwner",
     required: true,
   },
+  bakeryOwnerName: {
+    type: String,
+    required: false,
+  },
   title: {
     type: String,
     required: true,
