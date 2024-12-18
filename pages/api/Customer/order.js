@@ -1,7 +1,7 @@
 import dbConnect from "@/middleware/mongoose";
 import Order from "@/models/Order";
 import User from "@/models/CustomerUser";
-
+import DeliveryPartner from "@/models/DeliveryPartner";
 export default async function handler(req, res) {
   await dbConnect();
 
@@ -24,8 +24,9 @@ export default async function handler(req, res) {
     } catch (error) {
       return res.status(500).json({ message: "Error fetching order", error });
     }
+
   } else if (req.method === "POST") {
-    const { userId, items, totalAmount, addressId } = req.body;
+    const { userId, items, totalAmount, addressId, contact} = req.body;
 
     // Validate required fields
     if (!userId || !items || !totalAmount || !addressId) {
@@ -35,16 +36,44 @@ export default async function handler(req, res) {
     try {
       const user = await User.findById(userId);
       const selectedAddress = user.addresses.id(addressId);
+      
+      if (!selectedAddress) {
+        return res.status(404).json({ message: "Address not found" });
+      }
 
+      const { city, area } = selectedAddress;
+
+        const availableRiders = await 
+        DeliveryPartner.find({
+          city  });
+
+
+        if (availableRiders.length === 0) {
+          return res
+            .status(404)
+            .json({ message: "No available riders in this area" });
+        }
+
+        const ridersInArea = availableRiders.filter(
+          (rider) => rider.area === area
+        );
+
+         let assignedRider = ridersInArea.length > 0
+        ? ridersInArea[0] 
+        : availableRiders[0];
 
       const newOrder = new Order({
         userId,
         items,
         totalAmount,
         address: selectedAddress._id,
-        // deliveryBoy_id: assignedRider._id,
+        contact,
+        deliveryBoy_id: assignedRider._id,
       });
-      const savedOrder = await newOrder.save(); // 
+
+      const savedOrder = await newOrder.save(); // Save the new order
+      assignedRider.orderId.push(savedOrder._id);
+      await assignedRider.save();
 
       res.status(201).json(savedOrder); // Return the saved order
     } catch (error) {

@@ -24,9 +24,13 @@ const OrderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    contact: { 
+      type: String,
+      required: true,
+    },
     status: {
       type: String,
-      default: "Pending", // Possible values: Pending, Completed, Cancelled
+      default: "Pending", 
     },
     deliveryBoy_id: {
       type: mongoose.Schema.Types.ObjectId,

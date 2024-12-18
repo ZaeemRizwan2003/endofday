@@ -35,7 +35,7 @@ const Checkout = () => {
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
-    phone: "",
+    contact: "",
     city: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -129,11 +129,17 @@ const Checkout = () => {
       return;
     }
 
+    if (!userInfo.phone) {
+      alert("Please fill in your contact and city details.");
+      return;
+  }
+
     const orderData = {
       userId,
       items: cart,
       totalAmount,
-      addressId: selectedAddress, // Corrected key
+      addressId: selectedAddress,
+      contact: userInfo.contact,  
     };
 
     console.log("Order data being sent:", orderData);
@@ -169,6 +175,7 @@ const Checkout = () => {
           items: cart,
           totalAmount: totalCartPrice,
           addressId: selectedAddress,
+          contact: userInfo.contact,
         }
       );
 
@@ -334,50 +341,140 @@ const Checkout = () => {
         />
       )}
 
-      {/* Modal for New Address */}
-      {showModal && (
+      // Modal for New Address
+{showModal && (
+  <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="modal-content bg-white p-6 rounded-lg shadow-lg">
+      <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
+      
+      <input
+        type="text"
+        placeholder="Address Line"
+        value={newAddress.addressLine}
+        onChange={(e) =>
+          setNewAddress({ ...newAddress, addressLine: e.target.value })
+        }
+        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+      />
+      
+      {/* Dropdown for City Selection */}
+      <select
+        value={newAddress.city}
+        onChange={(e) =>
+          setNewAddress({ ...newAddress, city: e.target.value })
+        }
+        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+      >
+        <option value="">Select City</option>
+        <option value="Rawalpindi">Rawalpindi</option>
+        <option value="Islamabad">Islamabad</option>
+      </select>
+
+ {/* Dropdown for Area Selection */}
+ {newAddress.city && (
+        <select
+          value={newAddress.area}
+          onChange={(e) =>
+            setNewAddress({ ...newAddress, area: e.target.value })
+          }
+          className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+        >
+          <option value="">Select Area</option>
+          {newAddress.city === "Islamabad" &&
+            [
+              "E-7, Islamabad",
+              "E-8, Islamabad",
+              "E-9, Islamabad",
+              "E-10, Islamabad",
+              "E-11, Islamabad",
+              "E-12, Islamabad",
+              "E-16, Islamabad",
+              "E-17, Islamabad",
+              "F-5, Islamabad",
+              "F-6, Islamabad",
+              "F-7",
+              "F-8, Islamabad",
+              "F-9",
+              "F-10, Islamabad",
+              "F-11, Islamabad",
+              "F-12, Islamabad",
+              "F-15, Islamabad",
+              "F-17, Islamabad",
+              "I-8, Islamabad",
+              "I-9, Islamabad",
+              "I-10, Islamabad",
+              "I-11, Islamabad",
+            ].map((area) => (
+              <option key={area} value={area}>
+                {area}
+              </option>
+            ))}
+          {newAddress.city === "Rawalpindi" &&
+            [
+              "A block",
+              "B block",
+              "D block",
+              "Satellite town",
+            ].map((area) => (
+              <option key={area} value={area}>
+                {area}
+              </option>
+            ))}
+        </select>
+      )}
+
+
+      <input
+        type="text"
+        placeholder="Postal Code"
+        value={newAddress.postalCode}
+        onChange={(e) =>
+          setNewAddress({ ...newAddress, postalCode: e.target.value })
+        }
+        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+      />
+      
+      <div className="text-right">
+        <button
+          className="bg-gray-300 text-black py-2 px-4 rounded-lg mr-4"
+          onClick={() => setShowModal(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-purple-700 text-white py-2 px-4 rounded-lg"
+          onClick={handleNewAddress}
+        >
+          Save Address
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+      {/* Modal for Map Selection */}
+      {showMapModal && (
         <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="modal-content bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
-            <input
-              type="text"
-              placeholder="Address Line"
-              value={newAddress.addressLine}
-              onChange={(e) =>
-                setNewAddress({ ...newAddress, addressLine: e.target.value })
-              }
-              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-            />
-            <input
-              type="text"
-              placeholder="City"
-              value={newAddress.city}
-              onChange={(e) =>
-                setNewAddress({ ...newAddress, city: e.target.value })
-              }
-              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-            />
-            <input
-              type="text"
-              placeholder="Postal Code"
-              value={newAddress.postalCode}
-              onChange={(e) =>
-                setNewAddress({ ...newAddress, postalCode: e.target.value })
-              }
-              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-            />
-            <div className="text-right">
+          <div className="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
+            <h2 className="text-xl font-semibold mb-4">
+              Select Your Current Location
+            </h2>
+            <div className="w-full h-96">
+              {/* Render the OSM Map component */}
+              <OSMMap onLocationSelect={handleLocationSelect} />
+            </div>
+            <div className="text-right mt-4">
               <button
                 className="bg-gray-300 text-black py-2 px-4 rounded-lg mr-4"
-                onClick={() => setShowModal(false)}
+                onClick={() => setShowMapModal(false)}
               >
                 Cancel
               </button>
               <button
                 className="bg-purple-700 text-white py-2 px-4 rounded-lg"
-                onClick={handleNewAddress}
+                onClick={handleSaveCurrentLocation}
               >
-                Save Address
+                Save Location
               </button>
             </div>
           </div>

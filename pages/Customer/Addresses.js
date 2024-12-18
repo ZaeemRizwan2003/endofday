@@ -11,7 +11,7 @@ export const fetchAddresses = async (userId) => {
 };
 
 export const addNewAddress = async (userId, newAddress) => {
-    if (!userId || !newAddress.addressLine || !newAddress.city) {
+    if (!userId || !newAddress.addressLine || !newAddress.area|| !newAddress.city) {
         console.error("Invalid input: Missing required fields");
         throw new Error("Invalid input: Missing required fields");
       }

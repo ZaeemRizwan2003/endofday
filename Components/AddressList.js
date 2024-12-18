@@ -40,7 +40,7 @@ const AddressList = ({ addresses, handleSetDefaultAddress }) => {
                   address.isDefault ? "bg-purple-100" : "bg-white"
                 }`}
               >
-                <p className="text-sm truncate w-2/3">{address.addressLine}, {address.city}</p>
+                <p className="text-sm truncate w-2/3">{address.addressLine},{address.area}, {address.city}</p>
                 <button
                   onClick={() => {
                     handleSetDefaultAddress(address._id);
