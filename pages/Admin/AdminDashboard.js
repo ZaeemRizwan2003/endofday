@@ -30,7 +30,7 @@ export default function AdminDashboard() {
         <DashboardCard
           title="Manage Notification Requests"
           color="bg-purple-500"
-          link="/Admin/RequestApproval"
+          link="/Admin/Notification/RequestApproval"
         />
       </div>
     </div>
