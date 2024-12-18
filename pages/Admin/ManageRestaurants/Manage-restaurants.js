@@ -43,49 +43,65 @@ export default function ManageRestaurants() {
 
     fetchRestaurants();
   }, []);
-
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Restaurants</h1>
+    <div className="min-h-screen bg-gray-100 p-6">
+      {/* Page Title */}
+      <div className="mb-6 flex justify-between items-center">
+        <h1 className="text-4xl font-extrabold text-gray-800">Restaurants</h1>
+        <p className="text-lg font-semibold text-gray-700">
+          Total Bakeries: {bakeryCount}
+        </p>
+      </div>
 
-      {/* Display the total bakery count */}
-      <p className="text-lg text-gray-700 mb-6">
-        Total Bakeries: {bakeryCount}
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Restaurants Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {restaurants.map((restaurant) => (
           <div
             key={restaurant._id}
-            className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative"
           >
-            {/* Render Image */}
+            {/* Restaurant Image */}
             {restaurant.image && restaurant.imageContentType ? (
               <img
                 src={`data:${restaurant.imageContentType};base64,${restaurant.image}`}
                 alt={restaurant.restaurantName}
-                className="w-full h-48 object-cover rounded-md mb-4"
+                className="w-full h-48 object-cover"
               />
             ) : (
-              <div className="w-full h-48 bg-gray-300 rounded-md mb-4 flex justify-center items-center">
-                <span>No Image Available</span>
+              <div className="w-full h-48 bg-gray-300 flex justify-center items-center">
+                <span className="text-gray-500">No Image Available</span>
               </div>
             )}
 
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-              {restaurant.restaurantName}
-            </h2>
-            <p className="text-gray-600 mb-2">Location: {restaurant.address}</p>
-            <p className="text-gray-600 mb-4">Phone: {restaurant.number}</p>
-            <div className="flex flex-wrap gap-2">
-              {restaurant.option.map((option, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-blue-500 text-white text-sm rounded-full"
+            {/* Restaurant Info */}
+            <div className="p-6">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                {restaurant.restaurantName}
+              </h2>
+              <p className="text-gray-600 mb-2">Location: {restaurant.address}</p>
+              <p className="text-gray-600 mb-4">Phone: {restaurant.number}</p>
+
+              {/* Options */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {restaurant.option.map((option, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-500 text-white text-sm rounded-full"
+                  >
+                    {option}
+                  </span>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end">
+                <a
+                  href={`/Customer/restaurant/${restaurant._id}`}
+                  className="text-purple-700 hover:text-purple-900 font-medium transition"
                 >
-                  {option}
-                </span>
-              ))}
+                  View Menu &rarr;
+                </a>
+              </div>
             </div>
           </div>
         ))}
