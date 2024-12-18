@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { FaSpinner } from "react-icons/fa";
 import AdminLayout from "@/Components/AdminLayout";
 const RequestApproval = () => {
   const [notifications, setNotifications] = useState([]);
@@ -73,7 +74,11 @@ const RequestApproval = () => {
   };
 
   if (loading) {
-    return <div>Loading notifications...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <FaSpinner className="animate-spin text-6xl text-blue-500" />
+      </div>
+    );
   }
 
   return (
@@ -117,6 +122,9 @@ const RequestApproval = () => {
               key={notification._id}
               className="bg-white p-4 shadow-lg rounded-lg mb-4"
             >
+              <p className="text-lg text-gray-700 font-semibold">
+                Bakery Owner: {notification.bakeryOwnerName || "N/A"}
+              </p>
               <h2 className="font-bold text-lg">{notification.title}</h2>
               <p>{notification.message}</p>
               <p className="text-sm text-gray-500">

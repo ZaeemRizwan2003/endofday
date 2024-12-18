@@ -10,15 +10,14 @@ export default async function handler(req, res) {
       const { type = "all", search = "", page = 1, limit = 10 } = req.query;
 
       const skip = (page - 1) * limit;
-      
+
       let bakeryFilter = {};
       if (search) {
-        bakeryFilter.$or= [
-            { restaurantName: { $regex: search, $options: "i" } }, // Search by restaurant name
-            { address: { $regex: search, $options: "i" } }, // Search by address
-          ];
-        }
-      
+        bakeryFilter.$or = [
+          { restaurantName: { $regex: search, $options: "i" } }, // Search by restaurant name
+          { address: { $regex: search, $options: "i" } }, // Search by address
+        ];
+      }
 
       if (type !== "all") {
         bakeryFilter.option = type; // Filter by type
@@ -26,8 +25,12 @@ export default async function handler(req, res) {
 
       if (search) {
         const listingFilter = { itemname: { $regex: search, $options: "i" } };
-        const matchingListings = await Listings.find(listingFilter).select("bakeryowner").lean();
-        const matchingBakeryIds = matchingListings.map((listing) => listing.bakeryowner);
+        const matchingListings = await Listings.find(listingFilter)
+          .select("bakeryowner")
+          .lean();
+        const matchingBakeryIds = matchingListings.map(
+          (listing) => listing.bakeryowner
+        );
 
         if (matchingBakeryIds.length > 0) {
           bakeryFilter.$or.push({ _id: { $in: matchingBakeryIds } });
@@ -52,10 +55,14 @@ export default async function handler(req, res) {
         return { ...restaurant.toObject(), avgRating };
       });
 
-      const totalRestaurants = await RegisteredBakeries.countDocuments(bakeryFilter);
+      const totalRestaurants = await RegisteredBakeries.countDocuments(
+        bakeryFilter
+      );
 
-    res.status(200).json({
+      res.status(200).json({
         success: true,
+        restaurants: restaurantsWithAvgRating,
+
         data: {
           restaurants: restaurantsWithAvgRating,
         },

@@ -55,7 +55,6 @@ const Dashboard = () => {
     }
   }, [router]);
 
-
   const renderStars = (avgRating) => {
     const totalStars = 5;
     const filledStars = Math.floor(avgRating); // Get the whole number part of the average rating
@@ -99,8 +98,6 @@ const Dashboard = () => {
 
     return stars;
   };
-
-
 
   return (
     <>
@@ -178,7 +175,7 @@ const Dashboard = () => {
             )}
           </div>
         )}
-       
+
         <div className="flex justify-center mt-4">
           <button
             className="px-4 py-2 bg-gray-200 rounded-l disabled:opacity-50"

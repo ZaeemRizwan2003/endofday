@@ -21,22 +21,22 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
       console.error("User ID is missing. Cannot sync cart to server.");
       return;
     }
-    try{
-    await fetch("/api/Customer/cart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, cart }),
-    });
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      console.error("Error syncing cart to server:", errorResponse.message);
-      throw new Error("Failed to sync cart to server");
-    }
+    try {
+      await fetch("/api/Customer/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, cart }),
+      });
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error("Error syncing cart to server:", errorResponse.message);
+        throw new Error("Failed to sync cart to server");
+      }
 
-    console.log("Cart synced successfully");
-  } catch (error) {
-    console.error("Error syncing cart:", error.message);
-  }
+      console.log("Cart synced successfully");
+    } catch (error) {
+      console.error("Error syncing cart:", error.message);
+    }
   };
 
   const handleLogout = async () => {
@@ -51,7 +51,7 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
 
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
-    // localStorage.removeItem("cart");
+    localStorage.removeItem("cart");
     setCart([]);
     setIsLoggedIn(false);
     setUser(null);
