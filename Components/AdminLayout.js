@@ -9,6 +9,7 @@ import {
   FaBicycle,
   FaBlog,
   FaBell,
+  FaCheck,
 } from "react-icons/fa";
 
 export default function AdminLayout({ children }) {
@@ -52,8 +53,9 @@ export default function AdminLayout({ children }) {
       link: "/Admin/Notification/RequestApproval",
     },
     {
-      id: "approve bakery requests",
-      label: "approve bakery requests",
+      id: "Approve Restaurants",
+      label: "Approve Restaurants",
+      icon: <FaCheck />,
       link: "/Admin/ManageRestaurants/approve",
     },
   ];

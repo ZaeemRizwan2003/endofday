@@ -56,8 +56,8 @@ export default async function handler(req, res) {
       }
 
       const fuse = new Fuse(availableRiders, {
-        keys: ["area"], 
-        threshold: 0.3, 
+        keys: ["area"],
+        threshold: 0.3,
       });
 
       const ridersInArea = availableRiders.filter(
@@ -66,14 +66,14 @@ export default async function handler(req, res) {
 
       const matchedRiders = fuse.search(area);
 
-      let assignedRider =null;
+      let assignedRider = null;
 
       if (matchedRiders.length > 0) {
         assignedRider = matchedRiders[0].item;
       } else {
         assignedRider = availableRiders[0];
       }
-
+      console.log(assignedRider);
       const newOrder = new Order({
         userId,
         items,
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
         deliveryBoy_id: assignedRider._id,
       });
 
-      const savedOrder = await newOrder.save(); 
+      const savedOrder = await newOrder.save();
       assignedRider.orderId.push(savedOrder._id);
       await assignedRider.save();
 

@@ -3,7 +3,13 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import DashNav from "@/Components/CustomerNavbar";
 import Link from "next/link";
-import { Player } from "@lottiefiles/react-lottie-player";
+import dynamic from "next/dynamic";
+const Player = dynamic(
+  () => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player),
+  {
+    ssr: false,
+  }
+);
 
 const OrderPage = () => {
   const [order, setOrder] = useState([]);
@@ -111,11 +117,11 @@ const OrderPage = () => {
               </h2>
 
               <button
-              onClick={handleReviewClick}
-              className="mt-4 text-purple-700 hover:underline text-base font-semibold transition mb-3"
-            >
-              Don’t Forget to Leave a Review
-            </button>
+                onClick={handleReviewClick}
+                className="mt-4 text-purple-700 hover:underline text-base font-semibold transition mb-3"
+              >
+                Don’t Forget to Leave a Review
+              </button>
             </div>
           )}
 
