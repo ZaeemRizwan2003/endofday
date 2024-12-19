@@ -8,7 +8,11 @@ import DashNav from "@/Components/CustomerNavbar";
 import { loadStripe } from "@stripe/stripe-js";
 import { fetchAddresses, addNewAddress, setDefaultAddress } from "./Addresses";
 import AddressList from "@/Components/AddressList";
-import MapModal from "@/Components/MapModal";
+import dynamic from "next/dynamic";
+
+const MapModal = dynamic(() => import("@/Components/MapModal"), {
+  ssr: false,
+});
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -29,13 +33,14 @@ const Checkout = () => {
   const [newAddress, setNewAddress] = useState({
     addressLine: "",
     city: "",
+    area: "",
     postalCode: "",
   });
   const [showModal, setShowModal] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
-    contact: "",
+    contact:"",
     city: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -59,7 +64,7 @@ const Checkout = () => {
           setSelectedAddress(defaultAddress._id);
         }
 
-        setUserInfo({ ...userInfo, phone: "" }); // Let the user input phone and city
+        setUserInfo({ ...userInfo, contact: "" }); 
       } catch (err) {
         console.error(err);
       }
@@ -70,9 +75,19 @@ const Checkout = () => {
 
   const handleNewAddress = async () => {
     const userId = localStorage.getItem("userId");
-    const addedAddress = await addNewAddress(userId, newAddress);
-    setAddresses([...addresses, { ...addedAddress, isDefault: false }]);
-    setShowModal(false);
+    if (!newAddress.city || !newAddress.area || !newAddress.addressLine) {
+      alert("Please provide all required address fields.");
+      return;
+    }
+  
+    try {
+      const addedAddress = await addNewAddress(userId, newAddress);
+      setAddresses([...addresses, { ...addedAddress, isDefault: false }]);
+      setShowModal(false);
+    } catch (error) {
+      console.error("Failed to add new address", error);
+      alert("Failed to add new address. Please try again.");
+    }
   };
 
   const handleSetDefaultAddress = async (addressId) => {
@@ -94,23 +109,28 @@ const Checkout = () => {
       return;
     }
 
+    const addressLine = location.address || "Unnamed Address";
+    const city = location.city || "Unknown";
+    const postalCode = location.postalCode || "";
+
     try {
       const response = await axios.post("/api/Customer/map-address", {
         userId,
-        location,
+        location: { ...location, address: addressLine, city, postalCode },
       });
       console.log("API response:", response.data);
 
       if (response.data.success && response.data.newAddress) {
-        setAddresses((prevAddresses) => [...prevAddresses, response.data.newAddress]);
+        setAddresses((prevAddresses) => [
+          ...prevAddresses,
+          response.data.newAddress,
+        ]);
         setShowMapModal(false);
         alert("Location saved successfully!");
-
       } else {
         console.error("Unexpected API response:", response.data);
         alert("Failed to save location. Please try again.");
       }
-
     } catch (error) {
       console.error("Failed to save location", error);
       alert("Failed to save location. Please try again.");
@@ -129,17 +149,28 @@ const Checkout = () => {
       return;
     }
 
-    if (!userInfo.phone) {
+    if (!userInfo.contact) {
       alert("Please fill in your contact and city details.");
       return;
-  }
+    }
+
+    const selectedAddrObj = addresses.find(
+      (address) => address._id === selectedAddress
+    );
+  
+    if (!selectedAddrObj) {
+      alert("Selected address not found.");
+      return;
+    }
 
     const orderData = {
       userId,
       items: cart,
       totalAmount,
       addressId: selectedAddress,
-      contact: userInfo.contact,  
+      contact: contact,
+      city: selectedAddrObj.city, 
+      area: selectedAddrObj.area,
     };
 
     console.log("Order data being sent:", orderData);
@@ -149,6 +180,8 @@ const Checkout = () => {
 
       clearCart();
       setCart([]);
+      localStorage.removeItem("cart");
+
       router.push(`/Customer/OrderConfirm?id=${orderId}`);
     } catch (err) {
       console.error(
@@ -164,6 +197,11 @@ const Checkout = () => {
 
     if (!selectedAddress) {
       alert("Please select an address");
+      return;
+    }
+
+    if (!userInfo.contact) {
+      alert("Please provide your contact number.");
       return;
     }
 
@@ -242,13 +280,13 @@ const Checkout = () => {
           />
           <input
             type="text"
-            name="phone"
-            value={userInfo.phone}
+            name="contact"
+            value={userInfo.contact}
             onChange={(e) =>
-              setUserInfo({ ...userInfo, phone: e.target.value })
+              setUserInfo({ ...userInfo, contact: e.target.value })
             }
             className="p-3 border border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
-            placeholder="Phone"
+            placeholder="Contact"
           />
           <input
             type="text"
@@ -337,130 +375,129 @@ const Checkout = () => {
       {showMapModal && (
         <MapModal
           onClose={() => setShowMapModal(false)} // Close modal
-          onSaveLocation={handleSaveLocation} // Save location
+          onSaveLocation={(location) => {
+            console.log("Selected location from MapModal:", location);
+            handleSaveLocation(location);
+          }}
         />
       )}
 
-      // Modal for New Address
-{showModal && (
-  <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="modal-content bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
-      
-      <input
-        type="text"
-        placeholder="Address Line"
-        value={newAddress.addressLine}
-        onChange={(e) =>
-          setNewAddress({ ...newAddress, addressLine: e.target.value })
-        }
-        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-      />
-      
-      {/* Dropdown for City Selection */}
-      <select
-        value={newAddress.city}
-        onChange={(e) =>
-          setNewAddress({ ...newAddress, city: e.target.value })
-        }
-        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-      >
-        <option value="">Select City</option>
-        <option value="Rawalpindi">Rawalpindi</option>
-        <option value="Islamabad">Islamabad</option>
-      </select>
+      {/* // Modal for New Address */}
+      {showModal && (
+        <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="modal-content bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
 
- {/* Dropdown for Area Selection */}
- {newAddress.city && (
-        <select
-          value={newAddress.area}
-          onChange={(e) =>
-            setNewAddress({ ...newAddress, area: e.target.value })
-          }
-          className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-        >
-          <option value="">Select Area</option>
-          {newAddress.city === "Islamabad" &&
-            [
-              "E-7, Islamabad",
-              "E-8, Islamabad",
-              "E-9, Islamabad",
-              "E-10, Islamabad",
-              "E-11, Islamabad",
-              "E-12, Islamabad",
-              "E-16, Islamabad",
-              "E-17, Islamabad",
-              "F-5, Islamabad",
-              "F-6, Islamabad",
-              "F-7",
-              "F-8, Islamabad",
-              "F-9",
-              "F-10, Islamabad",
-              "F-11, Islamabad",
-              "F-12, Islamabad",
-              "F-15, Islamabad",
-              "F-17, Islamabad",
-              "I-8, Islamabad",
-              "I-9, Islamabad",
-              "I-10, Islamabad",
-              "I-11, Islamabad",
-            ].map((area) => (
-              <option key={area} value={area}>
-                {area}
-              </option>
-            ))}
-          {newAddress.city === "Rawalpindi" &&
-            [
-              "A block",
-              "B block",
-              "D block",
-              "Satellite town",
-            ].map((area) => (
-              <option key={area} value={area}>
-                {area}
-              </option>
-            ))}
-        </select>
+            <input
+              type="text"
+              placeholder="Address Line"
+              value={newAddress.addressLine}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, addressLine: e.target.value })
+              }
+              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+            />
+
+            {/* Dropdown for City Selection */}
+            <select
+              value={newAddress.city}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, city: e.target.value })
+              }
+              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+            >
+              <option value="">Select City</option>
+              <option value="Rawalpindi">Rawalpindi</option>
+              <option value="Islamabad">Islamabad</option>
+            </select>
+
+            {/* Dropdown for Area Selection */}
+            {newAddress.city && (
+              <select
+                value={newAddress.area}
+                onChange={(e) =>
+                  setNewAddress({ ...newAddress, area: e.target.value })
+                }
+                className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+              >
+                <option value="">Select Area</option>
+                {newAddress.city === "Islamabad" &&
+                  [
+                    "E-7, Islamabad",
+                    "E-8, Islamabad",
+                    "E-9, Islamabad",
+                    "E-10, Islamabad",
+                    "E-11, Islamabad",
+                    "E-12, Islamabad",
+                    "E-16, Islamabad",
+                    "E-17, Islamabad",
+                    "F-5, Islamabad",
+                    "F-6, Islamabad",
+                    "F-7",
+                    "F-8, Islamabad",
+                    "F-9",
+                    "F-10, Islamabad",
+                    "F-11, Islamabad",
+                    "F-12, Islamabad",
+                    "F-15, Islamabad",
+                    "F-17, Islamabad",
+                    "I-8, Islamabad",
+                    "I-9, Islamabad",
+                    "I-10, Islamabad",
+                    "I-11, Islamabad",
+                  ].map((area) => (
+                    <option key={area} value={area}>
+                      {area}
+                    </option>
+                  ))}
+                {newAddress.city === "Rawalpindi" &&
+                  ["A block", "B block", "D block", "Satellite town"].map(
+                    (area) => (
+                      <option key={area} value={area}>
+                        {area}
+                      </option>
+                    )
+                  )}
+              </select>
+            )}
+
+            <input
+              type="text"
+              placeholder="Postal Code"
+              value={newAddress.postalCode}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, postalCode: e.target.value })
+              }
+              className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
+            />
+
+            <div className="text-right">
+              <button
+                className="bg-gray-300 text-black py-2 px-4 rounded-lg mr-4"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-purple-700 text-white py-2 px-4 rounded-lg"
+                onClick={handleNewAddress}
+              >
+                Save Address
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
-
-      <input
-        type="text"
-        placeholder="Postal Code"
-        value={newAddress.postalCode}
-        onChange={(e) =>
-          setNewAddress({ ...newAddress, postalCode: e.target.value })
-        }
-        className="w-full p-3 border border-purple-300 rounded-lg mb-4 focus:outline-none focus:border-purple-500"
-      />
-      
-      <div className="text-right">
-        <button
-          className="bg-gray-300 text-black py-2 px-4 rounded-lg mr-4"
-          onClick={() => setShowModal(false)}
-        >
-          Cancel
-        </button>
-        <button
-          className="bg-purple-700 text-white py-2 px-4 rounded-lg"
-          onClick={handleNewAddress}
-        >
-          Save Address
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
       {/* Modal for Map Selection */}
-      {showMapModal && (
+      {/* {showMapModal && (
         <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
             <h2 className="text-xl font-semibold mb-4">
               Select Your Current Location
             </h2>
             <div className="w-full h-96">
-              {/* Render the OSM Map component */}
+              
               <OSMMap onLocationSelect={handleLocationSelect} />
             </div>
             <div className="text-right mt-4">
@@ -479,7 +516,7 @@ const Checkout = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

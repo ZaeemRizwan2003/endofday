@@ -23,6 +23,7 @@ export default async function handler(req, res) {
         totalAmount,
         address: selectedAddress,
         status: "pending",
+        contact: req.body.contact,
       });
 
       const deliveryFee = 150;

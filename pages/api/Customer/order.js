@@ -2,6 +2,9 @@ import dbConnect from "@/middleware/mongoose";
 import Order from "@/models/Order";
 import User from "@/models/CustomerUser";
 import DeliveryPartner from "@/models/DeliveryPartner";
+
+const Fuse = require("fuse.js");
+
 export default async function handler(req, res) {
   await dbConnect();
 
@@ -24,9 +27,8 @@ export default async function handler(req, res) {
     } catch (error) {
       return res.status(500).json({ message: "Error fetching order", error });
     }
-
   } else if (req.method === "POST") {
-    const { userId, items, totalAmount, addressId, contact} = req.body;
+    const { userId, items, totalAmount, addressId, contact } = req.body;
 
     // Validate required fields
     if (!userId || !items || !totalAmount || !addressId) {
@@ -36,31 +38,41 @@ export default async function handler(req, res) {
     try {
       const user = await User.findById(userId);
       const selectedAddress = user.addresses.id(addressId);
-      
+
       if (!selectedAddress) {
         return res.status(404).json({ message: "Address not found" });
       }
 
       const { city, area } = selectedAddress;
 
-        const availableRiders = await 
-        DeliveryPartner.find({
-          city  });
+      const availableRiders = await DeliveryPartner.find({
+        city,
+      });
 
+      if (availableRiders.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No available riders in this area" });
+      }
 
-        if (availableRiders.length === 0) {
-          return res
-            .status(404)
-            .json({ message: "No available riders in this area" });
-        }
+      const fuse = new Fuse(availableRiders, {
+        keys: ["area"], 
+        threshold: 0.3, 
+      });
 
-        const ridersInArea = availableRiders.filter(
-          (rider) => rider.area === area
-        );
+      const ridersInArea = availableRiders.filter(
+        (rider) => rider.area === area
+      );
 
-         let assignedRider = ridersInArea.length > 0
-        ? ridersInArea[0] 
-        : availableRiders[0];
+      const matchedRiders = fuse.search(area);
+
+      let assignedRider =null;
+
+      if (matchedRiders.length > 0) {
+        assignedRider = matchedRiders[0].item;
+      } else {
+        assignedRider = availableRiders[0];
+      }
 
       const newOrder = new Order({
         userId,
@@ -71,7 +83,7 @@ export default async function handler(req, res) {
         deliveryBoy_id: assignedRider._id,
       });
 
-      const savedOrder = await newOrder.save(); // Save the new order
+      const savedOrder = await newOrder.save(); 
       assignedRider.orderId.push(savedOrder._id);
       await assignedRider.save();
 
