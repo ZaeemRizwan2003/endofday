@@ -4,30 +4,28 @@ import Link from "next/link";
 import { FaSpinner } from "react-icons/fa";
 import AdminLayout from "@/Components/AdminLayout";
 
-const RequestApproval = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [filteredNotifications, setFilteredNotifications] = useState([]);
+const BakeryApproval = () => {
+  const [bakeries, setBakeries] = useState([]);
+  const [filteredBakeries, setFilteredBakeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const router = useRouter();
-  const { status = "pending" } = router.query; // Default to 'pending'
+  const { status = "pending" } = router.query;
 
   useEffect(() => {
-    const fetchNotifications = async () => {
+    const fetchBakeries = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/Notification/approvenotification");
+        const response = await fetch(`/api/Admin/Restaurants/bakeryrequests`);
 
         if (!response.ok) {
-          throw new Error("Failed to fetch notifications");
+          throw new Error("Failed to fetch bakeries");
         }
 
         const data = await response.json();
-        setNotifications(data.notifications);
-        setFilteredNotifications(
-          data.notifications.filter((n) => n.status === status)
-        );
+        setBakeries(data.bakeries);
+        setFilteredBakeries(data.bakeries.filter((b) => b.status === status));
       } catch (error) {
         setError(error.message);
       } finally {
@@ -35,13 +33,12 @@ const RequestApproval = () => {
       }
     };
 
-    fetchNotifications();
+    fetchBakeries();
   }, []);
 
-  // Filter notifications based on the selected status
   useEffect(() => {
-    setFilteredNotifications(notifications.filter((n) => n.status === status));
-  }, [status, notifications]);
+    setFilteredBakeries(bakeries.filter((b) => b.status === status));
+  }, [status, bakeries]);
 
   const handleFilterChange = (newStatus) => {
     router.push(
@@ -50,13 +47,13 @@ const RequestApproval = () => {
         query: { status: newStatus },
       },
       undefined,
-      { shallow: true } // Prevent full page reload
+      { shallow: true }
     );
   };
 
   const handleAction = async (id, actionStatus) => {
     try {
-      const response = await fetch(`/api/Notification/updatestatus`, {
+      const response = await fetch(`/api/Admin/Restaurants/updatestatus`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -68,15 +65,10 @@ const RequestApproval = () => {
         throw new Error("Failed to update status");
       }
 
-      // Update the notification's status in the list
-      setNotifications((prev) =>
-        prev.map((notification) =>
-          notification._id === id
-            ? { ...notification, status: actionStatus }
-            : notification
-        )
+      setBakeries((prev) =>
+        prev.map((b) => (b._id === id ? { ...b, status: actionStatus } : b))
       );
-      alert(`Notification successfully ${actionStatus}`);
+      alert(`Bakery successfully ${actionStatus}`);
     } catch (error) {
       alert(error.message);
     }
@@ -94,17 +86,15 @@ const RequestApproval = () => {
     <AdminLayout>
       <div className="container mx-auto p-4 mt-20">
         <Link
-          legacyBehavior
           href="/Admin/AdminDashboard"
           className="text-purple-600 hover:text-purple-800"
         >
           &larr; Back to Dashboard
         </Link>
         <h1 className="text-2xl font-bold mb-4 text-center">
-          Notification Requests
+          Bakery Approvals
         </h1>
 
-        {/* Status Filter Tabs */}
         <div className="flex justify-center space-x-4 mb-6">
           {["pending", "approved", "rejected"].map((filterStatus) => (
             <button
@@ -121,36 +111,38 @@ const RequestApproval = () => {
           ))}
         </div>
 
-        {/* Notification List */}
-        {filteredNotifications.length === 0 ? (
-          <p className="text-center">No {status} notifications found.</p>
+        {filteredBakeries.length === 0 ? (
+          <p className="text-center">No {status} bakeries found.</p>
         ) : (
           <ul>
-            {filteredNotifications.map((notification) => (
+            {filteredBakeries.map((bakery) => (
               <li
-                key={notification._id}
+                key={bakery._id}
                 className="bg-white p-4 shadow-lg rounded-lg mb-4"
               >
                 <p className="text-lg text-gray-700 font-semibold">
-                  Bakery Owner: {notification.bakeryOwnerName || "N/A"}
+                  Name: {bakery.restaurantName}
                 </p>
-                <h2 className="font-bold text-lg">{notification.title}</h2>
-                <p>{notification.message}</p>
+                <p className="text-sm text-gray-500">Email: {bakery.email}</p>
+                <p className="text-sm text-gray-500">
+                  Address: {bakery.address}
+                </p>
+                <p className="text-sm text-gray-500">Phone: {bakery.number}</p>
                 <p className="text-sm text-gray-500">
                   Requested on:{" "}
-                  {new Date(notification.createdAt).toLocaleDateString()}
+                  {new Date(bakery.createdAt).toLocaleDateString()}
                 </p>
                 {status === "pending" && (
                   <div className="mt-4">
                     <button
                       className="bg-green-500 text-white px-4 py-2 rounded mr-2"
-                      onClick={() => handleAction(notification._id, "approved")}
+                      onClick={() => handleAction(bakery._id, "approved")}
                     >
                       Approve
                     </button>
                     <button
                       className="bg-red-500 text-white px-4 py-2 rounded"
-                      onClick={() => handleAction(notification._id, "rejected")}
+                      onClick={() => handleAction(bakery._id, "rejected")}
                     >
                       Reject
                     </button>
@@ -165,4 +157,4 @@ const RequestApproval = () => {
   );
 };
 
-export default RequestApproval;
+export default BakeryApproval;

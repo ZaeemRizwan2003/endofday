@@ -6,17 +6,14 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
-      // Extract 'status' query parameter, default to 'pending'
-      const { status = "pending" } = req.query;
+      // Fetch all notifications without filtering by status
+      const notifications = await NotificationModel.find({}).lean();
 
-      // Validate the status
-      const validStatuses = ["pending", "approved", "rejected"];
-      if (!validStatuses.includes(status)) {
-        return res.status(400).json({ message: "Invalid status provided" });
+      if (notifications.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No notifications found", notifications: [] });
       }
-
-      // Fetch notifications based on the given status
-      const notifications = await NotificationModel.find({ status }).lean();
 
       return res.status(200).json({ notifications });
     } catch (error) {

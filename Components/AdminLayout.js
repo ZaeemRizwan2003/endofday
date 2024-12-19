@@ -15,12 +15,47 @@ export default function AdminLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const menuItems = [
-    { id: "home", label: "Home", icon: <FaHome />, link: "/Admin/AdminDashboard" },
-    { id: "manageRestaurants", label: "Manage Restaurants", icon: <FaUtensils />, link: "/Admin/ManageRestaurants/Manage-restaurants" },
-    { id: "manageCustomers", label: "Manage Customers", icon: <FaUsers />, link: "/Admin/ManageCustomers/Manage-customers" },
-    { id: "manageRiders", label: "Manage Riders", icon: <FaBicycle />, link: "/Admin/ManageRiders/manage-delivery-riders" },
-    { id: "manageBlogs", label: "Manage Blogs", icon: <FaBlog />, link: "/Admin/Blogs/ManageBlogs" },
-    { id: "notifications", label: "Notifications", icon: <FaBell />, link: "/Admin/Notification/RequestApproval" },
+    {
+      id: "home",
+      label: "Home",
+      icon: <FaHome />,
+      link: "/Admin/AdminDashboard",
+    },
+    {
+      id: "manageRestaurants",
+      label: "Manage Restaurants",
+      icon: <FaUtensils />,
+      link: "/Admin/ManageRestaurants/Manage-restaurants",
+    },
+    {
+      id: "manageCustomers",
+      label: "Manage Customers",
+      icon: <FaUsers />,
+      link: "/Admin/ManageCustomers/Manage-customers",
+    },
+    {
+      id: "manageRiders",
+      label: "Manage Riders",
+      icon: <FaBicycle />,
+      link: "/Admin/ManageRiders/manage-delivery-riders",
+    },
+    {
+      id: "manageBlogs",
+      label: "Manage Blogs",
+      icon: <FaBlog />,
+      link: "/Admin/Blogs/ManageBlogs",
+    },
+    {
+      id: "notifications",
+      label: "Notifications",
+      icon: <FaBell />,
+      link: "/Admin/Notification/RequestApproval",
+    },
+    {
+      id: "approve bakery requests",
+      label: "approve bakery requests",
+      link: "/Admin/ManageRestaurants/approve",
+    },
   ];
 
   return (
@@ -67,7 +102,9 @@ export default function AdminLayout({ children }) {
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
         <header className="bg-white shadow-md p-1 flex justify-between items-center pl-3 pr-3">
-          <h1 className="text-2xl font-bold text-gray-800 mt-3">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mt-3">
+            Admin Dashboard
+          </h1>
           <div className="flex space-x-4">
             <Link legacyBehavior href="/">
               <a className="text-blue-600 hover:text-blue-800">Go to Website</a>

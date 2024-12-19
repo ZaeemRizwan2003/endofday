@@ -8,6 +8,11 @@ const signupSchema = new mongoose.Schema(
     address: { type: String, required: true },
     number: { type: String, required: true },
     option: { type: [String], required: true },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
     image: {
       type: String,
       required: true,
@@ -54,6 +59,7 @@ const signupSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+
         createdAt: {
           type: Date,
           default: Date.now, // Automatically set the timestamp
