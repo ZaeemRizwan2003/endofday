@@ -56,29 +56,57 @@ const MapModal = ({ onClose, onSaveLocation }) => {
 }
   }, []);
 
+  const extractAreaFromAddress = (addressLine) => {
+    if (!addressLine) return "Unknown Area";
+  
+    const parts = addressLine.split(",");
+    if (parts.length >= 3) {
+      // Assume the second-to-last part is the area
+      return parts[parts.length - 3].trim();
+    }
+  
+    return "Unknown Area";
+  };
+
   const reverseGeocode = async (lat, lng) => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
       const data = await response.json();
+
       if (data.address) {
-        return {
-          city: data.address.city || data.address.town,
-          subarea: data.address.suburb || data.address.neighbourhood,
-        };
+        const city = data.address.city || data.address.town || "Unknown City";
+        const subarea =
+          data.address.suburb ||
+          data.address.neighbourhood ||
+          extractAreaFromAddress(data.display_name);
+        const fullAddress = data.display_name || "Unnamed Address";
+  
+        // Update state
+        setAddress(fullAddress);
+  
+        return { city, subarea, fullAddress };
       }
+  
+  
+      setAddress("Unknown Address");
+      return { city: "Unknown City", subarea: "Unknown Area", fullAddress: "Unknown Address" };
 
-      if (data.display_name) {
-        setAddress(data.display_name);
-      } else {
-        setAddress("Unknown Address");
-      }
+      // if (data.address) {
+      //   const city = data.address.city || data.address.town || "Unknown City";
+      // const subarea = data.address.suburb || data.address.neighbourhood || "Unknown Area";
+      // const fullAddress = data.display_name || "Unnamed Address";
 
-      return null;
+      // setAddress(fullAddress); // Update the displayed address
+      // return { city, subarea, fullAddress };
+      // }
+      // setAddress("Unknown Address");
+      // return { city: "Unknown City", subarea: "Unknown Area", fullAddress: "Unknown Address" };
     } catch (error) {
       console.error("Error fetching address:", error);
       setAddress("Error fetching address");
+      return { city: "Unknown City", subarea: "Unknown Area", fullAddress: "Error fetching address" };
     }
   };
 
@@ -94,7 +122,9 @@ const MapModal = ({ onClose, onSaveLocation }) => {
         const { lat, lon } = results[0];
         const newLocation = { lat: parseFloat(lat), lng: parseFloat(lon) };
         setLocation(newLocation);
-        reverseGeocode(newLocation.lat, newLocation.lng);
+        reverseGeocode(newLocation.lat, newLocation.lng).then((result) => {
+          setAddress(result.fullAddress);
+        });
       } else {
         alert("Location not found. Please try again.");
       }
@@ -109,7 +139,9 @@ const MapModal = ({ onClose, onSaveLocation }) => {
     useMapEvents({
       click(e) {
         setLocation(e.latlng); // Set location when user clicks on the map
-        reverseGeocode(e.latlng.lat, e.latlng.lng); 
+        reverseGeocode(e.latlng.lat, e.latlng.lng).then((result) => {
+          setAddress(result.fullAddress); // Update the address field
+        });
         map.setView(e.latlng, map.getZoom());
       },
     });
@@ -125,7 +157,14 @@ const MapModal = ({ onClose, onSaveLocation }) => {
       return;
     }
 
-    onSaveLocation({ ...location, address });
+    reverseGeocode(location.lat, location.lng).then((result) => {
+      onSaveLocation({
+        ...location,
+        address: result.fullAddress,
+        city: result.city,
+        subarea: result.subarea,
+      });
+    });
   };
 
   return (

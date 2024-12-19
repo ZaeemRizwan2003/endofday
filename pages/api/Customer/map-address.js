@@ -33,9 +33,19 @@ export default async function handler(req, res) {
           .json({ success: false, message: "User not found" });
       }
 
+      const extractAreaFromAddress = (addressLine) => {
+        if (!addressLine) return "Unknown Area";
+        const parts = addressLine.split(",");
+        if (parts.length >= 3) {
+          return parts[parts.length - 3].trim();
+        }
+        return "Unknown Area";
+      };
+
       const newAddress = {
         addressLine: location.address,
         city: location.city || "Unknown",
+        area: location.area || extractAreaFromAddress(location.address),
         postalCode: location.postalCode || "",
         lat: location.lat,
         lng: location.lng,

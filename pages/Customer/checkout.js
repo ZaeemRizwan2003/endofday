@@ -111,12 +111,13 @@ const Checkout = () => {
 
     const addressLine = location.address || "Unnamed Address";
     const city = location.city || "Unknown";
+    const area = location.subarea || extractAreaFromAddress(addressLine);
     const postalCode = location.postalCode || "";
 
     try {
       const response = await axios.post("/api/Customer/map-address", {
         userId,
-        location: { ...location, address: addressLine, city, postalCode },
+        location: { ...location, address: addressLine, city, area, postalCode },
       });
       console.log("API response:", response.data);
 

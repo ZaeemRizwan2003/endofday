@@ -120,14 +120,14 @@ const Navbar = () => {
                 Home
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 href="/about"
                 className="py-2 px-3 text-black hover:text-purple-700"
               >
                 About
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link
                 href="/blogs"

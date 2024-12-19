@@ -1,9 +1,11 @@
 import AdminLayout from "@/Components/AdminLayout";
 import React, { useState, useEffect } from "react";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 export default function ManageRestaurants() {
   const [restaurants, setRestaurants] = useState([]);
   const [bakeryCount, setBakeryCount] = useState(0); // Added state for bakery count
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRestaurants() {
@@ -46,6 +48,31 @@ export default function ManageRestaurants() {
 
     fetchRestaurants();
   }, []);
+
+  const handleDeleteRestaurant = async (restaurantId) => {
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this restaurant? This action cannot be undone."
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(
+        `/api/Admin/Restaurants/deleteRestaurant?id=${restaurantId}`,
+        { method: "DELETE" }
+      );
+      if (response.ok) {
+        setRestaurants((prev) =>
+          prev.filter((restaurant) => restaurant._id !== restaurantId)
+        );
+        alert("Restaurant deleted successfully!");
+      } else {
+        alert("Failed to delete restaurant.");
+      }
+    } catch (error) {
+      console.error("Error deleting restaurant:", error);
+      alert("An error occurred while deleting the restaurant.");
+    }
+  };
 
   return (
     <AdminLayout>

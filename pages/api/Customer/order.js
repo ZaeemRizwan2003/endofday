@@ -37,13 +37,22 @@ export default async function handler(req, res) {
 
     try {
       const user = await User.findById(userId);
+      if (!user) {
+        console.error("User not found with ID:", userId);
+        return res.status(404).json({ message: "User not found" });
+      }
       const selectedAddress = user.addresses.id(addressId);
 
       if (!selectedAddress) {
+        console.error("Selected address not found:", addressId);
         return res.status(404).json({ message: "Address not found" });
       }
 
-      const { city, area } = selectedAddress;
+      const { city, area, addressLine } = selectedAddress || {};
+      const resolvedArea =
+        area || extractAreaFromAddress(selectedAddress.addressLine || "");
+      console.log("Selected Address:", selectedAddress);
+      console.log("City:", city, "Area:", resolvedArea);
 
       const availableRiders = await DeliveryPartner.find({
         city,
@@ -55,25 +64,45 @@ export default async function handler(req, res) {
           .json({ message: "No available riders in this area" });
       }
 
+      // const fuse = new Fuse(availableRiders, {
+      //   keys: ["area"],
+      //   threshold: 0.3,
+      // });
+
+      // const ridersInArea = availableRiders.filter(
+      //   (rider) => rider.area === area
+      // );
+
+      // const matchedRiders = fuse.search(area);
+
+      let assignedRider = null;
       const fuse = new Fuse(availableRiders, {
         keys: ["area"],
         threshold: 0.3,
       });
-
+      const matchedRiders = fuse.search(resolvedArea);
       const ridersInArea = availableRiders.filter(
-        (rider) => rider.area === area
+        (rider) => rider.area === resolvedArea
       );
 
-      const matchedRiders = fuse.search(area);
-
-      let assignedRider = null;
-
-      if (matchedRiders.length > 0) {
+      if (ridersInArea.length > 0) {
+        assignedRider = ridersInArea[0];
+        console.log("Assigned Rider (Exact Match):", assignedRider);
+      } else if (matchedRiders.length > 0) {
         assignedRider = matchedRiders[0].item;
+        console.log("Assigned Rider (Fuzzy Match):", assignedRider);
       } else {
         assignedRider = availableRiders[0];
+        console.log("Assigned Rider (Fallback):", assignedRider);
       }
-      console.log(assignedRider);
+
+      if (!assignedRider) {
+        console.error("No rider could be assigned");
+        return res.status(500).json({ message: "No rider could be assigned" });
+      }
+
+      console.log("Assigned Rider:", assignedRider);
+
       const newOrder = new Order({
         userId,
         items,
@@ -89,6 +118,7 @@ export default async function handler(req, res) {
 
       res.status(201).json(savedOrder); // Return the saved order
     } catch (error) {
+      console.error("Error creating order:", error);
       return res.status(500).json({ message: "Error creating order", error });
     }
   }
