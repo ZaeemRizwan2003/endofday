@@ -18,7 +18,7 @@ export default function AdminLayout({ children }) {
     { id: "home", label: "Home", icon: <FaHome />, link: "/Admin/AdminDashboard" },
     { id: "manageRestaurants", label: "Manage Restaurants", icon: <FaUtensils />, link: "/Admin/ManageRestaurants/Manage-restaurants" },
     { id: "manageCustomers", label: "Manage Customers", icon: <FaUsers />, link: "/Admin/ManageCustomers/Manage-customers" },
-    { id: "manageRiders", label: "Manage Riders", icon: <FaBicycle />, link: "/Admin/ManageRiders/manage-delivery-riders" },
+    { id: "manageRiders", label: "Manage Riders", icon: <FaBicycle />, link: "/Admin/ManageRiders/Manage-riders" },
     { id: "manageBlogs", label: "Manage Blogs", icon: <FaBlog />, link: "/Admin/Blogs/ManageBlogs" },
     { id: "notifications", label: "Notifications", icon: <FaBell />, link: "/Admin/Notification/RequestApproval" },
   ];
