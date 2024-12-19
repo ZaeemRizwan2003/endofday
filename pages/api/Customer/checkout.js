@@ -17,7 +17,11 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 cart: user.cart,
-                addresses: user.addresses,
+                addresses: user.addresses.map((address) => ({
+                    ...address.toObject(),
+                    area: address.area || "Unknown Area",
+                    city: address.city || "Unknown City",
+                  })),
                 userInfo: {
                     name: user.name,
                     email: user.email,

@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   } else if (method === "POST") {
     const { userId, newAddress } = req.body;
 
-    if (!newAddress || !newAddress.addressLine || !newAddress.city) {
+    if (!newAddress || !newAddress.addressLine || !newAddress.area|| !newAddress.city) {
       return res.status(400).json({ success: false, message: "Missing address fields" });
     }
     try {
