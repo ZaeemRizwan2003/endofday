@@ -40,7 +40,7 @@ const DashNav = () => {
         <div className="flex md:order-2 space-x-3 rtl:space-x-reverse">
           <FaBell
             className="pl-2 mt-1 w-8 h-8 text-yellow-500 cursor-pointer"
-            onClick={() => router.push("/Restaurants/ShowRequests")} // Redirect or show notifications
+            onClick={() => router.push("/Restaurants/CreateNotification")} // Redirect or show notifications
           />
           {/* User Account Menu */}
           <FaUser
@@ -77,7 +77,7 @@ const DashNav = () => {
                   <li className="mb-3">
                     <button
                       className="text-purple-700 hover:underline"
-                      onClick={() => router.push("/Restaurants/ShowRequests")}
+                      onClick={() => router.push("/Restaurants/CreateNotification")}
                     >
                       Notification Requests
                     </button>

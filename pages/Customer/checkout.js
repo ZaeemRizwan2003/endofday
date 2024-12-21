@@ -40,7 +40,7 @@ const Checkout = () => {
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
-    contact: "",
+    contact:"",
     city: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -64,7 +64,7 @@ const Checkout = () => {
           setSelectedAddress(defaultAddress._id);
         }
 
-        setUserInfo({ ...userInfo, contact: "" });
+        setUserInfo({ ...userInfo, contact: "" }); 
       } catch (err) {
         console.error(err);
       }
@@ -79,7 +79,7 @@ const Checkout = () => {
       alert("Please provide all required address fields.");
       return;
     }
-
+  
     try {
       const addedAddress = await addNewAddress(userId, newAddress);
       setAddresses([...addresses, { ...addedAddress, isDefault: false }]);
@@ -158,7 +158,7 @@ const Checkout = () => {
     const selectedAddrObj = addresses.find(
       (address) => address._id === selectedAddress
     );
-
+  
     if (!selectedAddrObj) {
       alert("Selected address not found.");
       return;
@@ -170,7 +170,7 @@ const Checkout = () => {
       totalAmount,
       addressId: selectedAddress,
       contact: userInfo.contact,
-      city: selectedAddrObj.city,
+      city: selectedAddrObj.city, 
       area: selectedAddrObj.area,
     };
 

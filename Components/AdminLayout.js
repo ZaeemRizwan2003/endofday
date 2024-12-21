@@ -38,7 +38,7 @@ export default function AdminLayout({ children }) {
       id: "manageRiders",
       label: "Manage Riders",
       icon: <FaBicycle />,
-      link: "/Admin/ManageRiders/manage-delivery-riders",
+      link: "/Admin/ManageRiders/Manage-riders",
     },
     {
       id: "manageBlogs",

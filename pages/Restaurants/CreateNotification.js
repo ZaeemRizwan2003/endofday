@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import DashNav from "@/Components/Navbar";
 
 export default function NotificationForm() {
   const [formData, setFormData] = useState({
@@ -52,7 +53,9 @@ export default function NotificationForm() {
   };
 
   return (
-    <div className="relative">
+    <>
+    <DashNav/>
+    <div className="relative pt-20">
       <button
         onClick={goBackToDashboard}
         className="absolute top-4 right-4 px-6 py-2 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 focus:outline-none"
@@ -98,5 +101,6 @@ export default function NotificationForm() {
         </button>
       </form>
     </div>
+    </>
   );
 }
