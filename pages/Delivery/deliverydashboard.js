@@ -10,6 +10,7 @@ const DeliveryOrders = () => {
   const [isChatOpen, setIsChatOpen] = useState(false); // Chat UI state
   const [chatMessages, setChatMessages] = useState([]); // Chat messages
   const [messageInput, setMessageInput] = useState(""); // Message input
+  const [deliveryBoy, setDeliveryBoy] = useState({});
   const router = useRouter();
 
   const getMyOrders = async (driverId) => {
@@ -50,6 +51,7 @@ const DeliveryOrders = () => {
       return;
     }
     if (parsedData && parsedData._id) {
+      setDeliveryBoy(parsedData);
       getMyOrders(parsedData._id);
     } else {
       router.push("/Delivery/deliverypartner");
@@ -105,122 +107,121 @@ const DeliveryOrders = () => {
   }, []);
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-100 min-h-screen">
       {/* Delivery Header */}
       <DeliveryHeader />
 
-      {/* Page Title */}
-      <h1 className="mt-18 pt-14 text-3xl font-bold text-center text-purple-800 my-8">
-        My Order List
-      </h1>
+      {/* Greeting Section */}
+      <div className="container mx-auto mt-10 px-4">
+        <h1 className="text-4xl font-bold text-purple-800 mb-4">
+          Hi, {deliveryBoy?.name || "Delivery Partner"} 👋
+        </h1>
+        <p className="text-gray-600 text-lg mb-8">
+          Here's an overview of your assigned and delivered orders.
+        </p>
+      </div>
 
       {/* Orders Section */}
       <div className="container mx-auto px-2">
-        <h2 className="text-2xl font-bold text-gray-800">In Processing</h2>
+        {/* In Processing Orders */}
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          🛵 In Progress
+        </h2>
         {myOrders.length === 0 ? (
-          <p className="text-center text-gray-600 text-lg">
+          <p className="text-center text-gray-500 text-lg">
             No current orders available at the moment.
           </p>
         ) : (
-          myOrders.map((order) => (
-            <div
-              key={order._id}
-              className="bg-white shadow-lg rounded-lg p-6 mb-6 hover:shadow-xl transition-shadow"
-            >
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
-                <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {myOrders.map((order) => (
+              <div
+                key={order._id}
+                className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow"
+              >
+                <div className="flex justify-between items-center mb-2">
                   <h4 className="text-lg font-semibold text-gray-800">
-                    <span className="text-purple-700">Name:</span> {order.userId.name}
+                    🧾 Order #{order._id.slice(-6)}
                   </h4>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Contact:</span>{" "}
-                    {order.contact || "N/A"}
-                  </p>
+                  <span className="text-sm text-gray-500">
+                    Status: {order.status}
+                  </span>
                 </div>
-                <div>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Amount:</span> Rs.{order.totalAmount}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Address:</span>{" "}
-                    {order.address || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Status:</span> {order.status}
-                  </p>
-                </div>
-                <div>
-                  <label
-                    htmlFor={`status-${order._id}`}
-                    className="block font-semibold text-gray-700 mb-2"
-                  >
-                    Update Status:
-                  </label>
-                  <select
-                    id={`status-${order._id}`}
-                    className="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    defaultValue="Choose Status"
-                    onChange={(e) =>
-                      handleStatusChange(order._id, e.target.value)
-                    }
-                  >
-                    <option disabled>Choose Status</option>
-                    <option>Confirmed</option>
-                    <option>On The Way</option>
-                    <option>Delivered</option>
-                    <option>Failed To Deliver</option>
-                  </select>
-                </div>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Name:</span>{" "}
+                  {order.userId?.name || "N/A"}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Contact:</span>{" "}
+                  {order.userId?.contact || "N/A"}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Amount:</span> Rs.
+                  {order.totalAmount + 150}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Address:</span>{" "}
+                  {order.address
+                    ? `${order.address.addressLine}, ${order.address.area}, ${order.address.city}, ${order.address.postalCode}`
+                    : "Address not available"}
+                </p>
+
+                <label className="block font-medium text-gray-700 mt-4">
+                  Update Status:
+                </label>
+                <select
+                  className="block w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  defaultValue={order.status}
+                  onChange={(e) =>
+                    handleStatusChange(order._id, e.target.value)
+                  }
+                >
+                  <option>Confirmed</option>
+                  <option>On The Way</option>
+                  <option>Delivered</option>
+                  <option>Failed To Deliver</option>
+                </select>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
 
       {/* Delivered Orders Section */}
       <div className="container mx-auto px-4 mt-12">
-        <h2 className="text-2xl font-bold text-center text-green-700 mb-6">
-          Delivered Orders
+        <h2 className="text-2xl font-bold text-green-700 mb-4">
+          ✅ Delivered Orders
         </h2>
         {deliveredOrders.length === 0 ? (
-          <p className="text-center text-gray-600 text-lg">
+          <p className="text-center text-gray-500 text-lg">
             No delivered orders yet.
           </p>
         ) : (
-          deliveredOrders.map((order) => (
-            <div
-              key={order._id}
-              className="bg-white shadow-lg rounded-lg p-6 mb-6 hover:shadow-xl transition-shadow"
-            >
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-800">
-                    <span className="text-green-700">Name:</span> {order.userId.name}
-                  </h4>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Contact:</span>{" "}
-                    {order.contact || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Amount:</span> Rs.{order.totalAmount}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Address:</span>{" "}
-                    {order.address || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Status:</span> Delivered
-                  </p>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {deliveredOrders.map((order) => (
+              <div
+                key={order._id}
+                className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow"
+              >
+                <h4 className="text-lg font-semibold text-gray-800">
+                  🧾 Order #{order._id.slice(-6)}
+                </h4>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Name:</span>{" "}
+                  {order.userId?.name || "N/A"}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Amount:</span> Rs.
+                  {order.totalAmount}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Address:</span>{" "}
+                  {order.address
+                    ? `${order.address.addressLine}, ${order.address.area}, ${order.address.city}, ${order.address.postalCode}`
+                    : "Address not available"}
+                </p>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
 
@@ -231,64 +232,6 @@ const DeliveryOrders = () => {
       >
         <ChatBubbleOvalLeftIcon className="h-8 w-8 text-white" />
       </div>
-
-      {/* Chat UI */}
-      {isChatOpen && (
-        <div className="fixed bottom-16 right-6 bg-white shadow-2xl rounded-lg w-96 p-4 border border-gray-200">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-purple-800">
-              Chat with Customer
-            </h2>
-            <button
-              className="text-gray-500 hover:text-gray-700 focus:outline-none"
-              onClick={() => setIsChatOpen(false)}
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Chat Messages */}
-          <div className="overflow-y-auto h-64 border border-gray-200 rounded-lg p-3 bg-gray-50">
-            {chatMessages.map((msg, index) => (
-              <div
-                key={index}
-                className={`mb-2 flex ${
-                  msg.from === "Me" ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div
-                  className={`max-w-xs p-3 rounded-lg text-sm ${
-                    msg.from === "Me"
-                      ? "bg-purple-500 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  <strong className="block font-medium mb-1">{msg.from}</strong>
-                  <span>{msg.text}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Input Section */}
-          <div className="flex items-center mt-4 space-x-2">
-            <input
-              type="text"
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Type a message..."
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-            />
-            <button
-              className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg focus:outline-none shadow-md transition-all"
-              onClick={handleSendMessage}
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

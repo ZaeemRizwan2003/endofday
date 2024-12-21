@@ -7,7 +7,7 @@ import Blog from "@/models/Blog";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/uploads"); // Ensure this directory exists
+    cb(null, "public/uploads");
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -22,7 +22,7 @@ const upload = multer({ storage: storage });
 
 export const config = {
   api: {
-    bodyParser: false, // Disable bodyParser to handle multipart/form-data
+    bodyParser: false,
   },
 };
 
@@ -30,12 +30,20 @@ export default async function handler(req, res) {
   await dbConnect();
 
   if (req.method === "GET") {
-    const { skip = 0, limit = 10 } = req.query; // Pagination
+    const { category, tag, skip = 0, limit = 10 } = req.query;
+
     try {
-      const blogs = await Blog.find({})
+      const filter = {};
+      if (category) filter.category = category;
+      if (tag) filter.tags = tag;
+
+      const blogs = await Blog.find(filter)
         .skip(parseInt(skip))
         .limit(parseInt(limit))
-        .select("title thumbnail description likes comments pdfUrl");
+        .select(
+          "title thumbnail description likes comments pdfUrl category tags"
+        );
+
       return res.status(200).json(blogs);
     } catch (error) {
       console.error("Error fetching blogs:", error);
@@ -63,13 +71,15 @@ export default async function handler(req, res) {
       }
 
       if (mode === "manual") {
-        const { description, content } = req.body;
+        const { description, content, category, tags } = req.body;
         const thumbnail = req.body.thumbnail;
 
-        if (!description || !content) {
+        if (!description || !content || !category) {
           return res
             .status(400)
-            .json({ error: "Description and content are required." });
+            .json({
+              error: "Description, category  and content are required.",
+            });
         }
 
         try {
@@ -78,7 +88,10 @@ export default async function handler(req, res) {
             thumbnail,
             description,
             content,
+            category,
+            tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
           });
+
           return res.status(201).json(blog);
         } catch (error) {
           console.error("Error creating manual blog:", error);
@@ -88,7 +101,9 @@ export default async function handler(req, res) {
         const pdfFile = req.files["pdf"]?.[0];
         const thumbnailFile = req.files["thumbnail"]?.[0];
         const thumbnailUrl = req.body.thumbnailUrl;
-        const description = req.body.description; 
+        const description = req.body.description;
+        const category = req.body.category;
+        const tags = req.body.tags;
 
         if (!pdfFile) {
           return res.status(400).json({ error: "PDF file is required." });
@@ -104,7 +119,9 @@ export default async function handler(req, res) {
             title,
             thumbnail: finalThumbnail,
             description,
-            content: null, // No plain content for PDFs
+            content: null,
+            category,
+            tags: tags ? tags.split(',').map(tag => tag.trim()) : [], 
             pdfUrl,
           });
 

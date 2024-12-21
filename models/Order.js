@@ -34,7 +34,7 @@ const OrderSchema = new mongoose.Schema(
     },
     deliveryBoy_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "deliverypartners",
+      ref: "Deliverypartner",
     },
     reviewStatus: {
       type: String,

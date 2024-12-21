@@ -102,18 +102,26 @@ export const CartProvider = ({ children }) => {
   // };
 
   const incrementItemQuantity = async (itemId, remainingitem) => {
-    // Validate stock before incrementing
-    if (!isStockAvailable(itemId, remainingitem)) {
-      alert("Cannot add more than the available stock");
+    const existingItem = cart.find((item) => item.itemId === itemId);
+
+    if (!existingItem) {
+      console.warn(`Item with ID ${itemId} not found in cart.`);
       return;
     }
-
+  
+    if (existingItem.quantity >= remainingitem) {
+      alert(`Cannot add more than the available stock (${remainingitem} items).`);
+      return;
+    }
+  
     const updatedCart = cart.map((item) =>
       item.itemId === itemId ? { ...item, quantity: item.quantity + 1 } : item
     );
+  
     setCart(updatedCart);
     await syncCartToServer(localStorage.getItem("userId"), updatedCart);
   };
+  
 
   const decrementItemQuantity = async (itemId) => {
     const updatedCart = cart

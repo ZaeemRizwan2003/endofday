@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AdminLayout from "@/Components/AdminLayout";
 import { FaUsers, FaUtensils, FaShoppingCart, FaBicycle, FaBlog } from "react-icons/fa";
 import Chart from "chart.js/auto";
@@ -16,6 +16,9 @@ export default function AdminDashboard() {
   });
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  const ordersChartRef = useRef(null);
+  const customersRestaurantsChartRef = useRef(null);
 
   useEffect(() => {
     async function fetchStats() {
@@ -37,8 +40,12 @@ export default function AdminDashboard() {
 
   const renderCharts = (data) => {
     // Bar Chart for Orders
-    const ctx = document.getElementById("ordersChart").getContext("2d");
-    new Chart(ctx, {
+    if (ordersChartRef.current) {
+      ordersChartRef.current.destroy();
+    }
+    
+    const ordersCtx = document.getElementById("ordersChart").getContext("2d");
+    ordersChartRef.current = new Chart(ordersCtx, {
       type: "bar",
       data: {
         labels: ["Total Orders", "Last Month Orders"],
@@ -53,8 +60,13 @@ export default function AdminDashboard() {
     });
 
     // Pie Chart for Customers vs Restaurants
-    const ctxPie = document.getElementById("customersRestaurantsChart").getContext("2d");
-    new Chart(ctxPie, {
+    if (customersRestaurantsChartRef.current) {
+      customersRestaurantsChartRef.current.destroy();
+    }
+    const customersRestaurantsCtx = document
+      .getElementById("customersRestaurantsChart")
+      .getContext("2d");
+    customersRestaurantsChartRef.current = new Chart(customersRestaurantsCtx, {
       type: "pie",
       data: {
         labels: ["Customers", "Restaurants"],

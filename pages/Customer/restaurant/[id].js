@@ -40,8 +40,9 @@ const RestaurantMenu = () => {
   }, []);
 
   useEffect(() => {
-    if (id) {
-      setLoading(true); // Start loading
+    const userId = localStorage.getItem("userId");
+    if (id && userId) {
+      setLoading(true);  // Start loading
       axios
         .get(`/api/Customer/restaurants/${id}`)
         .then((response) => {
@@ -95,15 +96,27 @@ const RestaurantMenu = () => {
       }
 
       const data = await response.json();
-      return Array.isArray(data.cartItems) ? data.cartItems : [];
+      if (!data.success) {
+        throw new Error(data.message || "Failed to load cart");
+      }
+
+      return Array.isArray(data.cartItems) ? data.cart : [];
     } catch (error) {
       console.error("Error loading cart:", error);
       return [];
     }
   };
 
-  const handleAddToCart = (itemId, title, price, bakeryId) => {
-    addToCart(itemId, title, price, bakeryId);
+  const handleAddToCart = (itemId, title, price, bakeryId, remainingitem) => {
+
+    const currentQuantity = getItemQuantity(itemId);
+
+    if (currentQuantity >= remainingitem) {
+      toast.error(`Only ${remainingitem} items available in stock.`);
+      return;
+    }
+
+    addToCart(itemId, title, price, remainingitem, bakeryId);
     setAddedToCart((prev) => ({ ...prev, [itemId]: true }));
     toast.success(`${title} added to cart successfully`, {
       autoClose: 1000,
@@ -242,19 +255,27 @@ const RestaurantMenu = () => {
                       </div>
                       <div className="mt-4 flex items-center">
                         <button
-                          className="bg-purple-800 text-white rounded px-4 py-2 mr-6"
+                          className={`${
+                            item.remainingitem > 0
+                              ? "bg-purple-800 text-white"
+                              : "bg-gray-400 text-white cursor-not-allowed"
+                          } rounded px-4 py-2 mr-6`}
                           onClick={() =>
                             handleAddToCart(
                               item._id,
                               item.itemname,
                               item.discountedprice,
-                              item.bakeryId
+                              item.bakeryId,
+                              item.remainingItem
                             )
                           }
-                          disabled={addedToCart[item._id]}
+                          disabled={item.remainingitem <= 0 || addedToCart[item._id]}
+
                         >
-                          Add to Cart
+                          {item.remainingitem > 0 ? "Add to Cart" : "Out of Stock"}
                         </button>
+
+                        
 
                         {addedToCart[item._id] && (
                           <div className="flex items-center">
@@ -268,8 +289,13 @@ const RestaurantMenu = () => {
                               {getItemQuantity(item._id)}
                             </span>
                             <button
-                              className="text-green-600 text-xl ml-2"
-                              onClick={() => incrementItemQuantity(item._id)}
+                              className={`text-green-600 text-xl ml-2 ${
+                                getItemQuantity(item._id) >= item.remainingitem
+                                  ? "cursor-not-allowed opacity-50"
+                                  : ""
+                              }`}
+                              onClick={() => incrementItemQuantity(item._id, item.remainingItem)}
+                              disabled={getItemQuantity(item._id) >= item.remainingitem}
                             >
                               <FaRegPlusSquare />
                             </button>

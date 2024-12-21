@@ -15,6 +15,8 @@ const blogSchema = new mongoose.Schema({
       timestamp: { type: Date, default: Date.now },
     },
   ],
+  category: { type: String,default: "Uncategorized"},
+  tags: {type: [String], default: []}, 
   createdAt: { type: Date, default: Date.now },
 });
 

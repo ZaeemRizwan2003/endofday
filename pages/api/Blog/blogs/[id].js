@@ -40,7 +40,11 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const blog = await Blog.findById(id);
+
       if (!blog) return res.status(404).json({ error: 'Blog not found' });
+      if (!blog.tags) blog.tags = [];
+      if (!blog.category) blog.category = "Uncategorized";
+      
       res.status(200).json(blog);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch the blog' });

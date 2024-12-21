@@ -27,23 +27,28 @@ export default async function handler(req, res) {
       }
 
       // Enrich cart with bakeryId using the listings collection
-      const enrichedCart = await Promise.all(
-        cart.map(async (item) => {
-          const listing = await Listings.findById(item.itemId); // Find the listing by itemId
-          const bakeryId = listing?.bakeryowner || null; // Get the bakeryowner field
 
-          // Debugging: Print the itemId and bakeryId to the console
-          console.log(`Item ID: ${item.itemId}, Bakery ID: ${bakeryId}`);
+      const itemIds = cart.map((item) => item.itemId);
+      const listings = await Listings.find({ _id: { $in: itemIds } });
 
-          return {
-            itemId: item.itemId,
-            title: item.title,
-            price: item.price,
-            quantity: item.quantity,
-            bakeryId, // Add bakeryId to the cart item
-          };
-        })
-      );
+      const enrichedCart = cart.map(async (item) => {
+        const listing = listings.find(
+          (listing) => listing._id.toString() === item.itemId
+        );
+
+        const bakeryId = listing?.bakeryowner || null; // Get the bakeryowner field
+
+        // Debugging: Print the itemId and bakeryId to the console
+        console.log(`Item ID: ${item.itemId}, Bakery ID: ${bakeryId}`);
+
+        return {
+          itemId: item.itemId,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          bakeryId: listing?.bakeryowner, // Add bakeryId to the cart item
+        };
+      });
 
       // Save the enriched cart to the user
       user.cart = enrichedCart;
@@ -72,7 +77,7 @@ export default async function handler(req, res) {
     }
 
     try {
-      const user = await User.findById(userId);
+      const user = await User.findById(userId).select("cart");
 
       if (!user) {
         return res.status(404).json({

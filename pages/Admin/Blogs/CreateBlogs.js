@@ -1,3 +1,4 @@
+import AdminLayout from "@/Components/AdminLayout";
 import { useState } from "react";
 
 export default function BlogAdmin() {
@@ -11,6 +12,8 @@ export default function BlogAdmin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +25,8 @@ export default function BlogAdmin() {
     formData.append("mode", mode);
     formData.append("title", title);
     formData.append("description", description);
+    formData.append("category", category);
+    formData.append("tags", tags);
 
     if (thumbnailFile) {
       formData.append("thumbnail", thumbnailFile);
@@ -53,6 +58,8 @@ export default function BlogAdmin() {
         setThumbnailUrl("");
         setThumbnailFile(null);
         setPdf(null);
+        setCategory("");
+        setTags("");
       } else {
         setError("Failed to create blog.");
       }
@@ -64,6 +71,7 @@ export default function BlogAdmin() {
   };
 
   return (
+    <AdminLayout>
     <div className="container mx-auto p-6 max-w-3xl">
       {/* Header */}
       <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
@@ -113,10 +121,16 @@ export default function BlogAdmin() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 bg-white p-6 rounded-lg shadow-lg"
+      >
         {/* Title */}
         <div>
-          <label htmlFor="title" className="block font-medium mb-2 text-gray-700">
+          <label
+            htmlFor="title"
+            className="block font-medium mb-2 text-gray-700"
+          >
             Blog Title
           </label>
           <input
@@ -131,7 +145,10 @@ export default function BlogAdmin() {
 
         {/* Description */}
         <div>
-          <label htmlFor="description" className="block font-medium mb-2 text-gray-700">
+          <label
+            htmlFor="description"
+            className="block font-medium mb-2 text-gray-700"
+          >
             Blog Description
           </label>
           <textarea
@@ -143,10 +160,45 @@ export default function BlogAdmin() {
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
         </div>
+        <div>
+          <label
+            htmlFor="category"
+            className="block font-medium mb-2 text-gray-700"
+          >
+            Category
+          </label>
+          <input
+            id="category"
+            type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="tags"
+            className="block font-medium mb-2 text-gray-700"
+          >
+            Tags (comma-separated)
+          </label>
+          <input
+            id="tags"
+            type="text"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="e.g., Healthy, Vegan, Quick Recipes"
+            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600"
+          />
+        </div>
 
         {/* Thumbnail Upload or URL */}
         <div>
-          <label className="block font-medium mb-2 text-gray-700">Thumbnail</label>
+          <label className="block font-medium mb-2 text-gray-700">
+            Thumbnail
+          </label>
           <p className="text-sm text-gray-500 mb-2">
             Upload an image or provide a URL.
           </p>
@@ -169,7 +221,10 @@ export default function BlogAdmin() {
         {/* Manual Mode Fields */}
         {mode === "manual" && (
           <div>
-            <label htmlFor="content" className="block font-medium mb-2 text-gray-700">
+            <label
+              htmlFor="content"
+              className="block font-medium mb-2 text-gray-700"
+            >
               Blog Content
             </label>
             <textarea
@@ -186,7 +241,10 @@ export default function BlogAdmin() {
         {/* PDF Upload */}
         {mode === "pdf" && (
           <div>
-            <label htmlFor="pdf" className="block font-medium mb-2 text-gray-700">
+            <label
+              htmlFor="pdf"
+              className="block font-medium mb-2 text-gray-700"
+            >
               Upload Blog PDF
             </label>
             <input
@@ -220,5 +278,6 @@ export default function BlogAdmin() {
       {error && <p className="text-red-600 text-center mt-4">{error}</p>}
       {success && <p className="text-green-600 text-center mt-4">{success}</p>}
     </div>
+    </AdminLayout>
   );
 }

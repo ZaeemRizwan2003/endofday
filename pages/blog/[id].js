@@ -34,7 +34,7 @@ export default function BlogPost({ blog }) {
   return (
     <>
       <HomeNavbar />
-      <div className="min-h-screen bg-gray-100 py-10">
+      <div className="min-h-screen bg-gray-100 py-14">
         <div className="container mx-auto max-w-4xl bg-white shadow-lg rounded-lg p-6">
           {/* Blog Title */}
           <h1 className="text-4xl font-extrabold text-purple-700 text-center mb-4">
@@ -64,6 +64,16 @@ export default function BlogPost({ blog }) {
                 No content available for this blog.
               </p>
             )}
+
+            <p className="text-sm text-gray-600">
+              <strong>Category:</strong> {blog.category || "N/A"}
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Tags:</strong>{" "}
+              {Array.isArray(blog.tags) && blog.tags.length > 0
+                ? blog.tags.join(", ")
+                : "No tags available"}
+            </p>
           </div>
 
           {/* Like Button and Comments Section */}
@@ -89,7 +99,7 @@ export default function BlogPost({ blog }) {
                     className="border-b pb-2 text-gray-700 flex items-start space-x-2"
                   >
                     <div className="font-semibold text-purple-600">
-                      {c.user || "Anonymous"}:
+                      {c.name || "Anonymous"}:
                     </div>
                     <div>{c.comment}</div>
                   </li>
