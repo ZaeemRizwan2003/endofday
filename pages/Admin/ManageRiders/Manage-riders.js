@@ -160,7 +160,7 @@ export default function ManageRiders() {
                       </p>
                     </div>
                     <Link
-                      href={`/Admin/ManageRiders/Rider-details?userId=${rider._id}`}
+                     href={`/Admin/ManageRiders/RiderDetails?userId=${rider._id}`}
                       className="text-blue-500 hover:text-blue-700 font-medium transition"
                     >
                       View Details &rarr;

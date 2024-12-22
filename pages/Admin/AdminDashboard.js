@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import AdminLayout from "@/Components/AdminLayout";
-import { FaUsers, FaUtensils, FaShoppingCart, FaBicycle, FaBlog } from "react-icons/fa";
+import {
+  FaUsers,
+  FaUtensils,
+  FaShoppingCart,
+  FaBicycle,
+  FaBlog,
+  FaHourglassHalf,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaDollarSign,
+} from "react-icons/fa";
 import Chart from "chart.js/auto";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -13,6 +23,9 @@ export default function AdminDashboard() {
     totalRiders: 0,
     totalBlogs: 0,
     lastMonthOrders: 0,
+    pendingOrders: 0,
+    completedOrders: 0,
+    revenueGenerated: 0,
   });
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -27,7 +40,9 @@ export default function AdminDashboard() {
         if (startDate) params.append("startDate", startDate.toISOString());
         if (endDate) params.append("endDate", endDate.toISOString());
 
-        const response = await fetch(`/api/Admin/dashboardStats?${params.toString()}`);
+        const response = await fetch(
+          `/api/Admin/dashboardStats?${params.toString()}`
+        );
         const data = await response.json();
         setStats(data);
         renderCharts(data);
@@ -43,7 +58,7 @@ export default function AdminDashboard() {
     if (ordersChartRef.current) {
       ordersChartRef.current.destroy();
     }
-    
+
     const ordersCtx = document.getElementById("ordersChart").getContext("2d");
     ordersChartRef.current = new Chart(ordersCtx, {
       type: "bar",
@@ -88,7 +103,9 @@ export default function AdminDashboard() {
         <h1 className="text-3xl font-bold text-gray-800">Stats</h1>
         <div className="flex items-center space-x-4">
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Start Date</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Start Date
+            </label>
             <DatePicker
               selected={startDate}
               onChange={(date) => setStartDate(date)}
@@ -97,7 +114,9 @@ export default function AdminDashboard() {
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium mb-1">End Date</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              End Date
+            </label>
             <DatePicker
               selected={endDate}
               onChange={(date) => setEndDate(date)}
@@ -135,19 +154,43 @@ export default function AdminDashboard() {
           value={stats.totalBlogs}
           icon={<FaBlog className="text-red-500 text-4xl" />}
         />
+        <StatCard
+          title="Pending Orders"
+          value={stats.pendingOrders}
+          icon={<FaHourglassHalf className="text-yellow-500 text-4xl" />}
+        />
+        <StatCard
+          title="Completed Orders"
+          value={stats.completedOrders}
+          icon={<FaCheckCircle className="text-green-500 text-4xl" />}
+        />
+        {/* <StatCard
+          title="Cancelled Orders"
+          value={stats.cancelledOrders}
+          icon={<FaTimesCircle className="text-red-500 text-4xl" />}
+        /> */}
+        <StatCard
+          title="Revenue Generated"
+          value={`Rs.${stats.revenueGenerated}`}
+          icon={<FaDollarSign className="text-blue-500 text-4xl" />}
+        />
       </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         {/* Orders Bar Chart */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Orders Overview</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Orders Overview
+          </h2>
           <canvas id="ordersChart"></canvas>
         </div>
 
         {/* Customers vs Restaurants Pie Chart */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Customers vs Restaurants</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Customers vs Restaurants
+          </h2>
           <canvas id="customersRestaurantsChart"></canvas>
         </div>
       </div>
