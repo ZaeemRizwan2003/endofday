@@ -215,6 +215,7 @@ const Checkout = () => {
           totalAmount: totalCartPrice,
           addressId: selectedAddress,
           contact: userInfo.contact,
+  
         }
       );
 

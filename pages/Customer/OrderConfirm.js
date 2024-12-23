@@ -64,66 +64,82 @@ const OrderPage = () => {
         <div className="border rounded-lg p-4 mb-4">
           <h2 className="text-xl font-semibold">Order ID: {order._id}</h2>
 
-          {/* Progress Line */}
-          <div className="mt-4">
-            <div className="flex items-center space-x-2">
+          {/* Progress Bar with Animations */}
+          <div className="mt-6">
+            <div className="relative w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+              <div
+                className="h-full bg-green-500 transition-all duration-500"
+                style={{
+                  width: `${
+                    ((currentStatusIndex + 1) / statuses.length) * 100
+                  }%`,
+                }}
+              ></div>
+            </div>
+            <div className="flex justify-between mt-2">
               {statuses.map((status, index) => (
-                <div key={status} className="flex items-center">
+                <div
+                  key={status}
+                  className="flex flex-col items-center text-center w-1/4"
+                >
                   <div
-                    className={`w-6 h-6 flex items-center justify-center rounded-full ${
+                    className={`w-8 h-8 flex items-center justify-center rounded-full text-white font-bold ${
                       index <= currentStatusIndex
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-300 text-gray-500"
+                        ? "bg-green-500 animate-pulse"
+                        : "bg-gray-300"
                     }`}
                   >
                     {index + 1}
                   </div>
-                  {index < statuses.length - 1 && (
-                    <div
-                      className={`w-10 h-1 ${
-                        index < currentStatusIndex
-                          ? "bg-green-500"
-                          : "bg-gray-300"
-                      }`}
-                    ></div>
-                  )}
+                  <span
+                    className={`mt-1 text-sm font-semibold ${
+                      index <= currentStatusIndex
+                        ? "text-green-600"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {status}
+                  </span>
                 </div>
               ))}
             </div>
-            <div className="flex justify-between mt-2">
-              {statuses.map((status) => (
-                <span
-                  key={status}
-                  className="text-sm font-semibold text-gray-600"
-                >
-                  {status}
-                </span>
-              ))}
+
+            {/* Status Animations */}
+            <div className="flex justify-center mt-6">
+              {order.status === "Pending" && (
+                <Player
+                  autoplay
+                  loop
+                  src="https://assets8.lottiefiles.com/packages/lf20_q7uarxsb.json"
+                  style={{ height: "150px", width: "150px" }}
+                />
+              )}
+              {order.status === "Confirmed" && (
+                <Player
+                  autoplay
+                  loop
+                  src="https://assets6.lottiefiles.com/packages/lf20_jnyb0m8z.json"
+                  style={{ height: "150px", width: "150px" }}
+                />
+              )}
+              {order.status === "On The Way" && (
+                <Player
+                  autoplay
+                  loop
+                  src="https://assets6.lottiefiles.com/packages/lf20_V9t630.json"
+                  style={{ height: "150px", width: "150px" }}
+                />
+              )}
+              {order.status === "Delivered" && (
+                <Player
+                  autoplay
+                  loop
+                  src="https://assets6.lottiefiles.com/packages/lf20_5ngs2ksb.json"
+                  style={{ height: "150px", width: "150px" }}
+                />
+              )}
             </div>
           </div>
-
-          {/* Delivered Animation */}
-          {order.status === "Delivered" && (
-            <div className="mt-6 flex flex-col items-center justify-center">
-              <Player
-                autoplay
-                loop={true}
-                src="https://assets6.lottiefiles.com/packages/lf20_5ngs2ksb.json"
-                style={{ height: "150px", width: "150px" }}
-              />
-
-              <h2 className="text-2xl font-bold text-green-600 mt-4 animate-bounce">
-                Enjoy your food!
-              </h2>
-
-              <button
-                onClick={handleReviewClick}
-                className="mt-4 text-purple-700 hover:underline text-base font-semibold transition mb-3"
-              >
-                Don’t Forget to Leave a Review
-              </button>
-            </div>
-          )}
 
           {/* <p>Address: {order.address.addressLine}</p> */}
           {selectedAddress ? (
