@@ -2,7 +2,7 @@ import dbConnect from "@/middleware/mongoose";
 import Order from "@/models/Order";
 import User from "@/models/CustomerUser";
 import DeliveryPartner from "@/models/DeliveryPartner";
-
+import Listings from "@/models/foodlistingmodel";
 const Fuse = require("fuse.js");
 
 export default async function handler(req, res) {
@@ -103,6 +103,22 @@ export default async function handler(req, res) {
 
       console.log("Assigned Rider:", assignedRider);
 
+      for (const item of items) {
+        const listing = await Listings.findById(item.itemId);
+        if (!listing) {
+          return res
+            .status(404)
+            .json({ message: `Item with ID ${item.itemId} not found` });
+        }
+        if (listing.remainingitem < item.quantity) {
+          return res.status(400).json({
+            message: `Insufficient stock for item ${listing.name}. Available: ${listing.remainingitem}`,
+          });
+        }
+
+        listing.remainingitem -= item.quantity;
+        await listing.save();
+      }
       const newOrder = new Order({
         userId,
         items,
