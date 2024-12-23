@@ -12,12 +12,15 @@ import {
   faStar as faStarOutline,
 } from "@fortawesome/free-solid-svg-icons";
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
+import toast from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showChat, setShowChat] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [ongoingOrder, setOngoingOrder] = useState(null);
   const [newMessage, setNewMessage] = useState("");
 
   const {
@@ -121,9 +124,66 @@ const Dashboard = () => {
     return stars;
   };
 
+
+  useEffect(() => {
+    let orderCheckInterval;
+  
+    const fetchOngoingOrder = async () => {
+      try {
+        const response = await axios.get("/api/Customer/order?status=ongoing");
+        if (response.data?.ongoingOrder) {
+          setOngoingOrder(response.data.ongoingOrder);
+  
+          toast.dismiss("ongoing-order-toast");
+
+            toast(
+              (t) => (
+                <div
+                  onClick={() => {
+                    toast.dismiss(t.id); // Dismiss toast when clicked
+                    router.push(
+                      `/Customer/OrderConfirm?id=${response.data.ongoingOrder._id}`
+                    );
+                  }}
+                  className="cursor-pointer"
+                >
+                  🚚 <strong>Your order is in progress!</strong>
+                  <p className="text-sm">Click here to track your order.</p>
+                </div>
+              ),
+              {
+                id: "ongoing-order-toast", // Unique toast ID to prevent duplicates
+                duration: Infinity, // Toast remains until manually dismissed
+                style: {
+                  background: "#4F46E5",
+                  color: "#fff",
+                  cursor: "pointer",
+                },
+                position: "bottom-left",
+              }
+            );
+        } else {
+          // Clear toast if order is delivered or not ongoing
+          toast.dismiss("ongoing-order-toast");
+          clearInterval(orderCheckInterval);
+        }
+      } catch (error) {
+        console.error("Failed to fetch ongoing order:", error);
+      }
+    };
+  
+    // Check for ongoing orders every 10 seconds
+    fetchOngoingOrder();
+    orderCheckInterval = setInterval(fetchOngoingOrder, 10000);
+  
+    return () => clearInterval(orderCheckInterval); 
+  }, [router]);
+
   return (
     <>
       <DashNav search={search} setSearch={setSearch} />
+      <Toaster position="bottom-left" reverseOrder={false} />
+
 
       <div className="p-20 relative">
         {/* Chat Icon */}
@@ -134,44 +194,43 @@ const Dashboard = () => {
           <ChatBubbleOvalLeftIcon className="w-8 h-8" />
         </button>
 
-         {/* Chat UI */}
-  {showChat && (
-    <div className="fixed bottom-16 right-6 w-80 bg-white rounded-lg shadow-xl border border-gray-200">
-      <div className="p-4 border-b border-gray-300 bg-purple-100 text-purple-800 font-bold">
-        Chat with Driver
-      </div>
-      <div className="p-4 max-h-64 overflow-y-auto">
-        {messages.map((message, index) => (
-          <p
-            key={index}
-            className={`mb-2 ${
-              message.sender === "Customer"
-                ? "text-right text-blue-600"
-                : "text-left text-green-600"
-            }`}
-          >
-            {message.sender}: {message.text}
-          </p>
-        ))}
-      </div>
-      <div className="p-4 flex items-center space-x-2">
-        <input
-          type="text"
-          className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          placeholder="Type your message"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-        />
-        <button
-          className="px-4 py-2 bg-purple-800 text-white rounded-lg hover:bg-purple-700"
-          onClick={handleSendMessage}
-        >
-          Send
-        </button>
-      </div>
-    </div>
-  )}
-
+        {/* Chat UI */}
+        {showChat && (
+          <div className="fixed bottom-16 right-6 w-80 bg-white rounded-lg shadow-xl border border-gray-200">
+            <div className="p-4 border-b border-gray-300 bg-purple-100 text-purple-800 font-bold">
+              Chat with Driver
+            </div>
+            <div className="p-4 max-h-64 overflow-y-auto">
+              {messages.map((message, index) => (
+                <p
+                  key={index}
+                  className={`mb-2 ${
+                    message.sender === "Customer"
+                      ? "text-right text-blue-600"
+                      : "text-left text-green-600"
+                  }`}
+                >
+                  {message.sender}: {message.text}
+                </p>
+              ))}
+            </div>
+            <div className="p-4 flex items-center space-x-2">
+              <input
+                type="text"
+                className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Type your message"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+              />
+              <button
+                className="px-4 py-2 bg-purple-800 text-white rounded-lg hover:bg-purple-700"
+                onClick={handleSendMessage}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Options Buttons */}
         <div className="p-4 flex justify-center space-x-4 mb-8">
@@ -218,7 +277,9 @@ const Dashboard = () => {
                       {restaurant.address}
                     </p>
                     <div className="flex items-center mt-2">
-                      <div className="flex">{renderStars(restaurant.avgRating)}</div>
+                      <div className="flex">
+                        {renderStars(restaurant.avgRating)}
+                      </div>
                       <p className="text-gray-600 text-lg font-semibold mr-2">
                         {restaurant.avgRating}
                       </p>

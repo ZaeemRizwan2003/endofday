@@ -1,12 +1,14 @@
 import Order from "@/models/Order";
 import Stripe from "stripe";
 import User from "@/models/CustomerUser";
+import DeliveryPartner from "@/models/DeliveryPartner";
+const Fuse = require("fuse.js");
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
-    const { items, totalAmount, userId, addressId } = req.body;
+    const { items, totalAmount, userId, addressId, contact } = req.body;
 
     try {
       // Find user and address
@@ -16,15 +18,63 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Address not found" });
       }
 
+      const { city, area, addressLine } = selectedAddress || {};
+      const resolvedArea =
+        area || extractAreaFromAddress(selectedAddress.addressLine || "");
+      console.log("Selected Address:", selectedAddress);
+      console.log("City:", city, "Area:", resolvedArea);
+
+      // 🛵 **Step 2: Assign Rider**
+      const availableRiders = await DeliveryPartner.find({
+        city,
+      });
+
+      if (availableRiders.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No available riders in this area" });
+      }
+
+      let assignedRider = null;
+      const fuse = new Fuse(availableRiders, {
+        keys: ["area"],
+        threshold: 0.3,
+      });
+      const matchedRiders = fuse.search(resolvedArea);
+      const ridersInArea = availableRiders.filter(
+        (rider) => rider.area === resolvedArea
+      );
+
+      if (ridersInArea.length > 0) {
+        assignedRider = ridersInArea[0];
+        console.log("Assigned Rider (Exact Match):", assignedRider);
+      } else if (matchedRiders.length > 0) {
+        assignedRider = matchedRiders[0].item;
+        console.log("Assigned Rider (Fuzzy Match):", assignedRider);
+      } else {
+        assignedRider = availableRiders[0];
+        console.log("Assigned Rider (Fallback):", assignedRider);
+      }
+
+      if (!assignedRider) {
+        console.error("No rider could be assigned");
+        return res.status(500).json({ message: "No rider could be assigned" });
+      }
+
       // Create new order in the database
       const newOrder = await Order.create({
         userId,
         items,
         totalAmount,
         address: selectedAddress,
+        contact,
+        deliveryBoy_id: assignedRider._id,
         status: "pending",
-        contact: req.body.contact,
       });
+      assignedRider.orderId.push(newOrder._id);
+      await assignedRider.save();
+
+      console.log("Assigned Rider:", assignedRider);
 
       const deliveryFee = 150;
 
