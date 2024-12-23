@@ -26,14 +26,14 @@ export default async function handler(req, res) {
           select: "name",
         });
 
-        if (!orders || orders.length === 0) {
-            return res.status(200).json({
-              success: true,
-              message: "No orders assigned to this driver.",
-              orders: [],
-            });
-          }
-          
+      if (!orders || orders.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "No orders assigned to this driver.",
+          orders: [],
+        });
+      }
+
       const enrichedOrders = orders.map((order) => {
         let addressDetails = null;
 

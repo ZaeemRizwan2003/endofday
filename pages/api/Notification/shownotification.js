@@ -11,7 +11,9 @@ export default async function handler(req, res) {
       // Fetch notification requests where bakeryOwnerId matches the id passed in query parameter
       const notifications = await NotificationRequests.find({
         bakeryOwnerId: id,
-      }).lean();
+      })
+        .sort({ createdAt: -1 })
+        .lean();
 
       if (notifications.length > 0) {
         return res.status(200).json({ notifications });

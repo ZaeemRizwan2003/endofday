@@ -1,26 +1,25 @@
 import Navbar from "@/Components/Navbar";
 import React, { useState, useEffect } from "react";
-import Cookies from "js-cookie"; // Import js-cookie to manage cookies
+import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { FaSpinner } from "react-icons/fa"; // Import FaSpinner
+import { FaSpinner } from "react-icons/fa";
 
 const Dashboard = () => {
-  const [listings, setListings] = useState([]); // Initialize as an empty array
+  const [listings, setListings] = useState([]);
   const [reminders, setReminders] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedListingId, setSelectedListingId] = useState(null);
-  const [loading, setLoading] = useState(true); // New loading state
+  const [loading, setLoading] = useState(true);
+  const [selectedListingId, setSelectedListingId] = useState(null); // Modal support for delete
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const router = useRouter();
 
-  // Fetch listings from the API when the component mounts
+  // Fetch listings from the API
   useEffect(() => {
     const fetchListings = async () => {
-      const userId = Cookies.get("userId"); // Replace 'userID' with the actual name of your cookie
-
+      const userId = Cookies.get("userId");
       if (!userId) {
-        router.push("/Login"); // Redirect if no user ID found
+        router.push("/Login");
         return;
       }
 
@@ -48,29 +47,29 @@ const Dashboard = () => {
             }
             return listing;
           });
-          setListings(processedListings); // Set fetched listings
+          setListings(processedListings);
         } else {
           console.error("Failed to fetch listings:", data.message);
         }
       } catch (error) {
         console.error("Error fetching listings:", error);
       } finally {
-        setLoading(false); // Hide the loading indicator after data fetch
+        setLoading(false);
       }
     };
 
     fetchListings();
   }, [router]);
 
-  // Calculate reminders when the component loads
+  // Calculate reminders for updates
   useEffect(() => {
     const currentTime = new Date();
     const updateReminders = listings.map((listing) => {
       const lastUpdated = new Date(listing.updatedAt);
-      const hoursSinceUpdate = (currentTime - lastUpdated) / (1000 * 60 * 60); // Difference in hours
+      const hoursSinceUpdate = (currentTime - lastUpdated) / (1000 * 60 * 60);
       return {
         ...listing,
-        needsUpdate: hoursSinceUpdate >= 23, // true if 23 hours have passed
+        needsUpdate: hoursSinceUpdate >= 23,
       };
     });
     setReminders(updateReminders);
@@ -83,12 +82,13 @@ const Dashboard = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id }), // Send the listing id to the API
+        body: JSON.stringify({ id }),
       });
 
       const data = await response.json();
       if (data.success) {
-        setListings(listings.filter((listing) => listing._id !== id)); // Update listings
+        setListings(listings.filter((listing) => listing._id !== id));
+        setShowDeleteModal(false);
       } else {
         console.error("Failed to delete listing:", data.error);
       }
@@ -101,11 +101,20 @@ const Dashboard = () => {
     router.push("/Restaurants/addFoodListing");
   };
 
-  // Show the spinner when loading
+  const openDeleteModal = (id) => {
+    setSelectedListingId(id);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setSelectedListingId(null);
+    setShowDeleteModal(false);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <FaSpinner className="animate-spin text-6xl text-blue-500" />
+        <FaSpinner className="animate-spin text-6xl text-purple-500" />
       </div>
     );
   }
@@ -114,7 +123,6 @@ const Dashboard = () => {
     <>
       <Navbar />
       <div className="container mx-auto p-4 mt-20">
-        {/* Add Food Button */}
         <div className="flex justify-center mb-6">
           <button
             onClick={handleAddFood}
@@ -140,9 +148,7 @@ const Dashboard = () => {
             </span>
           </button>
         </div>
-
-        {/* Display Listings */}
-        <h1 className="text-2xl font-bold mb-4 text-center text-black">
+        <h1 className="text-3xl font-bold mb-6 text-center text-purple-800">
           Your Food Listings
         </h1>
         {reminders.length === 0 ? (
@@ -152,9 +158,8 @@ const Dashboard = () => {
             {reminders.map((listing) => (
               <div
                 key={listing._id}
-                className="bg-white p-3 shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200"
+                className="bg-white p-4 shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200"
               >
-                {/* Display the image stored in the database */}
                 {listing.image &&
                   listing.image.data &&
                   listing.image.contentType && (
@@ -169,7 +174,6 @@ const Dashboard = () => {
                       />
                     </div>
                   )}
-
                 <h2 className="text-xl font-bold text-gray-800">
                   {listing.itemname}
                 </h2>
@@ -207,42 +211,20 @@ const Dashboard = () => {
 
                 <div className="flex justify-between mt-4">
                   <button
-                    onClick={() => {
-                      setSelectedListingId(listing._id);
-                      setShowModal(true);
-                    }}
-                    className="Btn flex items-center text-red-600 hover:text-red-800"
+                    onClick={() => openDeleteModal(listing._id)}
+                    className="text-red-600 hover:text-red-800"
                   >
-                    <svg
-                      viewBox="0 0 16 16"
-                      className="bi bi-trash3-fill"
-                      fill="currentColor"
-                      height="18"
-                      width="18"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 1 0v-8a.5.5 0 0 0-.5-.5Z" />
-                    </svg>
-                    <span className="ml-2">Delete</span>
+                    Delete
                   </button>
-
                   <button
                     onClick={() =>
                       router.push(
                         `/Restaurants/addFoodListing?edit=${listing._id}`
                       )
                     }
-                    className="edit-button flex items-center text-green-600 hover:text-green-800"
+                    className="text-green-600 hover:text-green-800"
                   >
-                    <svg
-                      className="edit-svgIcon"
-                      viewBox="0 0 512 512"
-                      height="18"
-                      width="18"
-                    >
-                      <path d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.2 8.6 23.7 6.1l120.3-35.8c14.1-4.2 27-11.8 37.4-22.2l179.3-179.3 22.6-22.6zM362.3 115.5l33.9 33.9-70.6 70.6-33.9-33.9 70.6-70.6zM104.5 397.4c-3.9 3.9-8.6 6.7-13.7 8.2l-65.5 19.6 19.6-65.5c1.5-5.1 4.3-9.8 8.2-13.7l176.8-176.8 33.9 33.9-176.8 176.8z" />
-                    </svg>
-                    <span className="ml-2">Edit</span>
+                    Edit
                   </button>
                 </div>
               </div>
@@ -250,6 +232,31 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Are you sure you want to delete this listing?
+            </h2>
+            <div className="flex justify-between">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deleteListing(selectedListingId)}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-800"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

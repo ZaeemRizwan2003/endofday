@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import DeliveryHeader from "@/Components/DeliveryHeader";
 import axios from "axios";
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
@@ -10,7 +10,8 @@ const DeliveryOrders = () => {
   const [isChatOpen, setIsChatOpen] = useState(false); // Chat UI state
   const [chatMessages, setChatMessages] = useState([]); // Chat messages
   const [messageInput, setMessageInput] = useState(""); // Message input
-  const [deliveryBoy, setDeliveryBoy] = useState({});
+  const [deliveryBoy, setDeliveryBoy] = useState(null); // Delivery rider's data
+  const [loading, setLoading] = useState(true); // Loading state during login verification
   const [failedOrders, setFailedOrders] = useState([]);
   const router = useRouter();
 
@@ -19,13 +20,12 @@ const DeliveryOrders = () => {
       const response = await axios.get(
         `/api/deliverypartners/orders-assign?driverId=${driverId}`
       );
+      console.log("API Response:", response.data);
       if (response.status === 200 && response.data.success) {
-        const currentOrders = response.data.orders.filter(
-          (order) => order.status !== "Delivered" && order.status !== "Failed To Deliver"
-        );
-        const delivered = response.data.orders.filter(
-          (order) => order.status === "Delivered"
-        );
+        const currentOrders = response.data.orders
+          .filter((order) => order.status !== "Delivered") && order.status !== "Failed To Deliver"
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort descending by createdAt
+
         const failed = response.data.orders.filter(
           (order) => order.status === "Failed To Deliver"
         );
@@ -43,25 +43,30 @@ const DeliveryOrders = () => {
 
   useEffect(() => {
     const deliveryData = localStorage.getItem("delivery");
+
     if (!deliveryData) {
-      router.push("/Delivery/deliverypartner");
+      // Redirect to login if no delivery data
+      router.replace("/Login");
       return;
     }
+
     let parsedData;
     try {
       parsedData = JSON.parse(deliveryData);
     } catch {
       localStorage.removeItem("delivery");
-      router.push("/Delivery/deliverypartner");
+      router.replace("/Login");
       return;
     }
+
     if (parsedData && parsedData._id) {
       setDeliveryBoy(parsedData);
       getMyOrders(parsedData._id);
     } else {
-      router.push("/Delivery/deliverypartner");
+      router.replace("/Login");
     }
-  }, []);
+    setLoading(false); // Stop loading after validation
+  }, [router]);
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
@@ -111,6 +116,14 @@ const DeliveryOrders = () => {
     return () => window.removeEventListener("storage", handleStorageEvent);
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <p className="text-lg text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Delivery Header */}
@@ -158,7 +171,9 @@ const DeliveryOrders = () => {
                 <p className="text-gray-700">
                   <span className="font-semibold">Contact:</span>{" "}
                   {order.contact || "N/A"}
+                  {order.contact || "N/A"}
                 </p>
+
                 <p className="text-gray-700">
                   <span className="font-semibold">Amount:</span> Rs.
                   {order.totalAmount + 150}

@@ -8,15 +8,21 @@ export default function VerifyOTP() {
   const { email } = router.query; // Get email from query string
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // Tracks success or error
+  const [loading, setLoading] = useState(false); // Tracks loading state
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading state
+    setMessage(""); // Clear any previous message
     try {
       const res = await axios.post("/api/ForgotPassword/verify-otp", {
         email,
         otp,
       });
       setMessage(res.data.message);
+      setMessageType("success"); // Set message type to success
+      setLoading(false); // End loading state
 
       if (res.status === 200) {
         router.push({
@@ -27,6 +33,8 @@ export default function VerifyOTP() {
     } catch (error) {
       console.error(error);
       setMessage("OTP verification failed. Please try again.");
+      setMessageType("error"); // Set message type to error
+      setLoading(false); // End loading state
     }
   };
 
@@ -49,13 +57,24 @@ export default function VerifyOTP() {
           </div>
           <button
             type="submit"
-            className="w-full py-3 mt-4 text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring focus:ring-purple-300"
+            disabled={loading} // Disable button while loading
+            className={`w-full py-3 mt-4 text-white rounded-md ${
+              loading
+                ? "bg-purple-400 cursor-not-allowed"
+                : "bg-purple-600 hover:bg-purple-700"
+            } focus:outline-none focus:ring focus:ring-purple-300`}
           >
-            Verify OTP
+            {loading ? "Verifying OTP..." : "Verify OTP"}
           </button>
         </form>
         {message && (
-          <p className="mt-4 text-center text-green-500">{message}</p>
+          <p
+            className={`mt-4 text-center ${
+              messageType === "success" ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {message}
+          </p>
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,15 +22,19 @@ const DeliveryHeader = () => {
   }, [pathName, router]);
 
   const logout = () => {
-    localStorage.removeItem("delivery");
-    router.push("/Delivery/deliverypartner");
+    localStorage.clear();
+
+    router.push("/Login");
   };
 
   return (
     <nav className="bg-white fixed w-full z-20 top-0 border-b border-gray-200">
       <div className="max-w-screen-xl flex justify-between items-center mx-auto p-4">
         {/* Logo */}
-        <Link href="/Delivery/deliverydashboard" className="flex items-center space-x-3">
+        <Link
+          href="/Delivery/deliverydashboard"
+          className="flex items-center space-x-3"
+        >
           <img src="/mainlogo.png" className="h-10" alt="Logo" />
         </Link>
 
@@ -52,30 +56,45 @@ const DeliveryHeader = () => {
                 />
               </div>
               <ul className="py-2">
-              {details ? (
+                {details ? (
                   <>
                     <li>
-                      <Link href="/Delivery/account-info" className="block px-4 py-2 hover:bg-gray-100">
+                      <Link
+                        href="/Delivery/account-info"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                      >
                         Account Information
                       </Link>
                     </li>
                     <li>
-                      <Link href="/ForgotPassword/Reset-password" className="block px-4 py-2 hover:bg-gray-100">
+                      <Link
+                        href="/ForgotPassword/Reset-password"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                      >
                         Change Password
                       </Link>
                     </li>
                     <li>
-                      <Link href="/Delivery/All-Orders" className="block px-4 py-2 hover:bg-gray-100">
+                      <Link
+                        href="/Delivery/All-Orders"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                      >
                         All Orders
                       </Link>
                     </li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={logout}>
+                    <li
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={logout}
+                    >
                       Logout
                     </li>
                   </>
                 ) : (
                   <li>
-                    <Link href="/" className="block px-4 py-2 hover:bg-gray-100">
+                    <Link
+                      href="/"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
                       Home
                     </Link>
                   </li>
