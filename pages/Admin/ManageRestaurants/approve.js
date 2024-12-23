@@ -16,7 +16,7 @@ const BakeryApproval = () => {
   useEffect(() => {
     const fetchBakeries = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await fetch(`/api/Admin/Restaurants/bakeryrequests`);
 
         if (!response.ok) {
@@ -74,35 +74,35 @@ const BakeryApproval = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <FaSpinner className="animate-spin text-6xl text-purple-500" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //    <p>Loading Restaurants.....</p>
+  //   );
+  // }
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-4 mt-20">
-        <Link
-          href="/Admin/AdminDashboard"
-          className="text-purple-600 hover:text-purple-800"
-        >
-          &larr; Back to Dashboard
-        </Link>
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Bakery Approvals
-        </h1>
+      <div className="bg-gray-100 p-6 min-h-screen">
+        {/* Page Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-4xl font-extrabold text-gray-800">Bakery Approvals</h1>
+          <Link
+            href="/Admin/AdminDashboard"
+            className="text-blue-600 hover:text-blue-800 font-medium"
+          >
+            &larr; Back to Dashboard
+          </Link>
+        </div>
 
-        <div className="flex justify-center space-x-4 mb-6">
+        {/* Status Filter Tabs */}
+        <div className="flex justify-center mb-6 space-x-4">
           {["pending", "approved", "rejected"].map((filterStatus) => (
             <button
               key={filterStatus}
-              className={`px-4 py-2 rounded ${
+              className={`px-4 py-2 rounded-lg font-medium transition ${
                 status === filterStatus
-                  ? "bg-purple-500 text-white"
-                  : "bg-gray-200 text-black"
+                  ? "bg-purple-600 text-white shadow-md"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
               }`}
               onClick={() => handleFilterChange(filterStatus)}
             >
@@ -111,46 +111,73 @@ const BakeryApproval = () => {
           ))}
         </div>
 
+        {/* Bakery List */}
         {filteredBakeries.length === 0 ? (
-          <p className="text-center">No {status} bakeries found.</p>
+          <div className="text-center py-12">
+            <p className="text-lg text-gray-600">No {status} bakeries found.</p>
+          </div>
         ) : (
-          <ul>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {filteredBakeries.map((bakery) => (
-              <li
+              <div
                 key={bakery._id}
-                className="bg-white p-4 shadow-lg rounded-lg mb-4"
+                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
-                <p className="text-lg text-gray-700 font-semibold">
-                  Name: {bakery.restaurantName}
-                </p>
-                <p className="text-sm text-gray-500">Email: {bakery.email}</p>
-                <p className="text-sm text-gray-500">
-                  Address: {bakery.address}
-                </p>
-                <p className="text-sm text-gray-500">Phone: {bakery.number}</p>
-                <p className="text-sm text-gray-500">
-                  Requested on:{" "}
-                  {new Date(bakery.createdAt).toLocaleDateString()}
-                </p>
+                {/* Bakery Header */}
+                <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    {bakery.restaurantName}
+                  </h2>
+                  <span
+                    className={`px-2 py-1 text-sm font-medium rounded-full ${
+                      status === "pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : status === "approved"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {bakery.status.charAt(0).toUpperCase() + bakery.status.slice(1)}
+                  </span>
+                </div>
+
+                {/* Bakery Body */}
+                <div className="p-4">
+                  <p className="text-gray-700 mb-2">
+                    <strong>Email:</strong> {bakery.email}
+                  </p>
+                  <p className="text-gray-700 mb-2">
+                    <strong>Address:</strong> {bakery.address}
+                  </p>
+                  <p className="text-gray-700 mb-2">
+                    <strong>Phone:</strong> {bakery.number}
+                  </p>
+                  <p className="text-gray-500 text-sm">
+                    Requested on:{" "}
+                    {new Date(bakery.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Actions */}
                 {status === "pending" && (
-                  <div className="mt-4">
+                  <div className="p-4 border-t border-gray-200 flex justify-end space-x-4">
                     <button
-                      className="bg-green-500 text-white px-4 py-2 rounded mr-2"
                       onClick={() => handleAction(bakery._id, "approved")}
+                      className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
                     >
                       Approve
                     </button>
                     <button
-                      className="bg-red-500 text-white px-4 py-2 rounded"
                       onClick={() => handleAction(bakery._id, "rejected")}
+                      className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
                     >
                       Reject
                     </button>
                   </div>
                 )}
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </AdminLayout>

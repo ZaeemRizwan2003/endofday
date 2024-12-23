@@ -32,6 +32,31 @@ export default async function handler(req, res) {
         createdAt: { $gte: lastMonth },
       });
     }
+    
+      // New Order Metrics
+      const pendingOrders = await Order.countDocuments({
+        status: "pending",
+        ...dateFilter,
+      });
+  
+      const completedOrders = await Order.countDocuments({
+        status: "Delivered",
+        ...dateFilter,
+      });
+  
+      // const cancelledOrders = await Order.countDocuments({
+      //   status: "cancelled",
+      //   ...dateFilter,
+      // });
+  
+      const revenueGeneratedResult = await Order.aggregate([
+        { $match: { status: "Delivered", ...dateFilter } },
+        { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
+      ]);
+  
+      const revenueGenerated = revenueGeneratedResult.length
+        ? revenueGeneratedResult[0].totalRevenue
+        : 0;
 
     res.status(200).json({
       totalCustomers,
@@ -40,6 +65,10 @@ export default async function handler(req, res) {
       totalRiders,
       totalBlogs,
       lastMonthOrders,
+      pendingOrders,
+      completedOrders,
+      // cancelledOrders,
+      revenueGenerated,
     });
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
