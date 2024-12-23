@@ -15,6 +15,7 @@ const DashNav = () => {
         credentials: "include",
       });
       if (response.ok) {
+        localStorage.clear();
         router.push("/Login");
       } else {
         console.error("Logout failed: ", await response.json());
@@ -77,7 +78,7 @@ const DashNav = () => {
                   <li className="mb-3">
                     <button
                       className="text-purple-700 hover:underline"
-                      onClick={() => router.push("/Restaurants/CreateNotification")}
+                      onClick={() => router.push("/Restaurants/ShowRequests")}
                     >
                       Notification Requests
                     </button>

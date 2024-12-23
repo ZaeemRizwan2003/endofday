@@ -10,14 +10,15 @@ const page = () => {
     <>
       <div className="container">
         <h1 style={{ textAlign: "center" }}></h1>
-        {login ? <DeliveryLogin /> : <DeliverySignUp />}
+        {/* {login ? <DeliveryLogin /> : <DeliverySignUp />} */}
+        <DeliverySignUp />
         <div>
-          <button
+          {/* <button
             className="text-purple-800 hover:text-purple-600 font-semibold underline transition-colors duration-300 mt-3"
             onClick={() => setlogin(!login)}
           >
             {!login ? "Already Have Account? Login" : "New User? Signup"}
-          </button>
+          </button> */}
         </div>
       </div>
     </>

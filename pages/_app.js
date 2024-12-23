@@ -12,11 +12,15 @@ const CartProvider = dynamic(
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
-  const isAdminRoute = router.pathname.startsWith("/Admin");
+  const isExcludedRoute =
+    router.pathname.startsWith("/Admin") ||
+    router.pathname.startsWith("/Restaurants");
+  // ||
+  // router.pathname.startsWith("/Delivery");
 
   return (
     <>
-      {isAdminRoute ? (
+      {isExcludedRoute ? (
         <Component {...pageProps} />
       ) : (
         <CartProvider>

@@ -8,6 +8,7 @@ export default function NotificationForm() {
     message: "",
   });
 
+  const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -18,7 +19,6 @@ export default function NotificationForm() {
     e.preventDefault();
 
     try {
-      // Get userId directly from localStorage
       const userId = localStorage.getItem("userId");
       if (!userId) {
         alert("User ID is missing. Please log in again.");
@@ -29,7 +29,7 @@ export default function NotificationForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          userId: userId, // Send userId in headers
+          userId: userId,
         },
         body: JSON.stringify(formData),
       });
@@ -37,8 +37,11 @@ export default function NotificationForm() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Notification request submitted successfully!");
-        router.push("/Restaurants/RDashboard"); // Redirect on success
+        setShowPopup(true); // Show the popup message
+        setTimeout(() => {
+          setShowPopup(false); // Automatically close the popup after a few seconds
+          router.push("/Restaurants/RDashboard");
+        }, 3000); // 3-second delay
       } else {
         alert(data.error || "Failed to submit request");
       }
@@ -54,53 +57,72 @@ export default function NotificationForm() {
 
   return (
     <>
-    <DashNav/>
-    <div className="relative pt-20">
-      <button
-        onClick={goBackToDashboard}
-        className="absolute top-4 right-4 px-6 py-2 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 focus:outline-none"
-      >
-        Go Back to Dashboard
-      </button>
-
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-lg mx-auto mt-10 p-8 bg-white shadow-lg rounded-lg"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          Create Notification
-        </h2>
-
-        <label className="block mb-2 text-gray-600 font-medium">Title</label>
-        <input
-          type="text"
-          name="title"
-          placeholder="Notification Title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-
-        <label className="block mb-2 text-gray-600 font-medium">Message</label>
-        <textarea
-          name="message"
-          placeholder="Notification Message"
-          value={formData.message}
-          onChange={handleChange}
-          required
-          rows="5"
-          className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        ></textarea>
-
+      <DashNav />
+      <div className="relative pt-20 bg-gradient-to-br from-purple-50 to-purple-100 min-h-screen">
         <button
-          type="submit"
-          className="w-full py-3 mt-4 text-white font-semibold bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          onClick={goBackToDashboard}
+          className="absolute top-4 right-4 px-6 py-2 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all duration-200"
         >
-          Submit
+          Go Back to Dashboard
         </button>
-      </form>
-    </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="max-w-xl mx-auto mt-10 p-8 bg-white shadow-xl rounded-2xl border border-gray-100 transform transition-all hover:scale-105"
+        >
+          <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+            Create Notification
+          </h2>
+
+          <label className="block mb-2 text-gray-700 font-semibold">
+            Title
+          </label>
+          <input
+            type="text"
+            name="title"
+            placeholder="Notification Title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 mb-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+          />
+
+          <label className="block mb-2 text-gray-700 font-semibold">
+            Message
+          </label>
+          <textarea
+            name="message"
+            placeholder="Notification Message"
+            value={formData.message}
+            onChange={handleChange}
+            required
+            rows="5"
+            className="w-full px-4 py-3 mb-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+          ></textarea>
+
+          <button
+            type="submit"
+            className="w-full py-3 mt-4 text-white font-semibold bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all duration-200"
+          >
+            Submit
+          </button>
+        </form>
+
+        {/* Popup Message */}
+        {showPopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <h3 className="text-2xl font-bold mb-4">
+                Notification Submitted!
+              </h3>
+              <p className="text-gray-700">
+                The status of the notification approval will be sent to your
+                email shortly.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }

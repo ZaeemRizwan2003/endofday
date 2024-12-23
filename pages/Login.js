@@ -24,22 +24,21 @@ const Login = () => {
       const res = await axios.post("/api/login", formData);
 
       if (res.status === 200) {
-        const { token, userId, userType } = res.data;
+        const { token, userId, userType, userData } = res.data;
 
+        // Store token and userId in localStorage
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userId);
 
+        // Handle different user types
         if (userType === "listing") {
           await fetchUserCart(userId); // Set cart for the customer
-        }
-
-        // Redirect based on userType
-        if (userType === "bakery") {
-          router.push("/Restaurants/RDashboard");
-        } else if (userType === "listing") {
           router.push("/Customer/Cdashboard");
+        } else if (userType === "bakery") {
+          router.push("/Restaurants/RDashboard");
         } else if (userType === "delivery") {
-          localStorage.setItem("delivery", JSON.stringify(formData));
+          // Store delivery-specific details in localStorage
+          localStorage.setItem("delivery", JSON.stringify(userData));
           router.push("/Delivery/deliverydashboard");
         }
       }

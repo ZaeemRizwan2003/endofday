@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import DeliveryHeader from "@/Components/DeliveryHeader";
 import axios from "axios";
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
@@ -10,7 +10,8 @@ const DeliveryOrders = () => {
   const [isChatOpen, setIsChatOpen] = useState(false); // Chat UI state
   const [chatMessages, setChatMessages] = useState([]); // Chat messages
   const [messageInput, setMessageInput] = useState(""); // Message input
-  const [deliveryBoy, setDeliveryBoy] = useState({});
+  const [deliveryBoy, setDeliveryBoy] = useState(null); // Delivery rider's data
+  const [loading, setLoading] = useState(true); // Loading state during login verification
   const router = useRouter();
 
   const getMyOrders = async (driverId) => {
@@ -38,25 +39,30 @@ const DeliveryOrders = () => {
 
   useEffect(() => {
     const deliveryData = localStorage.getItem("delivery");
+
     if (!deliveryData) {
-      router.push("/Delivery/deliverypartner");
+      // Redirect to login if no delivery data
+      router.replace("/Login");
       return;
     }
+
     let parsedData;
     try {
       parsedData = JSON.parse(deliveryData);
     } catch {
       localStorage.removeItem("delivery");
-      router.push("/Delivery/deliverypartner");
+      router.replace("/Login");
       return;
     }
+
     if (parsedData && parsedData._id) {
       setDeliveryBoy(parsedData);
       getMyOrders(parsedData._id);
     } else {
-      router.push("/Delivery/deliverypartner");
+      router.replace("/Login");
     }
-  }, []);
+    setLoading(false); // Stop loading after validation
+  }, [router]);
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
@@ -105,6 +111,14 @@ const DeliveryOrders = () => {
     window.addEventListener("storage", handleStorageEvent);
     return () => window.removeEventListener("storage", handleStorageEvent);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <p className="text-lg text-gray-600">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -180,45 +194,6 @@ const DeliveryOrders = () => {
                   <option>Delivered</option>
                   <option>Failed To Deliver</option>
                 </select>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Delivered Orders Section */}
-      <div className="container mx-auto px-4 mt-12">
-        <h2 className="text-2xl font-bold text-green-700 mb-4">
-          ✅ Delivered Orders
-        </h2>
-        {deliveredOrders.length === 0 ? (
-          <p className="text-center text-gray-500 text-lg">
-            No delivered orders yet.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {deliveredOrders.map((order) => (
-              <div
-                key={order._id}
-                className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow"
-              >
-                <h4 className="text-lg font-semibold text-gray-800">
-                  🧾 Order #{order._id.slice(-6)}
-                </h4>
-                <p className="text-gray-700">
-                  <span className="font-semibold">Name:</span>{" "}
-                  {order.userId?.name || "N/A"}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-semibold">Amount:</span> Rs.
-                  {order.totalAmount}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-semibold">Address:</span>{" "}
-                  {order.address
-                    ? `${order.address.addressLine}, ${order.address.area}, ${order.address.city}, ${order.address.postalCode}`
-                    : "Address not available"}
-                </p>
               </div>
             ))}
           </div>

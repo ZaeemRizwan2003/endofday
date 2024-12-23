@@ -6,25 +6,36 @@ import axios from "axios";
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); // New loading state
+  const [otpSent, setOtpSent] = useState(false); // State to track OTP sent status
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Show "Sending OTP" text
+    setOtpSent(false); // Reset OTP sent status
+
     try {
       const res = await axios.post("/api/ForgotPassword/forgot-password", {
         email,
       });
-      setMessage(res.data.message);
 
-      // Redirect to verify-otp page if OTP is successfully sent
-      if (res.status === 200) {
-        router.push({
-          pathname: "/ForgotPassword/Verify-otp", // Redirect to verify OTP
-          query: { email }, // Pass email as query parameter
-        });
-      }
+      setMessage(res.data.message);
+      setOtpSent(true); // OTP sent successfully
+
+      // Redirect to verify-otp page after a brief delay
+      setTimeout(() => {
+        if (res.status === 200) {
+          router.push({
+            pathname: "/ForgotPassword/Verify-otp",
+            query: { email },
+          });
+        }
+      }, 2000); // Delay of 2 seconds for user to see the message
     } catch (error) {
       setMessage("Error sending OTP. Please try again.");
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -47,9 +58,14 @@ export default function ForgotPassword() {
           </div>
           <button
             type="submit"
-            className="w-full py-3 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            disabled={loading} // Disable button when loading
+            className={`w-full py-3 ${
+              loading
+                ? "bg-purple-400 cursor-not-allowed"
+                : "bg-purple-700 hover:bg-purple-800"
+            } text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500`}
           >
-            Send OTP
+            {loading ? "Sending OTP..." : otpSent ? "OTP Sent!" : "Send OTP"}
           </button>
         </form>
         {message && <p className="mt-4 text-center text-gray-600">{message}</p>}
