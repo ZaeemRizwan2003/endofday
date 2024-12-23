@@ -19,13 +19,16 @@ const DeliveryOrders = () => {
       const response = await axios.get(
         `/api/deliverypartners/orders-assign?driverId=${driverId}`
       );
+      console.log("API Response:", response.data);
       if (response.status === 200 && response.data.success) {
-        const currentOrders = response.data.orders.filter(
-          (order) => order.status !== "Delivered"
-        );
-        const delivered = response.data.orders.filter(
-          (order) => order.status === "Delivered"
-        );
+        const currentOrders = response.data.orders
+          .filter((order) => order.status !== "Delivered")
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort descending by createdAt
+
+        const delivered = response.data.orders
+          .filter((order) => order.status === "Delivered")
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort descending by createdAt
+
         setMyOrders(currentOrders);
         setDeliveredOrders(delivered);
       } else {
@@ -166,8 +169,9 @@ const DeliveryOrders = () => {
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Contact:</span>{" "}
-                  {order.userId?.contact || "N/A"}
+                  {order.contact || "N/A"}
                 </p>
+
                 <p className="text-gray-700">
                   <span className="font-semibold">Amount:</span> Rs.
                   {order.totalAmount + 150}
