@@ -27,6 +27,7 @@ const Signup = () => {
       setError("Payment failed. Please try again.");
     }
   }, [router.query]);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
@@ -51,6 +52,33 @@ const Signup = () => {
     setSuccess("");
     setLoading(true);
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(formData.email)) {
+      setError(
+        "Email must be a valid Gmail address (e.g., example@gmail.com)."
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password !== formData.confirmpassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    if (!selectedImage) {
+      setError("Please upload an image.");
+      setLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmpassword) {
       setError("Passwords don't match");
       setLoading(false);
@@ -62,7 +90,6 @@ const Signup = () => {
       let mimeType = "";
 
       if (selectedImage) {
-        // Convert image file to Base64 string
         const result = await convertToBase64(selectedImage);
         base64Image = result.base64;
         mimeType = result.mimeType;
@@ -79,7 +106,7 @@ const Signup = () => {
         confirmpassword: formData.confirmpassword,
         address: formData.address,
         number: formData.number,
-        option: formData.option, // Include the selected type in the request
+        option: formData.option,
         image: base64Image, // Base64 string
         contentType: mimeType, // MIME type
       };
@@ -104,7 +131,7 @@ const Signup = () => {
           "/api/Restaurants/subscribe",
           {
             email: formData.email,
-            userId: signupResponse.data.userId, // Assuming the signup API returns userId
+            userId: signupResponse.data.userId,
             name: formData.name,
             password: formData.password,
             address: formData.address,
@@ -115,8 +142,7 @@ const Signup = () => {
         );
 
         if (subscribeResponse.status === 200) {
-          // Redirect to Stripe Checkout page
-          window.location.href = subscribeResponse.data.url; // Redirect to Stripe Checkout URL
+          window.location.href = subscribeResponse.data.url;
         }
       }
     } catch (err) {
@@ -225,12 +251,22 @@ const Signup = () => {
                     type="email"
                     name="email"
                     id="email"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    className={`bg-gray-50 border ${
+                      /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email)
+                        ? "border-green-500"
+                        : "border-red-500"
+                    } text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5`}
                     placeholder="bakeryname@company.com"
                     value={formData.email}
                     onChange={handleChange}
                     required
                   />
+                  {formData.email &&
+                    !/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email) && (
+                      <p className="text-red-500 text-sm mt-1">
+                        Please use a valid Gmail address.
+                      </p>
+                    )}
                 </div>
 
                 {/* Password */}
@@ -246,11 +282,20 @@ const Signup = () => {
                     name="password"
                     id="password"
                     placeholder="••••••••"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    className={`bg-gray-50 border ${
+                      formData.password.length >= 8
+                        ? "border-green-500"
+                        : "border-red-500"
+                    } text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5`}
                     value={formData.password}
                     onChange={handleChange}
                     required
                   />
+                  {formData.password && formData.password.length < 8 && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Password must be at least 8 characters.
+                    </p>
+                  )}
                 </div>
 
                 {/* Confirm Password */}

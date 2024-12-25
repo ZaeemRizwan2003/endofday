@@ -42,7 +42,6 @@ export default async function handler(req, res) {
             (addr) => addr._id.toString() === order.address.toString()
           );
         }
-
         return {
           _id: order._id,
           userId: {

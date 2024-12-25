@@ -130,6 +130,7 @@ const OrderPage = () => {
                   style={{ height: "150px", width: "150px" }}
                 />
               )}
+
               {order.status === "Delivered" && (
                 <Player
                   autoplay
@@ -141,6 +142,16 @@ const OrderPage = () => {
             </div>
           </div>
 
+          <div>
+            <p className="mt-4 text-lg text-purple-800 font-semibold text-center mb-3 underline">
+              <Link
+                href={`/Customer/ReviewPage?orderId=${order._id}`}
+                legacyBehavior
+              >
+                Don't forget to give us a review!
+              </Link>
+            </p>
+          </div>
           {/* <p>Address: {order.address.addressLine}</p> */}
           {selectedAddress ? (
             <p>

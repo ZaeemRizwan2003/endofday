@@ -35,8 +35,28 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: "All fields are required." });
       }
 
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+      if (!emailRegex.test(email)) {
+        return res
+          .status(400)
+          .json({ message: "Email must be a valid Gmail address." });
+      }
+
+      if (password.length < 8) {
+        return res
+          .status(400)
+          .json({ message: "Password must be at least 8 characters long." });
+      }
+
       if (password !== confirmpassword) {
         return res.status(400).json({ message: "Passwords don't match." });
+      }
+
+      const existingRestaurant = await RegisteredBakeries.findOne({ email });
+      if (existingRestaurant) {
+        return res
+          .status(400)
+          .json({ message: "Restaurant with this email already exists." });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -51,7 +71,7 @@ export default async function handler(req, res) {
         option: option === "both" ? ["pickup", "delivery"] : [option],
         image,
         imageContentType: contentType,
-        status: "pending", // Add pending status for approval
+        status: "pending",
         resetOtp: null,
         otpExpiry: null,
       });
@@ -60,7 +80,7 @@ export default async function handler(req, res) {
       console.log("Saved Bakery:", savedBakery);
       res.status(200).json({
         message: "Signup successful!",
-        userId: savedBakery._id, // Return user ID for Stripe processing
+        userId: savedBakery._id,
       });
     } catch (error) {
       console.error(error);

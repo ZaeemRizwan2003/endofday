@@ -33,16 +33,29 @@ export default function Home({ initialBlogs }) {
   const fetchFilteredBlogs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `/api/Blog/getblogs?category=${selectedCategory}&tag=${selectedTag}`
-      );
+      const query = [];
+      if (selectedCategory) query.push(`category=${selectedCategory}`);
+      if (selectedTag) query.push(`tag=${selectedTag}`);
+  
+      const queryString = query.length > 0 ? `?${query.join('&')}` : '';
+
+       const res = await axios.get(`/api/Blog/getblogs${queryString}`);
+       console.log('API Response:', res.data);
+
       setBlogs(res.data);
       setHasMore(false);
     } catch (error) {
       console.error("Error fetching filtered blogs:", error);
+    }finally {
+      setLoading(false); // Ensure loading stops
+      console.log('Loading State:', loading);
     }
   };
 
+  useEffect(() => {
+    fetchFilteredBlogs();
+  }, [selectedCategory, selectedTag]);
+  
   return (
     <>
       <HomeNavbar />
@@ -101,7 +114,7 @@ export default function Home({ initialBlogs }) {
           {/* 📰 Blog Listing */}
           {loading ? (
             <p className="text-center text-gray-600">Loading blogs...</p>
-          ) : (
+          ) : blogs.length > 0 ? (
             <InfiniteScroll
               dataLength={blogs.length}
               next={fetchMoreBlogs}
@@ -122,6 +135,8 @@ export default function Home({ initialBlogs }) {
                 ))}
               </div>
             </InfiniteScroll>
+          ): (
+            <p className="text-center text-gray-600">No blogs found for the selected filters.</p>
           )}
         </div>
       </div>
