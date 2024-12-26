@@ -7,11 +7,11 @@ import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
 const DeliveryOrders = () => {
   const [myOrders, setMyOrders] = useState([]);
   const [deliveredOrders, setDeliveredOrders] = useState([]);
-  const [isChatOpen, setIsChatOpen] = useState(false); // Chat UI state
-  const [chatMessages, setChatMessages] = useState([]); // Chat messages
-  const [messageInput, setMessageInput] = useState(""); // Message input
-  const [deliveryBoy, setDeliveryBoy] = useState(null); // Delivery rider's data
-  const [loading, setLoading] = useState(true); // Loading state during login verification
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
+  const [deliveryBoy, setDeliveryBoy] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [failedOrders, setFailedOrders] = useState([]);
   const router = useRouter();
 
@@ -21,14 +21,24 @@ const DeliveryOrders = () => {
         `/api/deliverypartners/orders-assign?driverId=${driverId}`
       );
       console.log("API Response:", response.data);
+
       if (response.status === 200 && response.data.success) {
         const currentOrders = response.data.orders
-          .filter((order) => order.status !== "Delivered") && order.status !== "Failed To Deliver"
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort descending by createdAt
+        .filter(
+          (order)=>
+            order.status==="Confirmed" || order.status==="On the Way" || order.status==="Delivered")
+          .sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
 
         const failed = response.data.orders.filter(
           (order) => order.status === "Failed To Deliver"
         );
+
+        const delivered = response.data.orders.filter(
+          (order) => order.status === "Delivered"
+        );
+
         setMyOrders(currentOrders);
         setDeliveredOrders(delivered);
         setFailedOrders(failed);
@@ -150,17 +160,31 @@ const DeliveryOrders = () => {
             No current orders available at the moment.
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {myOrders.map((order, index) => (
               <div
                 key={order._id || index}
-                className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow"
+                className={`bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow ${
+                  order.status === "Delivered"
+                    ? "border-green-500"
+                    : order.status === "Failed To Deliver"
+                    ? "border-red-500"
+                    : "border-yellow-500"
+                } border-l-4`}
               >
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="text-lg font-semibold text-gray-800">
                     🧾 Order #{order._id.slice(-6)}
                   </h4>
-                  <span className="text-sm text-gray-500">
+                  <span
+                    className={`text-sm font-bold ${
+                      order.status === "Delivered"
+                        ? "text-green-600"
+                        : order.status === "Failed To Deliver"
+                        ? "text-red-600"
+                        : "text-yellow-600"
+                    }`}
+                  >
                     Status: {order.status}
                   </span>
                 </div>
@@ -170,7 +194,6 @@ const DeliveryOrders = () => {
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Contact:</span>{" "}
-                  {order.contact || "N/A"}
                   {order.contact || "N/A"}
                 </p>
 
@@ -216,7 +239,7 @@ const DeliveryOrders = () => {
             No delivered orders yet.
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {deliveredOrders.map((order) => (
               <div
                 key={order._id}
@@ -245,56 +268,65 @@ const DeliveryOrders = () => {
         )}
       </div>
 
-{/* Failed To Deliver Orders Section */}
-<div className="container mx-auto px-4 mt-12">
-  <h2 className="text-2xl font-bold text-red-600 mb-4">
-    ❌ Failed To Deliver Orders
-  </h2>
-  {failedOrders.length === 0 ? (
-    <p className="text-center text-gray-500 text-lg">
-      No failed orders yet.
-    </p>
-  ) : (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {failedOrders.map((order) => (
-        <div
-          key={order._id}
-          className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow"
-        >
-          <h4 className="text-lg font-semibold text-gray-800">
-            🧾 Order #{order._id.slice(-6)}
-          </h4>
-          <p className="text-gray-700">
-            <span className="font-semibold">Name:</span>{" "}
-            {order.userId?.name || "N/A"}
+      {/* Failed To Deliver Orders Section */}
+      <div className="container mx-auto px-4 mt-12">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          ❌ Failed To Deliver Orders
+        </h2>
+        {failedOrders.length === 0 ? (
+          <p className="text-center text-gray-500 text-lg">
+            No failed orders yet.
           </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Contact:</span>{" "}
-            {order.contact || "N/A"}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Amount:</span> Rs.
-            {order.totalAmount}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Address:</span>{" "}
-            {order.address
-              ? `${order.address.addressLine}, ${order.address.area}, ${order.address.city}, ${order.address.postalCode}`
-              : "Address not available"}
-          </p>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {failedOrders.map((order) => (
+              <div
+                key={order._id}
+                className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow"
+              >
+                <h4 className="text-lg font-semibold text-gray-800">
+                  🧾 Order #{order._id.slice(-6)}
+                </h4>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Name:</span>{" "}
+                  {order.userId?.name || "N/A"}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Contact:</span>{" "}
+                  {order.contact || "N/A"}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Amount:</span> Rs.
+                  {order.totalAmount}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Address:</span>{" "}
+                  {order.address
+                    ? `${order.address.addressLine}, ${order.address.area}, ${order.address.city}, ${order.address.postalCode}`
+                    : "Address not available"}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-     {/* ✅ Chat UI */}
-     {isChatOpen && (
+      {/* ✅ Chat UI */}
+      {isChatOpen && (
         <div className="fixed bottom-16 right-6 w-80 bg-white rounded-lg shadow-xl border">
-          <div className="p-4 border-b bg-purple-100 text-purple-800 font-bold">Chat with Customer</div>
+          <div className="p-4 border-b bg-purple-100 text-purple-800 font-bold">
+            Chat with Customer
+          </div>
           <div className="p-4 max-h-64 overflow-y-auto">
             {chatMessages.map((message, index) => (
-              <p key={index} className={`mb-2 ${message.from === "Me" ? "text-right text-blue-600" : "text-left text-green-600"}`}>
+              <p
+                key={index}
+                className={`mb-2 ${
+                  message.from === "Me"
+                    ? "text-right text-blue-600"
+                    : "text-left text-green-600"
+                }`}
+              >
                 {message.from}: {message.text}
               </p>
             ))}
@@ -310,7 +342,10 @@ const DeliveryOrders = () => {
                 if (e.key === "Enter") handleSendMessage();
               }}
             />
-            <button className="px-4 py-2 bg-purple-800 text-white rounded-lg" onClick={handleSendMessage}>
+            <button
+              className="px-4 py-2 bg-purple-800 text-white rounded-lg"
+              onClick={handleSendMessage}
+            >
               Send
             </button>
           </div>

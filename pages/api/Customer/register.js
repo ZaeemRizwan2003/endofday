@@ -7,6 +7,15 @@ export default async function handler(req, res) {
 
   const { name, email, password } = req.body;
 
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: 'Email must be a valid Gmail address.' });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({ message: 'Password must be at least 8 characters long.' });
+  }
+  
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {

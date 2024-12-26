@@ -152,8 +152,8 @@ const Dashboard = () => {
                 </div>
               ),
               {
-                id: "ongoing-order-toast", // Unique toast ID to prevent duplicates
-                duration: Infinity, // Toast remains until manually dismissed
+                id: "ongoing-order-toast", 
+                duration: Infinity, 
                 style: {
                   background: "#4F46E5",
                   color: "#fff",

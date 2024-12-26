@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaTrashAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
+import DashNav from "@/Components/CustomerNavbar";
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState([]);
@@ -32,7 +33,9 @@ export default function Favorites() {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <>
+    <DashNav/>
+    <div className="p-6 pt-20 bg-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold text-purple-800 mb-6">My Favorites</h2>
 
       {loading ? (
@@ -82,5 +85,6 @@ export default function Favorites() {
         <p className="text-center text-gray-600">No favorites added yet.</p>
       )}
     </div>
+    </>
   );
 }

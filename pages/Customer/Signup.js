@@ -18,6 +18,19 @@ const Signup = () => {
     setError("");
     setSuccess("");
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  if (!emailRegex.test(email)) {
+    setError("Email must be a valid Gmail address (e.g., example@gmail.com).");
+    return;
+  }
+
+  if (password.length < 8) {
+    setError("Password must be at least 8 characters long.");
+    return;
+  }
+
+  setLoading(true);
+
     try {
       const res = await axios.post("/api/Customer/register", {
         name,

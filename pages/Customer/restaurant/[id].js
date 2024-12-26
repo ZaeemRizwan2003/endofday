@@ -54,11 +54,11 @@ const RestaurantMenu = () => {
             const updatedAt = new Date(item.updatedAt);
             const currentTime = new Date();
             const timeDifference = currentTime - updatedAt;
-            const hoursDifference = timeDifference / (1000 * 60 * 60); // Convert to hours
-            return hoursDifference <= 24; // Keep only listings within the last 24 hours
+            const hoursDifference = timeDifference / (1000 * 60 * 60); 
+            return hoursDifference <= 24; 
           });
 
-          // Calculate average rating
+         
           const totalRating = restaurantData.reviews.reduce(
             (acc, review) => acc + review.rating,
             0
@@ -67,17 +67,18 @@ const RestaurantMenu = () => {
 
           setRestaurant({
             ...restaurantData,
-            menu: filteredMenu, // Set filtered menu items
+            menu: filteredMenu, 
           });
           setAvgRating(avgRating);
 
-          console.log("Average Rating:", avgRating); // Log the average rating
+          console.log("Average Rating:", avgRating); 
+          
 
-          setLoading(false); // Stop loading
+          setLoading(false); 
         })
         .catch((error) => {
           console.error(error);
-          setLoading(false); // Stop loading even on error
+          setLoading(false); 
         });
     }
   }, [id]);
@@ -181,7 +182,7 @@ const RestaurantMenu = () => {
       <DashNav />
       <div className="p-20 justify-center">
         {loading ? (
-          // Loading spinner while fetching data
+          
           <div className="flex justify-center items-center h-64">
             <LuLoader className="text-purple-800 animate-spin text-5xl" />
             <span className="ml-4 text-lg text-purple-800 font-semibold">
@@ -196,7 +197,7 @@ const RestaurantMenu = () => {
                 <h1 className="text-3xl font-bold text-purple-800 mb-2">
                   {restaurant?.restaurantName}
                   <span className="ml-4 text-yellow-500 font-semibold">
-                    {avgRating.toFixed(1)} {/* Display the average rating */}
+                    {avgRating.toFixed(1)} 
                     <span className="text-gray-400">/ 5</span>
                   </span>
                   <button
@@ -223,7 +224,21 @@ const RestaurantMenu = () => {
                     className="flex flex-col border rounded-lg overflow-hidden shadow-lg hover:shadow-md transition duration-300"
                   >
                     <div className="relative group border rounded-lg shadow-lg p-4 flex flex-col justify-between h-full">
-                      <div className="absolute top-2 right-2">
+                    {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.itemname}
+                      className="w-full h-40 object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
+                      <span>No Image</span>
+                    </div>
+                  )}
+
+                     
+                      <div className="flex-grow">
+                      <div className="absolute top-30 right-5">
                         <button
                           onClick={() => toggleFavorite(item._id)}
                           className="mt-4 self-start"
@@ -235,7 +250,6 @@ const RestaurantMenu = () => {
                           )}
                         </button>
                       </div>
-                      <div className="flex-grow">
                         <h2 className="text-xl font-bold text-purple-800 mb-2">
                           {item.itemname}
                         </h2>

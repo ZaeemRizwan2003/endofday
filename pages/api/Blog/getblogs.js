@@ -34,8 +34,8 @@ export default async function handler(req, res) {
 
     try {
       const filter = {};
-      if (category) filter.category = category;
-      if (tag) filter.tags = tag;
+      if (category && category !== '') filter.category = category;
+      if (tag && tag !== '') filter.tags = { $in: [tag] };
 
       const blogs = await Blog.find(filter)
         .skip(parseInt(skip))

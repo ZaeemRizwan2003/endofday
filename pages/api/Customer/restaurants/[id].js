@@ -26,8 +26,9 @@ export default async function handler(req, res) {
       const updatedRemainingItem = item.remainingitem - cartQuantity;
 
       return {
-        ...item._doc, // Spread the document fields
-        remainingitem: Math.max(updatedRemainingItem, 0), // Prevent negative stock
+        ...item._doc, 
+        remainingitem: Math.max(updatedRemainingItem, 0),
+        imageUrl: `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`,
       };
     });
 
