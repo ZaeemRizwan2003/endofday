@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import DashNav from "@/Components/CustomerNavbar";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+
 const Player = dynamic(
   () => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player),
   {
@@ -14,15 +15,28 @@ const Player = dynamic(
 const OrderPage = () => {
   const [order, setOrder] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const router = useRouter();
   const { id } = router.query;
 
   useEffect(() => {
     const fetchOrders = async () => {
-      if (!id) return;
+
+      if (!router.isReady) return;
+
+      const orderId = id || localStorage.getItem("lastOrderId");
+
+      if (!orderId) {
+        console.warn("No order ID found in query or localStorage.");
+        setError("No valid order ID provided.");
+        setLoading(false);
+        return;
+      }
+
       try {
         console.log("Fetching order with ID:", id);
-        const res = await axios.get(`/api/Customer/order?id=${id}`);
+        const res = await axios.get(`/api/Customer/order?id=${orderId}`);
         setOrder(res.data);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
@@ -32,7 +46,7 @@ const OrderPage = () => {
     };
 
     fetchOrders();
-  }, [id]);
+  }, [id, router.isReady]);
 
   if (!order || Object.keys(order).length === 0) {
     return <p>No order found.</p>;

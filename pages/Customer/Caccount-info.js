@@ -47,7 +47,9 @@ const AccountInfo = () => {
           <p className="mb-4">
             <span className="font-semibold text-gray-700">Email:</span> {user.email}
           </p>
-          {/* Add more user info as needed */}
+          <p className="mb-4">
+            <span className="font-semibold text-gray-700">Your Loyalty Points:</span> {user.loyaltyPoints}
+          </p>
         </div>
         <button
           onClick={() => {

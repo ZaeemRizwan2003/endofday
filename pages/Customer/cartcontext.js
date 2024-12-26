@@ -72,7 +72,6 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (itemId, title, price, remainingitem, bakeryId) => {
-    // Validate stock before adding
     if (!isStockAvailable(itemId, remainingitem)) {
       alert("Cannot add more than the available stock");
       return;
@@ -92,14 +91,6 @@ export const CartProvider = ({ children }) => {
         const userId = localStorage.getItem("userId");
     await syncCartToServer(userId, updatedCart);
     };
-
-  //   } else {
-  //     const newItem = { itemId, title, price, quantity: 1, bakeryId };
-  //     const updatedCart = [...cart, newItem];
-  //     setCart(updatedCart);
-  //     await syncCartToServer(localStorage.getItem("userId"), updatedCart);
-  //   }
-  // };
 
   const incrementItemQuantity = async (itemId, remainingitem) => {
     const existingItem = cart.find((item) => item.itemId === itemId);
@@ -171,6 +162,7 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         clearCart,
         fetchUserCart,
+        
       }}
     >
       {children}

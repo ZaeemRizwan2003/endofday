@@ -4,6 +4,7 @@ import User from "@/models/CustomerUser";
 import DeliveryPartner from "@/models/DeliveryPartner";
 import Listings from "@/models/foodlistingmodel";
 const Fuse = require("fuse.js");
+import mongoose from "mongoose";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -14,6 +15,10 @@ export default async function handler(req, res) {
     try {
       // ✅ Fetch a specific order by ID
       if (id) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.status(400).json({ message: "Invalid order ID format." });
+        }
+
         const order = await Order.findById(id).populate({
           path: "userId",
           populate: { path: "addresses", model: "User" },
@@ -52,7 +57,7 @@ export default async function handler(req, res) {
 
   // ✅ Create a new order
   else if (req.method === "POST") {
-    const { userId, items, totalAmount, addressId, contact } = req.body;
+    const { userId, items, totalAmount, addressId, contact , pointsRedeemed=0} = req.body;
 
     if (!userId || !items || !totalAmount || !addressId) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -113,10 +118,25 @@ export default async function handler(req, res) {
         listing.remainingitem -= item.quantity;
         await listing.save();
       }
+
+      if (pointsRedeemed > user.loyaltyPoints) {
+        return res.status(400).json({ message: "Insufficient loyalty points." });
+      }
+
+      const finalAmount = totalAmount - pointsRedeemed;
+      user.loyaltyPoints -= pointsRedeemed;
+
+      // Earn new loyalty points
+      const loyaltyPointsEarned = Math.floor(finalAmount / 100);
+      user.loyaltyPoints += loyaltyPointsEarned;
+
+      
+      await user.save();
+
       const newOrder = new Order({
         userId,
         items,
-        totalAmount,
+        totalAmount:finalAmount,
         address: selectedAddress._id,
         contact: req.body.contact,
         deliveryBoy_id: assignedRider._id,
@@ -126,7 +146,12 @@ export default async function handler(req, res) {
       assignedRider.orderId.push(savedOrder._id);
       await assignedRider.save();
 
-      res.status(201).json(savedOrder);
+      res.status(201).json({
+        success: true,
+        message: "Order placed successfully",
+        order: savedOrder,
+        loyaltyPointsEarned,
+      });
     } catch (error) {
       console.error("Error creating order:", error);
       return res.status(500).json({ message: "Error creating order", error });

@@ -26,14 +26,20 @@ const Cart = () => {
               <button
                 className="text-gray-600 hover:text-gray-800"
                 onClick={() => decrementItemQuantity(item.itemId)}
-              // disabled={item.quantity <= 1} // Disable if quantity is 1
+              disabled={item.quantity <= 1} // Disable if quantity is 1
               >
                 <FaRegMinusSquare />
               </button>
               <span className="px-1">{item.quantity}</span>
               <button
-                className="text-gray-600 hover:text-gray-800"
+                className={`text-gray-600 hover:text-gray-800  ${
+                  item.quantity >= item.remainingitem
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
                 onClick={() => incrementItemQuantity(item.itemId, item.remainingitem)}
+
+                disabled={item.quantity >= item.remainingitem}
               >
                 <FaRegPlusSquare />
               </button>

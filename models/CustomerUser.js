@@ -56,6 +56,7 @@ const UserSchema = new mongoose.Schema(
         ref: "Listings", 
       },
     ],
+    loyaltyPoints: { type: Number, default: 0 }, 
   },
   { timestamps: true }
 );

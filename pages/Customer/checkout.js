@@ -45,6 +45,9 @@ const Checkout = () => {
   });
   const [paymentMethod, setPaymentMethod] = useState("");
   const [showMapModal, setShowMapModal] = useState(false);
+  const [loyaltyPoints, setLoyaltyPoints] = useState(0);
+  const [pointsApplied, setPointsApplied] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   const router = useRouter();
 
@@ -140,10 +143,9 @@ const Checkout = () => {
 
   const handleSubmit = async () => {
     const userId = localStorage.getItem("userId");
-    const totalAmount = cart.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
+    const totalAmount = calculateTotalAmount();
+    const finalAmount = totalAmount - discountAmount;
+
 
     if (!selectedAddress) {
       alert("Please select an address.");
@@ -164,21 +166,25 @@ const Checkout = () => {
       return;
     }
 
+    
     const orderData = {
       userId,
       items: cart,
-      totalAmount,
+      totalAmount:finalAmount,
       addressId: selectedAddress,
       contact: userInfo.contact,
       city: selectedAddrObj.city,
       area: selectedAddrObj.area,
+      pointsRedeemed: pointsApplied ? discountAmount : 0,
     };
 
     console.log("Order data being sent:", orderData);
     try {
       const response = await axios.post("/api/Customer/order", orderData);
-      const orderId = response.data._id;
+      const orderId = response.data.order._id;
 
+      localStorage.setItem("lastOrderId", orderId);
+      
       clearCart();
       setCart([]);
       localStorage.removeItem("cart");
@@ -226,9 +232,36 @@ const Checkout = () => {
     }
   };
 
-  const totalCartPrice = cart
-    .reduce((total, item) => total + 150 + item.price * item.quantity, 0)
-    .toFixed(2);
+  
+    useEffect(() => {
+      const fetchLoyaltyPoints = async () => {
+        const userId = localStorage.getItem("userId");
+        try {
+          const response = await axios.get(`/api/Customer/loyalty?userId=${userId}`);
+          setLoyaltyPoints(response.data.loyaltyPoints);
+        } catch (error) {
+          console.error("Failed to fetch loyalty points:", error);
+        }
+      };
+    
+      fetchLoyaltyPoints();
+    }, []);
+
+    const handleApplyLoyaltyPoints = () => {
+      if (pointsApplied) {
+        setPointsApplied(false);
+        setDiscountAmount(0);
+      } else {
+        const discount = Math.min(loyaltyPoints, calculateTotalAmount());
+        setDiscountAmount(discount);
+        setPointsApplied(true);
+      }
+    };
+
+    const calculateTotalAmount = () => {
+      return cart.reduce((sum, item) => sum + item.price * item.quantity, 0) + 150;
+    };
+
 
   return (
     <div>
@@ -300,6 +333,61 @@ const Checkout = () => {
           />
         </div>
 
+        {/* Loyalty Points */}
+       
+        <h2 className="text-xl font-semibold text-black mt-8">Loyalty Points</h2>
+        <div>
+          {/* <p>You have <strong>{loyaltyPoints}</strong> points available.</p> */}
+          <button
+            onClick={handleApplyLoyaltyPoints}
+            className={`mt-2 p-2 rounded ${
+              pointsApplied ? "bg-red-600" : "bg-purple-600"
+            } text-white`}
+          >
+            {pointsApplied ? "Remove Loyalty Points" : "Use Loyalty Points"}
+          </button>
+          {pointsApplied && (
+            <p className="mt-2 text-purple-700">
+              {discountAmount} points applied. You saved Rs.{discountAmount}!
+            </p>
+          )}
+      </div>
+
+         {/* Cart Info Section */}
+         <h2 className="text-xl font-semibold text-black mt-8">Cart Items</h2>
+        <div className="cart-items mt-4">
+          {cart.map((item) => (
+            <div
+              key={item.itemId}
+              className="flex justify-between items-center border-b py-2"
+            >
+              <div>
+                <p className="font-semibold">{item.title}</p>
+                <p className="text-sm text-gray-500">Rs.{item.price * item.quantity} </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => decrementItemQuantity(item.itemId)}>
+                  <FaRegMinusSquare className="text-purple-600" />
+                </button>
+                <span>{item.quantity}</span>
+                <button onClick={() => incrementItemQuantity(item.itemId)}>
+                  <FaRegPlusSquare className="text-purple-600" />
+                </button>
+                <button onClick={() => removeFromCart(item.itemId)}>
+                  <RiDeleteBin2Line className="text-red-600" />
+                </button>
+              </div>
+            </div>
+          ))}
+          <div className="mt-4 text-right">
+            <p>+ Delivery Charges: Rs.150</p>
+            <p>Discount Applied: Rs.{discountAmount}</p>
+            <p className="text-lg font-bold">
+              Total: Rs.{calculateTotalAmount() - discountAmount}
+            </p>
+          </div>
+        </div>
+
         {/* Payment Method Section */}
         <h2 className="text-xl font-semibold text-black mt-8">
           Payment Method
@@ -331,37 +419,7 @@ const Checkout = () => {
           </label>
         </div>
 
-        {/* Cart Info Section */}
-        <h2 className="text-xl font-semibold text-black mt-8">Cart Items</h2>
-        <div className="cart-items mt-4">
-          {cart.map((item) => (
-            <div
-              key={item.itemId}
-              className="flex justify-between items-center border-b py-2"
-            >
-              <div>
-                <p className="font-semibold">{item.title}</p>
-                <p className="text-sm text-gray-500">Rs.{item.price} each</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => decrementItemQuantity(item.itemId)}>
-                  <FaRegMinusSquare className="text-purple-600" />
-                </button>
-                <span>{item.quantity}</span>
-                <button onClick={() => incrementItemQuantity(item.itemId)}>
-                  <FaRegPlusSquare className="text-purple-600" />
-                </button>
-                <button onClick={() => removeFromCart(item.itemId)}>
-                  <RiDeleteBin2Line className="text-red-600" />
-                </button>
-              </div>
-            </div>
-          ))}
-          <div className="mt-4 text-right">
-            <p>+ Delivery Charges: Rs.150</p>
-            <p className="text-lg font-semibold">Total: Rs.{totalCartPrice}</p>
-          </div>
-        </div>
+       
 
         {/* Submit Button */}
         <div className="mt-8 text-center">
@@ -491,34 +549,7 @@ const Checkout = () => {
         </div>
       )}
 
-      {/* Modal for Map Selection */}
-      {/* {showMapModal && (
-        <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
-            <h2 className="text-xl font-semibold mb-4">
-              Select Your Current Location
-            </h2>
-            <div className="w-full h-96">
-              
-              <OSMMap onLocationSelect={handleLocationSelect} />
-            </div>
-            <div className="text-right mt-4">
-              <button
-                className="bg-gray-300 text-black py-2 px-4 rounded-lg mr-4"
-                onClick={() => setShowMapModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-purple-700 text-white py-2 px-4 rounded-lg"
-                onClick={handleSaveCurrentLocation}
-              >
-                Save Location
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
+     
     </div>
   );
 };
