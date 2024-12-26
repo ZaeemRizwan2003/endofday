@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -9,7 +9,18 @@ const Login = () => {
   const [formData, setFormData] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false); // New state for payment success popup
+  const [pendingStatus, setPendingStatus] = useState(false);
   const { fetchUserCart } = useCart();
+
+  // Handle query parameter for payment success
+  useEffect(() => {
+    if (router.query.paymentSuccess) {
+      setPaymentSuccess(true);
+      // Remove the query parameter from the URL after showing the popup
+      router.replace("/Login", undefined, { shallow: true });
+    }
+  }, [router]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,8 +35,13 @@ const Login = () => {
       const res = await axios.post("/api/login", formData);
 
       if (res.status === 200) {
-        const { token, userId, userType, userData } = res.data;
+        const { token, userId, userType, userData, status } = res.data;
 
+        if (userType === "bakery" && status === "pending") {
+          setPendingStatus(true);
+          setLoading(false);
+          return;
+        }
         // Store token and userId in localStorage
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userId);
@@ -37,7 +53,6 @@ const Login = () => {
         } else if (userType === "bakery") {
           router.push("/Restaurants/RDashboard");
         } else if (userType === "delivery") {
-          // Store delivery-specific details in localStorage
           localStorage.setItem("delivery", JSON.stringify(userData));
           router.push("/Delivery/deliverydashboard");
         }
@@ -130,6 +145,45 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Payment Success Popup */}
+      {paymentSuccess && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+            <h2 className="text-xl font-semibold mb-4 text-green-600">
+              ✅ Payment Successful!
+            </h2>
+            <p className="text-gray-700 mb-4">
+              Your payment was successfully processed. Your bakery status will
+              be sent to you via email.
+            </p>
+            <button
+              onClick={() => setPaymentSuccess(false)}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {pendingStatus && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow text-center">
+            <h2>🕒 Pending Approval</h2>
+            <p>
+              Your request is being processed by the admin. Please wait for an
+              email.
+            </p>
+            <button
+              onClick={() => setPendingStatus(false)}
+              className="mt-4 bg-purple-600 text-white px-4 py-2 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

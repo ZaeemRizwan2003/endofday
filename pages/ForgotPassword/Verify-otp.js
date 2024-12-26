@@ -1,40 +1,83 @@
-// pages/verify-otp.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 
 export default function VerifyOTP() {
   const router = useRouter();
-  const { email } = router.query; // Get email from query string
   const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // Tracks success or error
   const [loading, setLoading] = useState(false); // Tracks loading state
+  const [resendLoading, setResendLoading] = useState(false); // Tracks resend state
+  const [resendTimer, setResendTimer] = useState(10); // ⏳ Timer starts at 10 seconds
 
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("forgotPasswordEmail");
+    if (storedEmail) {
+      setEmail(storedEmail);
+    } else {
+      router.push("/ForgotPassword"); // Redirect back if no email is found
+    }
+  }, [router]);
+
+  // Timer Countdown Logic
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(timer);
+    }
+
+    return () => clearInterval(timer); // Cleanup on unmount
+  }, [resendTimer]);
+
+  // Handle OTP Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading state
-    setMessage(""); // Clear any previous message
+    setLoading(true);
+    setMessage("");
     try {
       const res = await axios.post("/api/ForgotPassword/verify-otp", {
         email,
         otp,
       });
       setMessage(res.data.message);
-      setMessageType("success"); // Set message type to success
-      setLoading(false); // End loading state
+      setMessageType("success");
+      setLoading(false);
 
       if (res.status === 200) {
         router.push({
           pathname: "/ForgotPassword/Reset-password",
-          query: { email }, // Pass email to next step
+          query: { email },
         });
       }
     } catch (error) {
       console.error(error);
       setMessage("OTP verification failed. Please try again.");
-      setMessageType("error"); // Set message type to error
-      setLoading(false); // End loading state
+      setMessageType("error");
+      setLoading(false);
+    }
+  };
+
+  // Handle Resend OTP
+  const handleResendOTP = async () => {
+    setResendLoading(true);
+    setMessage(""); // Clear any previous message
+    try {
+      await axios.post("/api/ForgotPassword/forgot-password", { email });
+      setMessage("A new OTP has been sent to your email.");
+      setMessageType("success");
+      setResendTimer(10); // ⏳ Reset timer to 10 seconds
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to resend OTP. Please try again later.");
+      setMessageType("error");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -57,7 +100,7 @@ export default function VerifyOTP() {
           </div>
           <button
             type="submit"
-            disabled={loading} // Disable button while loading
+            disabled={loading}
             className={`w-full py-3 mt-4 text-white rounded-md ${
               loading
                 ? "bg-purple-400 cursor-not-allowed"
@@ -67,6 +110,30 @@ export default function VerifyOTP() {
             {loading ? "Verifying OTP..." : "Verify OTP"}
           </button>
         </form>
+
+        {/* Resend OTP Section */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Didn't get the OTP?{" "}
+            <button
+              onClick={handleResendOTP}
+              disabled={resendTimer > 0 || resendLoading}
+              className={`text-purple-600 hover:underline ${
+                resendTimer > 0 || resendLoading
+                  ? "cursor-not-allowed opacity-50"
+                  : ""
+              }`}
+            >
+              {resendLoading
+                ? "Resending..."
+                : resendTimer > 0
+                ? `Resend in ${resendTimer}s`
+                : "Resend OTP"}
+            </button>
+          </p>
+        </div>
+
+        {/* Success/Error Message */}
         {message && (
           <p
             className={`mt-4 text-center ${

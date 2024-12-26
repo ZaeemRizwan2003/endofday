@@ -25,7 +25,7 @@ export default async function handler(req, res) {
             quantity: 1,
           },
         ],
-        success_url: `${process.env.NEXT_PUBLIC_URL}/Login`,
+        success_url: `${process.env.NEXT_PUBLIC_URL}/Login?paymentSuccess=true`,
         cancel_url: `${process.env.NEXT_PUBLIC_URL}/Restaurants/Signup?paymentFailed=true`,
         metadata: { userId },
       });

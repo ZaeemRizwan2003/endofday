@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       let userType = null;
       let cart = [];
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
-
+      let status = null;
       if (isEmail) {
         const [bakeryUser, listingUser] = await Promise.all([
           RegisteredBakeries.findOne({ email: identifier }),
@@ -25,6 +25,10 @@ export default async function handler(req, res) {
 
         user = bakeryUser || listingUser;
         userType = bakeryUser ? "bakery" : "listing";
+
+        if (bakeryUser) {
+          status = bakeryUser.status || null;
+        }
 
         if (userType === "listing" && listingUser) {
           cart = listingUser.cart || [];
@@ -85,6 +89,7 @@ export default async function handler(req, res) {
         userType,
         userData,
         cart,
+        status,
       });
     } catch (error) {
       console.error("Login error: ", error);
