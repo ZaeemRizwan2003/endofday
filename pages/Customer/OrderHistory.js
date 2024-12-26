@@ -64,51 +64,62 @@ const OrderHistory = () => {
   return (
     <>
       <DashNav />
-      <div className="mt-16 container mx-auto p-4 relative">
-        <h1 className="text-2xl font-bold text-purple-800 mb-4">
-          Order History
-          <Link legacyBehavior href="/Customer/Cdashboard">
-            <a className="ml-8 text-blue-600 hover:underline text-sm">
-              Browse Again
-            </a>
-          </Link>
-        </h1>
-        <button
-          onClick={handleClearHistory}
-          className="absolute top-4 right-4 text-red-600 hover:underline text-sm"
-        >
-          Clear History
-        </button>
-        <div className="mt-4">
+      <div className="mt-16 container mx-auto px-4 lg:px-12 py-8 relative">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-6 flex-wrap">
+          <h1 className="text-3xl font-bold text-purple-700">Order History</h1>
+          <div className="flex gap-4 mt-4 lg:mt-0">
+            <Link legacyBehavior href="/Customer/Cdashboard">
+              <a className="text-blue-600 hover:underline text-sm">
+                Browse Again
+              </a>
+            </Link>
+            <button
+              onClick={handleClearHistory}
+              className="text-red-600 hover:text-red-800 font-semibold text-sm"
+            >
+              Clear History
+            </button>
+          </div>
+        </div>
+
+        {/* Order Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {orders.length === 0 ? (
-            <p className="text-gray-600">No orders found.</p>
+            <p className="text-gray-500 col-span-full text-center text-lg">
+              No orders found.
+            </p>
           ) : (
             orders.map((order) => (
               <div
                 key={order._id}
-                className="border border-gray-300 rounded-lg shadow p-4 mb-4"
+                className="bg-white border border-gray-200 rounded-lg shadow-lg p-6 hover:shadow-xl transition duration-300"
               >
-                <h2 className="font-semibold text-lg">Order ID: {order._id}</h2>
-                <p className="text-sm text-gray-500">
-                  Total Amount: Rs.{order.totalAmount}
+                <h2 className="font-semibold text-lg mb-2 text-gray-800">
+                  Order ID: {order._id}
+                </h2>
+                <p className="text-sm text-gray-500 mb-1">
+                  Total Amount:{" "}
+                  <span className="font-medium">Rs.{order.totalAmount}</span>
                 </p>
-                <p className="text-sm text-gray-500">
-                  Address: {order.address}
+                <p className="text-sm text-gray-500 mb-3">
+                  Address: <span className="font-medium">{order.address}</span>
                 </p>
-                <h3 className="mt-2 font-bold">Items:</h3>
-                <ul className="pl-5">
+                <h3 className="font-bold text-md mb-1">Items:</h3>
+                <ul className="list-disc list-inside text-sm mb-4">
                   {order.items.map((item) => (
                     <li key={item.itemId}>
                       {item.title} - Quantity: {item.quantity}
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-end items-center mt-4 space-x-2">
+                <div className="flex justify-between items-center mt-4">
                   <button
                     onClick={() => handleDeleteOrder(order._id)}
-                    className="text-red-600 hover:text-red-800 transition"
+                    className="text-red-600 hover:text-red-800 flex items-center gap-1"
                   >
-                    <FaTrashCan className="w-6 h-6" />
+                    <FaTrashCan />
+                    Delete
                   </button>
                   {order.reviewStatus === "Reviewed" ? (
                     <span className="text-green-600 font-semibold">
@@ -117,7 +128,7 @@ const OrderHistory = () => {
                   ) : (
                     <button
                       onClick={() => handleReviewOrder(order._id)}
-                      className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
+                      className="bg-purple-600 text-white px-3 py-1 rounded-md hover:bg-purple-700 transition"
                     >
                       Review Order
                     </button>
