@@ -2,14 +2,14 @@ import Link from "next/link";
 import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios"
+import axios from "axios";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const[loading,setLoading]=useState("");
+  const [loading, setLoading] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
 
@@ -19,17 +19,19 @@ const Signup = () => {
     setSuccess("");
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-  if (!emailRegex.test(email)) {
-    setError("Email must be a valid Gmail address (e.g., example@gmail.com).");
-    return;
-  }
+    if (!emailRegex.test(email)) {
+      setError(
+        "Email must be a valid Gmail address (e.g., example@gmail.com)."
+      );
+      return;
+    }
 
-  if (password.length < 8) {
-    setError("Password must be at least 8 characters long.");
-    return;
-  }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
     try {
       const res = await axios.post("/api/Customer/register", {
@@ -39,7 +41,7 @@ const Signup = () => {
       });
 
       if (res.status === 200) {
-        localStorage.setItem('token', res.data.token);
+        localStorage.setItem("token", res.data.token);
         setSuccess("signup successful, you can login now");
         setName("");
         setEmail("");
@@ -56,10 +58,7 @@ const Signup = () => {
 
   return (
     <section className="bg-gray-50">
-
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-
-
         <div className="sm:mx-auto sm:w-full sm:max-w-sm mb-3">
           <img
             className="mx-auto h-10 w-auto"
@@ -68,15 +67,14 @@ const Signup = () => {
           />
         </div>
 
-        
-<div className="absolute underline top-12 right-10">
-        <Link
-          href="/Delivery/deliverypartner"
-          className="text-base font-medium text-purple-800 hover:underline"
-        >
-          Signup as Driver
-        </Link>
-      </div>
+        <div className="absolute underline top-12 right-10">
+          <Link
+            href="/Delivery/deliverypartner"
+            className="text-base font-medium text-purple-800 hover:underline"
+          >
+            Signup as Driver
+          </Link>
+        </div>
 
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -103,7 +101,7 @@ const Signup = () => {
                   onChange={(e) => setName(e.target.value)}
                   required
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                  placeholder="John Doe"
+                  placeholder="Allama Iqbal"
                 />
               </div>
 
@@ -161,14 +159,20 @@ const Signup = () => {
               {/* Redirect to Login */}
               <p className="text-sm text-black font-light">
                 Already a member?{" "}
-                <Link href="/Login" className="font-medium text-black hover:underline">
+                <Link
+                  href="/Login"
+                  className="font-medium text-black hover:underline"
+                >
                   Login
                 </Link>
               </p>
 
               <p className="text-sm text-black font-light">
                 Or Signup your Restaurant{" "}
-                <Link href="/Restaurants/Signup" className="font-medium text-black hover:underline">
+                <Link
+                  href="/Restaurants/Signup"
+                  className="font-medium text-black hover:underline"
+                >
                   Signup
                 </Link>
               </p>

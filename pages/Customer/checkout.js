@@ -146,7 +146,6 @@ const Checkout = () => {
     const totalAmount = calculateTotalAmount();
     const finalAmount = totalAmount - discountAmount;
 
-
     if (!selectedAddress) {
       alert("Please select an address.");
       return;
@@ -166,11 +165,10 @@ const Checkout = () => {
       return;
     }
 
-    
     const orderData = {
       userId,
       items: cart,
-      totalAmount:finalAmount,
+      totalAmount: finalAmount,
       addressId: selectedAddress,
       contact: userInfo.contact,
       city: selectedAddrObj.city,
@@ -184,7 +182,7 @@ const Checkout = () => {
       const orderId = response.data.order._id;
 
       localStorage.setItem("lastOrderId", orderId);
-      
+
       clearCart();
       setCart([]);
       localStorage.removeItem("cart");
@@ -201,7 +199,8 @@ const Checkout = () => {
   const handleStripePayment = async () => {
     const stripe = await stripePromise;
     const userId = localStorage.getItem("userId");
-
+    const totalAmount = calculateTotalAmount();
+    const finalAmount = totalAmount - discountAmount;
     if (!selectedAddress) {
       alert("Please select an address");
       return;
@@ -218,50 +217,54 @@ const Checkout = () => {
         {
           userId,
           items: cart,
-          totalAmount: totalCartPrice,
+          totalAmount: finalAmount,
           addressId: selectedAddress,
           contact: userInfo.contact,
-  
+          pointsRedeemed: pointsApplied ? discountAmount : 0,
         }
       );
+      console.log("API Response:", response.data);
+      // const sessionId = response.data.id;
 
-      const sessionId = response.data.id;
+      const { sessionId } = response.data;
       await stripe.redirectToCheckout({ sessionId });
     } catch (error) {
       console.error("Stripe payment failed", error);
     }
   };
 
-  
-    useEffect(() => {
-      const fetchLoyaltyPoints = async () => {
-        const userId = localStorage.getItem("userId");
-        try {
-          const response = await axios.get(`/api/Customer/loyalty?userId=${userId}`);
-          setLoyaltyPoints(response.data.loyaltyPoints);
-        } catch (error) {
-          console.error("Failed to fetch loyalty points:", error);
-        }
-      };
-    
-      fetchLoyaltyPoints();
-    }, []);
-
-    const handleApplyLoyaltyPoints = () => {
-      if (pointsApplied) {
-        setPointsApplied(false);
-        setDiscountAmount(0);
-      } else {
-        const discount = Math.min(loyaltyPoints, calculateTotalAmount());
-        setDiscountAmount(discount);
-        setPointsApplied(true);
+  useEffect(() => {
+    const fetchLoyaltyPoints = async () => {
+      const userId = localStorage.getItem("userId");
+      try {
+        const response = await axios.get(
+          `/api/Customer/loyalty?userId=${userId}`
+        );
+        setLoyaltyPoints(response.data.loyaltyPoints);
+      } catch (error) {
+        console.error("Failed to fetch loyalty points:", error);
       }
     };
 
-    const calculateTotalAmount = () => {
-      return cart.reduce((sum, item) => sum + item.price * item.quantity, 0) + 150;
-    };
+    fetchLoyaltyPoints();
+  }, []);
 
+  const handleApplyLoyaltyPoints = () => {
+    if (pointsApplied) {
+      setPointsApplied(false);
+      setDiscountAmount(0);
+    } else {
+      const discount = Math.min(loyaltyPoints, calculateTotalAmount());
+      setDiscountAmount(discount);
+      setPointsApplied(true);
+    }
+  };
+
+  const calculateTotalAmount = () => {
+    return (
+      cart.reduce((sum, item) => sum + item.price * item.quantity, 0) + 150
+    );
+  };
 
   return (
     <div>
@@ -334,8 +337,10 @@ const Checkout = () => {
         </div>
 
         {/* Loyalty Points */}
-       
-        <h2 className="text-xl font-semibold text-black mt-8">Loyalty Points</h2>
+
+        <h2 className="text-xl font-semibold text-black mt-8">
+          Loyalty Points
+        </h2>
         <div>
           {/* <p>You have <strong>{loyaltyPoints}</strong> points available.</p> */}
           <button
@@ -351,10 +356,10 @@ const Checkout = () => {
               {discountAmount} points applied. You saved Rs.{discountAmount}!
             </p>
           )}
-      </div>
+        </div>
 
-         {/* Cart Info Section */}
-         <h2 className="text-xl font-semibold text-black mt-8">Cart Items</h2>
+        {/* Cart Info Section */}
+        <h2 className="text-xl font-semibold text-black mt-8">Cart Items</h2>
         <div className="cart-items mt-4">
           {cart.map((item) => (
             <div
@@ -363,7 +368,9 @@ const Checkout = () => {
             >
               <div>
                 <p className="font-semibold">{item.title}</p>
-                <p className="text-sm text-gray-500">Rs.{item.price * item.quantity} </p>
+                <p className="text-sm text-gray-500">
+                  Rs.{item.price * item.quantity}{" "}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => decrementItemQuantity(item.itemId)}>
@@ -418,8 +425,6 @@ const Checkout = () => {
             Pay Online
           </label>
         </div>
-
-       
 
         {/* Submit Button */}
         <div className="mt-8 text-center">
@@ -548,8 +553,6 @@ const Checkout = () => {
           </div>
         </div>
       )}
-
-     
     </div>
   );
 };

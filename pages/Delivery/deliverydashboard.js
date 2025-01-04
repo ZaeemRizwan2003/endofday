@@ -24,12 +24,13 @@ const DeliveryOrders = () => {
 
       if (response.status === 200 && response.data.success) {
         const currentOrders = response.data.orders
-        .filter(
-          (order)=>
-            order.status==="Confirmed" || order.status==="On the Way" || order.status==="Delivered")
-          .sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
+          .filter(
+            (order) =>
+              order.status === "Pending" ||
+              order.status === "On the Way" ||
+              order.status === "Confirmed"
+          )
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         const failed = response.data.orders.filter(
           (order) => order.status === "Failed To Deliver"
