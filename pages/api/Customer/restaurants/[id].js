@@ -26,9 +26,11 @@ export default async function handler(req, res) {
       const updatedRemainingItem = item.remainingitem - cartQuantity;
 
       return {
-        ...item._doc, 
+        ...item._doc,
         remainingitem: Math.max(updatedRemainingItem, 0),
-        imageUrl: `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`,
+        imageUrl: `data:${
+          item.image.contentType
+        };base64,${item.image.data.toString("base64")}`,
       };
     });
 

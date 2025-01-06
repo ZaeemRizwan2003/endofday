@@ -3,12 +3,14 @@ import Order from "@/models/Order";
 import User from "@/models/CustomerUser";
 import DeliveryPartner from "@/models/DeliveryPartner";
 import Listings from "@/models/foodlistingmodel";
+import RegisteredBakeries from "@/models/RBakerymodel";
 const Fuse = require("fuse.js");
 import mongoose from "mongoose";
 
 export default async function handler(req, res) {
   await dbConnect();
 
+  // ✅ GET Requests
   if (req.method === "GET") {
     const { id, status } = req.query;
 
@@ -19,10 +21,12 @@ export default async function handler(req, res) {
           return res.status(400).json({ message: "Invalid order ID format." });
         }
 
-        const order = await Order.findById(id).populate({
-          path: "userId",
-          populate: { path: "addresses", model: "User" },
-        });
+        const order = await Order.findById(id)
+          .populate({
+            path: "userId",
+            populate: { path: "addresses", model: "User" },
+          })
+          .populate("bakeryId"); // Populate bakeryId for details
 
         if (!order) {
           return res.status(404).json({ message: "Order not found" });
@@ -37,15 +41,13 @@ export default async function handler(req, res) {
 
       // ✅ Fetch ongoing orders
       if (status === "ongoing") {
-        const ongoingOrder = await Order.findOne({
+        const ongoingOrders = await Order.find({
           status: { $in: ["Pending", "Confirmed", "On The Way"] },
-        }).sort({ createdAt: -1 }); // Get the latest ongoing order
+        })
+          .populate("bakeryId") // Populate bakery details
+          .sort({ createdAt: -1 }); // Get all ongoing orders
 
-        if (!ongoingOrder) {
-          return res.status(404).json({ message: "No ongoing orders found" });
-        }
-
-        return res.status(200).json({ ongoingOrder });
+        return res.status(200).json({ ongoingOrders }); // Always return 200
       }
 
       return res.status(400).json({ message: "Invalid query parameters" });
@@ -55,32 +57,73 @@ export default async function handler(req, res) {
     }
   }
 
-  // ✅ Create a new order
+  // ✅ POST Requests - Create a New Order
   else if (req.method === "POST") {
-    const { userId, items, totalAmount, addressId, contact , pointsRedeemed=0} = req.body;
+    const {
+      userId,
+      items,
+      totalAmount,
+      addressId,
+      contact,
+      pointsRedeemed = 0,
+    } = req.body;
 
     if (!userId || !items || !totalAmount || !addressId) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     try {
+      // Validate user and address
       const user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      const selectedAddress = user.addresses.id(addressId);
 
+      const selectedAddress = user.addresses.id(addressId);
       if (!selectedAddress) {
         return res.status(404).json({ message: "Address not found" });
       }
 
+      // Validate and assign bakeryId
+      let bakeryId = null;
+      const something = await Listings.findById(items[0].itemId);
+      bakeryId = something.bakeryowner;
+      console.log(something);
+      for (const item of items) {
+        const listing = await Listings.findById(item.itemId);
+
+        if (!listing) {
+          return res
+            .status(404)
+            .json({ message: `Item with ID ${item.itemId} not found` });
+        }
+
+        // if (!bakeryId) {
+        //   bakeryId = listing.bakeryowner; // Assign bakeryId from the first item
+        // } else if (bakeryId.toString() !== listing.bakeryowner.toString()) {
+        //   return res
+        //     .status(400)
+        //     .json({ message: "All items must belong to the same bakery." });
+        // }
+
+        if (listing.remainingitem < item.quantity) {
+          return res.status(400).json({
+            message: `Insufficient stock for item ${listing.name}. Available: ${listing.remainingitem}`,
+          });
+        }
+
+        listing.remainingitem -= item.quantity; // Update stock
+        await listing.save();
+      }
+
+      // Assign delivery partner
       const { city, area, addressLine } = selectedAddress || {};
       const resolvedArea =
         area || extractAreaFromAddress(selectedAddress.addressLine || "");
 
       const availableRiders = await DeliveryPartner.find({ city });
-
       let assignedRider = null;
+
       const fuse = new Fuse(availableRiders, {
         keys: ["area"],
         threshold: 0.3,
@@ -102,43 +145,28 @@ export default async function handler(req, res) {
         return res.status(500).json({ message: "No rider could be assigned" });
       }
 
-      for (const item of items) {
-        const listing = await Listings.findById(item.itemId);
-        if (!listing) {
-          return res
-            .status(404)
-            .json({ message: `Item with ID ${item.itemId} not found` });
-        }
-        if (listing.remainingitem < item.quantity) {
-          return res.status(400).json({
-            message: `Insufficient stock for item ${listing.name}. Available: ${listing.remainingitem}`,
-          });
-        }
-
-        listing.remainingitem -= item.quantity;
-        await listing.save();
-      }
-
+      // Loyalty points processing
       if (pointsRedeemed > user.loyaltyPoints) {
-        return res.status(400).json({ message: "Insufficient loyalty points." });
+        return res
+          .status(400)
+          .json({ message: "Insufficient loyalty points." });
       }
 
       const finalAmount = totalAmount - pointsRedeemed;
       user.loyaltyPoints -= pointsRedeemed;
-
-      // Earn new loyalty points
       const loyaltyPointsEarned = Math.floor(finalAmount / 100);
       user.loyaltyPoints += loyaltyPointsEarned;
 
-      
       await user.save();
 
+      // Create order
       const newOrder = new Order({
         userId,
+        bakeryId,
         items,
-        totalAmount:finalAmount,
+        totalAmount: finalAmount,
         address: selectedAddress._id,
-        contact: req.body.contact,
+        contact,
         deliveryBoy_id: assignedRider._id,
       });
 
@@ -158,7 +186,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // ✅ Delete an order
+  // ✅ DELETE Requests
   else if (req.method === "DELETE") {
     const { id } = req.query;
     try {

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const OrderItemSchema = new mongoose.Schema({
   itemId: String,
-  bakeryId: String,
+  // bakeryId: String,
   title: String,
   price: Number,
   quantity: Number,
@@ -15,6 +15,11 @@ const OrderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    bakeryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "RegisteredBakeries",
+      required: true,
+    },
     items: [OrderItemSchema],
     totalAmount: {
       type: Number,
@@ -24,13 +29,13 @@ const OrderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    contact: { 
+    contact: {
       type: String,
       required: true,
     },
     status: {
       type: String,
-      default: "Pending", 
+      default: "Pending",
     },
     deliveryBoy_id: {
       type: mongoose.Schema.Types.ObjectId,

@@ -63,7 +63,9 @@ export default async function handler(req, res) {
       if (!assignedRider) {
         return res.status(500).json({ message: "No rider could be assigned" });
       }
-
+      let bakeryId = null;
+      const something = await Listings.findById(items[0].itemId);
+      bakeryId = something.bakeryowner;
       // ✅ Validate Stock for Items
       for (const item of items) {
         const listing = await Listings.findById(item.itemId);
@@ -102,6 +104,7 @@ export default async function handler(req, res) {
       // ✅ Create Order in Database
       const newOrder = await Order.create({
         userId,
+        bakeryId,
         items,
         totalAmount: finalAmount,
         address: selectedAddress._id,

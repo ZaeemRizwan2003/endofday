@@ -124,44 +124,43 @@ const Dashboard = () => {
     return stars;
   };
 
-
   useEffect(() => {
     let orderCheckInterval;
-  
+
     const fetchOngoingOrder = async () => {
       try {
         const response = await axios.get("/api/Customer/order?status=ongoing");
         if (response.data?.ongoingOrder) {
           setOngoingOrder(response.data.ongoingOrder);
-  
+
           toast.dismiss("ongoing-order-toast");
 
-            toast(
-              (t) => (
-                <div
-                  onClick={() => {
-                    toast.dismiss(t.id); // Dismiss toast when clicked
-                    router.push(
-                      `/Customer/OrderConfirm?id=${response.data.ongoingOrder._id}`
-                    );
-                  }}
-                  className="cursor-pointer"
-                >
-                  🚚 <strong>Your order is in progress!</strong>
-                  <p className="text-sm">Click here to track your order.</p>
-                </div>
-              ),
-              {
-                id: "ongoing-order-toast", 
-                duration: Infinity, 
-                style: {
-                  background: "#4F46E5",
-                  color: "#fff",
-                  cursor: "pointer",
-                },
-                position: "bottom-left",
-              }
-            );
+          toast(
+            (t) => (
+              <div
+                onClick={() => {
+                  toast.dismiss(t.id); // Dismiss toast when clicked
+                  router.push(
+                    `/Customer/OrderConfirm?id=${response.data.ongoingOrder._id}`
+                  );
+                }}
+                className="cursor-pointer"
+              >
+                🚚 <strong>Your order is in progress!</strong>
+                <p className="text-sm">Click here to track your order.</p>
+              </div>
+            ),
+            {
+              id: "ongoing-order-toast",
+              duration: Infinity,
+              style: {
+                background: "#4F46E5",
+                color: "#fff",
+                cursor: "pointer",
+              },
+              position: "bottom-left",
+            }
+          );
         } else {
           // Clear toast if order is delivered or not ongoing
           toast.dismiss("ongoing-order-toast");
@@ -171,19 +170,18 @@ const Dashboard = () => {
         console.error("Failed to fetch ongoing order:", error);
       }
     };
-  
+
     // Check for ongoing orders every 10 seconds
     fetchOngoingOrder();
     orderCheckInterval = setInterval(fetchOngoingOrder, 10000);
-  
-    return () => clearInterval(orderCheckInterval); 
+
+    return () => clearInterval(orderCheckInterval);
   }, [router]);
 
   return (
     <>
       <DashNav search={search} setSearch={setSearch} />
       <Toaster position="bottom-left" reverseOrder={false} />
-
 
       <div className="p-20 relative">
         {/* Chat Icon */}

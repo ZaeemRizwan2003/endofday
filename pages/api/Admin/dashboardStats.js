@@ -15,11 +15,16 @@ export default async function handler(req, res) {
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
 
-    const dateFilter = start && end ? { createdAt: { $gte: start, $lte: end } } : {};
+    const dateFilter =
+      start && end ? { createdAt: { $gte: start, $lte: end } } : {};
 
     // Fetch data from the database
     const totalCustomers = await User.countDocuments(dateFilter);
-    const totalRestaurants = await RegisteredBakeries.countDocuments(dateFilter);
+    const totalRestaurants = await RegisteredBakeries.countDocuments({
+      status: "approved", // Only count approved bakeries
+      ...dateFilter, // Apply the date filter if provided
+    });
+
     const totalOrders = await Order.countDocuments(dateFilter);
     const totalRiders = await DeliveryPartner.countDocuments(dateFilter);
     const totalBlogs = await Blog.countDocuments(dateFilter);
@@ -32,31 +37,31 @@ export default async function handler(req, res) {
         createdAt: { $gte: lastMonth },
       });
     }
-    
-      // New Order Metrics
-      const pendingOrders = await Order.countDocuments({
-        status: "pending",
-        ...dateFilter,
-      });
-  
-      const completedOrders = await Order.countDocuments({
-        status: "Delivered",
-        ...dateFilter,
-      });
-  
-      // const cancelledOrders = await Order.countDocuments({
-      //   status: "cancelled",
-      //   ...dateFilter,
-      // });
-  
-      const revenueGeneratedResult = await Order.aggregate([
-        { $match: { status: "Delivered", ...dateFilter } },
-        { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
-      ]);
-  
-      const revenueGenerated = revenueGeneratedResult.length
-        ? revenueGeneratedResult[0].totalRevenue
-        : 0;
+
+    // New Order Metrics
+    const pendingOrders = await Order.countDocuments({
+      status: "pending",
+      ...dateFilter,
+    });
+
+    const completedOrders = await Order.countDocuments({
+      status: "Delivered",
+      ...dateFilter,
+    });
+
+    // const cancelledOrders = await Order.countDocuments({
+    //   status: "cancelled",
+    //   ...dateFilter,
+    // });
+
+    const revenueGeneratedResult = await Order.aggregate([
+      { $match: { status: "Delivered", ...dateFilter } },
+      { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
+    ]);
+
+    const revenueGenerated = revenueGeneratedResult.length
+      ? revenueGeneratedResult[0].totalRevenue
+      : 0;
 
     res.status(200).json({
       totalCustomers,

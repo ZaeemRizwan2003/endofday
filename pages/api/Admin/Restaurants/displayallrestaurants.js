@@ -5,8 +5,10 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       await dbConnect(); // Connect to the database
-      const restaurants = await RegisteredBakeries.find({}); // Fetch all restaurants
-      const bakeryCount = await RegisteredBakeries.countDocuments();
+      const restaurants = await RegisteredBakeries.find({ status: "approved" }); // Fetch all restaurants
+      const bakeryCount = await RegisteredBakeries.countDocuments({
+        status: "approved",
+      });
 
       // Process the restaurants to include the base64 image format if necessary
       const processedRestaurants = restaurants.map((restaurant) => {
