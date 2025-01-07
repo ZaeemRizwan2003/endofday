@@ -98,14 +98,6 @@ export default async function handler(req, res) {
             .json({ message: `Item with ID ${item.itemId} not found` });
         }
 
-        // if (!bakeryId) {
-        //   bakeryId = listing.bakeryowner; // Assign bakeryId from the first item
-        // } else if (bakeryId.toString() !== listing.bakeryowner.toString()) {
-        //   return res
-        //     .status(400)
-        //     .json({ message: "All items must belong to the same bakery." });
-        // }
-
         if (listing.remainingitem < item.quantity) {
           return res.status(400).json({
             message: `Insufficient stock for item ${listing.name}. Available: ${listing.remainingitem}`,

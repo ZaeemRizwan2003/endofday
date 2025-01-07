@@ -116,6 +116,17 @@ const RestaurantMenu = () => {
       toast.error(`Only ${remainingitem} items available in stock.`);
       return;
     }
+    if (cart.length > 0 && cart[0].bakeryId !== bakeryId) {
+      if (
+        confirm(
+          "Your cart contains items from another restaurant. Adding this item will clear your current cart. Do you want to proceed?"
+        )
+      ) {
+        setCart([]); // Clear cart if confirmed
+      } else {
+        return; // Exit without adding item
+      }
+    }
 
     addToCart(itemId, title, price, remainingitem, bakeryId);
     setAddedToCart((prev) => ({ ...prev, [itemId]: true }));

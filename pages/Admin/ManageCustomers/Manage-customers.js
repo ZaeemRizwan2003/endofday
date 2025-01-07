@@ -13,6 +13,9 @@ export default function ManageCustomers() {
     name: "",
     email: "",
   });
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -20,6 +23,7 @@ export default function ManageCustomers() {
         const response = await axios.get("/api/Admin/Customer/manageCustomer");
         if (response.data.success) {
           setCustomers(response.data.customers);
+          setFilteredCustomers(response.data.customers); 
         } else {
           console.error("Failed to fetch customers");
         }
@@ -32,6 +36,26 @@ export default function ManageCustomers() {
 
     fetchCustomers();
   }, []);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    filterCustomers(e.target.value); // Filter customers based on search query
+  };
+
+  const filterCustomers = (query) => {
+    if (!query) {
+      setFilteredCustomers(customers); // Show all customers if no query
+    } else {
+      const lowercasedQuery = query.toLowerCase();
+      const filtered = customers.filter(
+        (customer) =>
+          customer.name.toLowerCase().includes(lowercasedQuery) ||
+          customer.email.toLowerCase().includes(lowercasedQuery)
+      );
+      setFilteredCustomers(filtered); // Update filtered customers
+    }
+  };
+
 
   const handleDeleteCustomer = async (customerId) => {
     const confirmDelete = confirm(
@@ -116,6 +140,17 @@ export default function ManageCustomers() {
         </Link>
       </div>
 
+      <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search customers by name or email"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+
       {/* Loading State */}
       {loading ? (
         <div className="text-center mt-12">
@@ -123,9 +158,9 @@ export default function ManageCustomers() {
             Loading customers...
           </p>
         </div>
-      ) : customers.length > 0 ? (
+      ) : filteredCustomers.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {customers.map((customer) => (
+          {filteredCustomers.map((customer) => (
             <div
               key={customer._id}
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative"

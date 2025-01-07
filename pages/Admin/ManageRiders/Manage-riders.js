@@ -15,6 +15,8 @@ export default function ManageRiders() {
     area: "",
     city: "",
   });
+  const [filteredRiders, setFilteredRiders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchRiders = async () => {
@@ -22,6 +24,7 @@ export default function ManageRiders() {
         const response = await axios.get("/api/Admin/Riders/manageRiders");
         if (response.data.success) {
           setRiders(response.data.deliveryPartners);
+          setFilteredRiders(response.data.deliveryPartners); 
         } else {
           console.error("Failed to fetch riders");
         }
@@ -34,6 +37,28 @@ export default function ManageRiders() {
 
     fetchRiders();
   }, []);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    filterRiders(e.target.value); // Filter riders based on search query
+  };
+
+  const filterRiders = (query) => {
+    if (!query) {
+      setFilteredRiders(riders); // Show all riders if no query
+    } else {
+      const lowercasedQuery = query.toLowerCase();
+      const filtered = riders.filter(
+        (rider) =>
+          rider.name.toLowerCase().includes(lowercasedQuery) ||
+          rider.contact.toLowerCase().includes(lowercasedQuery) ||
+          rider.area.toLowerCase().includes(lowercasedQuery) ||
+          rider.city.toLowerCase().includes(lowercasedQuery)
+      );
+      setFilteredRiders(filtered); // Update filtered riders
+    }
+  };
+
 
   const handleDeleteRider = async (riderId) => {
     const confirmDelete = confirm(
@@ -106,14 +131,25 @@ export default function ManageRiders() {
           </Link>
         </div>
 
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search riders by name, contact, area, or city"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+
         {/* Loading State */}
         {loading ? (
           <div className="text-center mt-12">
             <p className="text-lg text-gray-500 animate-pulse">Loading riders...</p>
           </div>
-        ) : riders.length > 0 ? (
+        ) : filteredRiders.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {riders.map((rider) => (
+            {filteredRiders.map((rider) => (
               <div
                 key={rider._id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative"

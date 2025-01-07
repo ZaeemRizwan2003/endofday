@@ -55,8 +55,6 @@ const DashNav = ({ search, setSearch, isCheckout }) => {
     setCart([]);
     setIsLoggedIn(false);
     setUser(null);
-
-    // setCart({});
     router.push("/Login");
   };
 

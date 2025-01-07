@@ -326,14 +326,14 @@ const Checkout = () => {
             className="p-3 border border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
             placeholder="Contact"
           />
-          <input
+          {/* <input
             type="text"
             name="city"
             value={userInfo.city}
             onChange={(e) => setUserInfo({ ...userInfo, city: e.target.value })}
             className="p-3 border border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
             placeholder="City"
-          />
+          /> */}
         </div>
 
         {/* Loyalty Points */}

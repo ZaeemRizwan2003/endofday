@@ -21,7 +21,7 @@ const MoveToCurrentLocation = ({ location }) => {
   const map = useMap();
   useEffect(() => {
     if (location.lat && location.lng) {
-      map.setView([location.lat, location.lng], 13); // Move to user's location
+      map.setView([location.lat, location.lng], 18); // Move to user's location
     }
   }, [location, map]);
 

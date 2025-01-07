@@ -4,11 +4,14 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 export default function ManageRestaurants() {
   const [restaurants, setRestaurants] = useState([]);
-  const [bakeryCount, setBakeryCount] = useState(0); // State for bakery count
+  const [bakeryCount, setBakeryCount] = useState(0); 
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state for confirmation
-  const [restaurantToDelete, setRestaurantToDelete] = useState(null); // Restaurant to be deleted
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // Success modal visibility state
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [restaurantToDelete, setRestaurantToDelete] = useState(null); 
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); 
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   useEffect(() => {
     async function fetchRestaurants() {
@@ -23,6 +26,7 @@ export default function ManageRestaurants() {
 
         if (response.ok && data && Array.isArray(data.listings)) {
           setRestaurants(data.listings); // Directly set listings
+          setFilteredRestaurants(data.listings);
           setBakeryCount(data.count); // Set the bakery count
         } else {
           console.error("Invalid data format or no listings found.");
@@ -37,8 +41,28 @@ export default function ManageRestaurants() {
     fetchRestaurants();
   }, []);
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    filterRestaurants(e.target.value);
+  };
+
+  const filterRestaurants = (query) => {
+    if (!query) {
+      setFilteredRestaurants(restaurants); // Show all if no query
+    } else {
+      const lowercasedQuery = query.toLowerCase();
+      const filtered = restaurants.filter((restaurant) =>
+        restaurant.restaurantName.toLowerCase().includes(lowercasedQuery) ||
+        restaurant.address.toLowerCase().includes(lowercasedQuery) ||
+        restaurant.number.toLowerCase().includes(lowercasedQuery) ||
+        restaurant.email.toLowerCase().includes(lowercasedQuery) // Add email field if available
+      );
+      setFilteredRestaurants(filtered); // Update filtered restaurants
+    }
+  };
+
+
   const handleEditRestaurant = (restaurantId) => {
-    // Navigate to the edit page with the restaurant ID as a query parameter
     window.location.href = `/Admin/ManageRestaurants/EditRestaurant?id=${restaurantId}`;
   };
 
@@ -140,12 +164,23 @@ export default function ManageRestaurants() {
           </p>
         </div>
 
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search by name, area, phone, or email"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+
         {/* Restaurants Grid */}
         {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {restaurants.map((restaurant) => (
+            {filteredRestaurants.map((restaurant) => (
               <div
                 key={restaurant._id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative"
@@ -160,6 +195,9 @@ export default function ManageRestaurants() {
                   </p>
                   <p className="text-gray-600 mb-4">
                     Phone: {restaurant.number}
+                  </p>
+                  <p className="text-gray-600 mb-4">
+                    Email: {restaurant.email}
                   </p>
 
                   {/* Options */}

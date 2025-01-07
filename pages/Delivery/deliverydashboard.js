@@ -195,7 +195,7 @@ const DeliveryOrders = () => {
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Contact:</span>{" "}
-                  {order.contact || "N/A"}
+                  {order.contact || order.userId?.contact || "N/A"}
                 </p>
 
                 <p className="text-gray-700">

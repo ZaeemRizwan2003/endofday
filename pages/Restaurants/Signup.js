@@ -383,7 +383,7 @@ const Signup = () => {
 
               <button
                 type="submit"
-                className="w-full text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="w-full text-black bg-purple-400 hover:bg-purple-500 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center"
                 disabled={loading}
               >
                 {loading ? (
@@ -410,7 +410,7 @@ const Signup = () => {
                     Processing...
                   </>
                 ) : (
-                  "Create an Account"
+                  "CREATE ACCOUNT"
                 )}
               </button>
 

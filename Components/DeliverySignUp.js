@@ -277,9 +277,9 @@ const DeliverySignUp = () => {
           <button
             type="button"
             onClick={handleSignup}
-            className="w-40 bg-purple-700 hover:bg-purple-600 text-white py-3 px-6 rounded-lg shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all"
+            className="w-40 bg-purple-400 hover:bg-purple-500 text-black py-3 px-6 rounded-lg shadow-md focus:ring-2 focus:ring-offset-2  text-xl focus:ring-purple-500 transition-all"
           >
-            Sign Up
+            SIGN UP
           </button>
         </div>
       </div>

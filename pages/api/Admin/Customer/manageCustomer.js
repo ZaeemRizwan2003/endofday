@@ -7,9 +7,21 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
-      const customers = await User.find({ usertype: "customer" }).select(
-        "name email createdAt"
-      );
+      const { searchQuery } = req.query; // Get search query from the request
+
+      // Build search filter if there's a search query
+      const filter = searchQuery
+        ? {
+            usertype: "customer",
+            $or: [
+              { name: { $regex: searchQuery, $options: "i" } }, // Case-insensitive regex search for name
+              { email: { $regex: searchQuery, $options: "i" } }, // Case-insensitive regex search for email
+            ],
+          }
+        : { usertype: "customer" };
+
+
+       const customers = await User.find(filter).select("name email createdAt");
 
       const customersWithOrders = await Promise.all(
         customers.map(async (customer) => {

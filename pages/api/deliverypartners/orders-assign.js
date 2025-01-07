@@ -46,8 +46,9 @@ export default async function handler(req, res) {
           _id: order._id,
           userId: {
             name: order.userId?.name || "User information not available",
-            contact: order.contact || "N/A",
+            contact: order.contact ||order.userId?.contact || "N/A",
           },
+          contact: order.contact || order.userId?.contact || "N/A",
           address: addressDetails
             ? {
                 addressLine: addressDetails.addressLine || "N/A",

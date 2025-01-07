@@ -4,6 +4,9 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  const [currentRestaurantId, setCurrentRestaurantId] = useState(null);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [pendingItem, setPendingItem] = useState(null);
 
     const fetchUserCart = async (userId) => {
       if (!userId) {
@@ -15,7 +18,10 @@ export const CartProvider = ({ children }) => {
           const response = await fetch(`/api/Customer/cart?userId=${userId}`);
           if (response.ok) {
             const { cart } = await response.json();
-            setCart(cart || []); // Set the cart for the logged-in user
+            setCart(cart || []);
+            if (cart && cart.length > 0) {
+              setCurrentRestaurantId(cart[0].bakeryId);
+            }
             localStorage.setItem("cart", JSON.stringify(cart || []));
 
           } else {
@@ -77,6 +83,12 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
+    if (currentRestaurantId && currentRestaurantId !== bakeryId && cart.length > 0) {
+      setPendingItem({ itemId, title, price, remainingitem, bakeryId });
+      setShowConfirmationModal(true);
+      return;
+    }
+
     const existingItem = cart.find((cartItem) => cartItem.itemId === itemId);
 
       const updatedCart = existingItem
@@ -87,9 +99,34 @@ export const CartProvider = ({ children }) => {
       )
     : [...cart, { itemId, title, price, quantity: 1, bakeryId }];
 
+    if (cart.length === 0) {
+      setCurrentRestaurantId(bakeryId);
+    }
       setCart(updatedCart);
+    
         const userId = localStorage.getItem("userId");
     await syncCartToServer(userId, updatedCart);
+    };
+
+    const handleConfirmClearCart = async () => {
+      setCart([]);
+      setCurrentRestaurantId(pendingItem.bakeryId);
+      setShowConfirmationModal(false);
+      if (pendingItem) {
+        await addToCart(
+          pendingItem.itemId,
+          pendingItem.title,
+          pendingItem.price,
+          pendingItem.remainingitem,
+          pendingItem.bakeryId
+        );
+        setPendingItem(null);
+      }
+    };
+
+    const handleCancelAdd = () => {
+      setShowConfirmationModal(false);
+      setPendingItem(null);
     };
 
   const incrementItemQuantity = async (itemId, remainingitem) => {
@@ -162,10 +199,38 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         clearCart,
         fetchUserCart,
+        currentRestaurantId
         
       }}
     >
       {children}
+      {showConfirmationModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded shadow-md">
+            <h2 className="text-lg font-bold mb-4">
+              Change Restaurant?
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Adding items from another restaurant will clear your current cart.
+              Do you want to proceed?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                onClick={handleConfirmClearCart}
+              >
+                Yes, Clear Cart
+              </button>
+              <button
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+                onClick={handleCancelAdd}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </CartContext.Provider>
   );
 };
