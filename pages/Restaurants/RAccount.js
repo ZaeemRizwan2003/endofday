@@ -3,7 +3,6 @@ import dbConnect from "@/middleware/mongoose"; // Import your DB connection
 import RegisteredBakeries from "@/models/RBakerymodel"; // Import your model
 import { verifyToken } from "@/middleware/auth";
 import DashNav from "@/Components/Navbar";
-import Link from "next/link";
 const Account = ({ user, error }) => {
   if (error) {
     return (

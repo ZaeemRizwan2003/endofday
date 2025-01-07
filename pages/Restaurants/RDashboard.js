@@ -4,8 +4,21 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { FaSpinner } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { BiFoodMenu } from "react-icons/bi";
+
+const getCancelledOrders = (orders) => {
+  const currentTime = new Date();
+  return orders.filter((order) => {
+    // Check if the order is cancelled and updated within the last 24 hours
+    if (order.status === "Cancelled" && order.updatedAt) {
+      const updatedAt = new Date(order.updatedAt); // Use `updatedAt` field
+      const hoursSinceUpdate = (currentTime - updatedAt) / (1000 * 60 * 60); // Calculate time difference in hours
+      return hoursSinceUpdate <= 24; // Check if the update happened within the last 24 hours
+    }
+    return false; // Return false if it's not cancelled or updated
+  });
+};
 
 const Dashboard = () => {
   const [listings, setListings] = useState([]);
@@ -16,13 +29,26 @@ const Dashboard = () => {
   const [orders, setOrders] = useState([]);
   const [isOrdersOpen, setIsOrdersOpen] = useState(true); // State for toggling orders visibility
   const [filter, setFilter] = useState("all");
+  const [filteredOrders, setFilteredOrders] = useState([]);
+
+  // Filter the orders based on the selected filter
+  useEffect(() => {
+    if (filter === "all") {
+      setFilteredOrders(
+        orders.filter(
+          (order) => order.status !== "Ready" && order.status !== "Cancelled"
+        )
+      );
+    } else if (filter === "Ready") {
+      setFilteredOrders(orders.filter((order) => order.status === "Ready"));
+    } else if (filter === "Cancelled") {
+      setFilteredOrders(getCancelledOrders(orders)); // Filter orders cancelled in the last 24 hours
+    }
+  }, [filter, orders]);
+
   const toggleOrders = () => {
     setIsOrdersOpen((prevState) => !prevState); // Toggles the isOrdersOpen state
   };
-
-  const filteredOrders = orders.filter((order) =>
-    filter === "all" ? order.status !== "Ready" : order.status === filter
-  );
   const router = useRouter();
 
   useEffect(() => {
@@ -51,6 +77,13 @@ const Dashboard = () => {
 
     fetchOrders();
   }, []);
+  const handleStatusChange = (orderId, status) => {
+    if (status === "Cancelled") {
+      router.push(`/Restaurants/cancel-order/${orderId}`);
+    } else {
+      updateOrderStatus(orderId, status);
+    }
+  };
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
@@ -150,15 +183,18 @@ const Dashboard = () => {
         body: JSON.stringify({ id }),
       });
 
-      const data = await response.json();
-      if (data.success) {
-        setListings(listings.filter((listing) => listing._id !== id));
-        setShowDeleteModal(false);
-      } else {
-        console.error("Failed to delete listing:", data.error);
+      // Handle response properly
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete listing.");
       }
+
+      // Remove the listing locally
+      setListings(listings.filter((listing) => listing._id !== id));
+      setShowDeleteModal(false); // Close the modal after success
     } catch (error) {
-      console.error("Error deleting listing:", error);
+      console.error("Error deleting listing:", error.message);
+      alert(`Error: ${error.message}`); // Notify the user
     }
   };
 
@@ -229,11 +265,21 @@ const Dashboard = () => {
             </button>
             <button
               onClick={() => setFilter("Ready")}
-              className={`px-4 py-2 rounded ${
+              className={`mr-4 px-4 py-2 rounded ${
                 filter === "Ready" ? "bg-purple-500 text-white" : "bg-gray-200"
               }`}
             >
               Ready
+            </button>
+            <button
+              onClick={() => setFilter("Cancelled")}
+              className={`px-4 py-2 rounded ${
+                filter === "Cancelled"
+                  ? "bg-purple-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Cancelled
             </button>
           </div>
 
@@ -281,7 +327,7 @@ const Dashboard = () => {
                         id={`status-${order._id}`}
                         value={order.status}
                         onChange={(e) =>
-                          updateOrderStatus(order._id, e.target.value)
+                          handleStatusChange(order._id, e.target.value)
                         }
                         className="mt-2 p-2 border rounded-lg w-full"
                       >
@@ -296,7 +342,6 @@ const Dashboard = () => {
             )}
           </div>
         </motion.div>
-
         {/* Listings Section */}
         <div className="w-full md:w-2/3 p-4">
           <div className="flex justify-center mb-6">
@@ -379,6 +424,28 @@ const Dashboard = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          {showDeleteModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <h2 className="text-lg font-bold mb-4">Confirm Delete</h2>
+                <p>Are you sure you want to delete this listing?</p>
+                <div className="flex justify-end mt-4 gap-4">
+                  <button
+                    onClick={() => closeDeleteModal()}
+                    className="px-4 py-2 bg-gray-300 rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => deleteListing(selectedListingId)} // Pass ID correctly
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
