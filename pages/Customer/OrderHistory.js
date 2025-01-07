@@ -12,7 +12,7 @@ const OrderHistory = () => {
 
   useEffect(() => {
     const fetchUserId = () => {
-      const id = localStorage.getItem("userId");
+      const id = sessionStorage.getItem("userId");
       setUserId(id);
     };
 

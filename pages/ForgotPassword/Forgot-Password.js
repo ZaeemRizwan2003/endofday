@@ -22,7 +22,7 @@ export default function ForgotPassword() {
 
       setMessage(res.data.message);
       setOtpSent(true); // OTP sent successfully
-      localStorage.setItem("forgotPasswordEmail", email);
+      sessionStorage.setItem("forgotPasswordEmail", email);
       // Redirect to verify-otp page after a brief delay
       setTimeout(() => {
         if (res.status === 200) {

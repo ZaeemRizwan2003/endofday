@@ -42,10 +42,9 @@ const Login = () => {
           setLoading(false);
           return;
         }
-        // Store token and userId in localStorage
-        localStorage.setItem("token", token);
-        localStorage.setItem("userId", userId);
-
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("userId", userId);
+        sessionStorage.setItem("userType", userType);
         // Handle different user types
         if (userType === "listing") {
           await fetchUserCart(userId); // Set cart for the customer
@@ -53,7 +52,7 @@ const Login = () => {
         } else if (userType === "bakery") {
           router.push("/Restaurants/RDashboard");
         } else if (userType === "delivery") {
-          localStorage.setItem("delivery", JSON.stringify(userData));
+          sessionStorage.setItem("delivery", JSON.stringify(userData));
           router.push("/Delivery/deliverydashboard");
         }
       }

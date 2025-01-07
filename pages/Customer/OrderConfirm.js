@@ -22,13 +22,12 @@ const OrderPage = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-
       if (!router.isReady) return;
 
-      const orderId = id || localStorage.getItem("lastOrderId");
+      const orderId = id || sessionStorage.getItem("lastOrderId");
 
       if (!orderId) {
-        console.warn("No order ID found in query or localStorage.");
+        console.warn("No order ID found in query or sessionStorage.");
         setError("No valid order ID provided.");
         setLoading(false);
         return;

@@ -31,7 +31,7 @@ const RestaurantMenu = () => {
   const { id } = router.query;
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     if (userId) {
       loadCartFromServer(userId).then((fetchedCart) => {
         setCart(fetchedCart);
@@ -40,9 +40,9 @@ const RestaurantMenu = () => {
   }, []);
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     if (id && userId) {
-      setLoading(true);  // Start loading
+      setLoading(true); // Start loading
       axios
         .get(`/api/Customer/restaurants/${id}`)
         .then((response) => {
@@ -54,11 +54,10 @@ const RestaurantMenu = () => {
             const updatedAt = new Date(item.updatedAt);
             const currentTime = new Date();
             const timeDifference = currentTime - updatedAt;
-            const hoursDifference = timeDifference / (1000 * 60 * 60); 
-            return hoursDifference <= 24; 
+            const hoursDifference = timeDifference / (1000 * 60 * 60);
+            return hoursDifference <= 24;
           });
 
-         
           const totalRating = restaurantData.reviews.reduce(
             (acc, review) => acc + review.rating,
             0
@@ -67,18 +66,17 @@ const RestaurantMenu = () => {
 
           setRestaurant({
             ...restaurantData,
-            menu: filteredMenu, 
+            menu: filteredMenu,
           });
           setAvgRating(avgRating);
 
-          console.log("Average Rating:", avgRating); 
-          
+          console.log("Average Rating:", avgRating);
 
-          setLoading(false); 
+          setLoading(false);
         })
         .catch((error) => {
           console.error(error);
-          setLoading(false); 
+          setLoading(false);
         });
     }
   }, [id]);
@@ -109,7 +107,6 @@ const RestaurantMenu = () => {
   };
 
   const handleAddToCart = (itemId, title, price, bakeryId, remainingitem) => {
-
     const currentQuantity = getItemQuantity(itemId);
 
     if (currentQuantity >= remainingitem) {
@@ -135,7 +132,7 @@ const RestaurantMenu = () => {
   };
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     if (userId) {
       axios
         .get(`/api/Customer/favorites?userId=${userId}`)
@@ -146,7 +143,7 @@ const RestaurantMenu = () => {
 
   // Toggle Favorite Function
   const toggleFavorite = async (listingId) => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     if (!userId) return;
 
     const isFavorite = favorites.some((fav) => fav._id === listingId);
@@ -182,7 +179,6 @@ const RestaurantMenu = () => {
       <DashNav />
       <div className="p-20 justify-center">
         {loading ? (
-          
           <div className="flex justify-center items-center h-64">
             <LuLoader className="text-purple-800 animate-spin text-5xl" />
             <span className="ml-4 text-lg text-purple-800 font-semibold">
@@ -197,7 +193,7 @@ const RestaurantMenu = () => {
                 <h1 className="text-3xl font-bold text-purple-800 mb-2">
                   {restaurant?.restaurantName}
                   <span className="ml-4 text-yellow-500 font-semibold">
-                    {avgRating.toFixed(1)} 
+                    {avgRating.toFixed(1)}
                     <span className="text-gray-400">/ 5</span>
                   </span>
                   <button
@@ -224,32 +220,31 @@ const RestaurantMenu = () => {
                     className="flex flex-col border rounded-lg overflow-hidden shadow-lg hover:shadow-md transition duration-300"
                   >
                     <div className="relative group border rounded-lg shadow-lg p-4 flex flex-col justify-between h-full">
-                    {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.itemname}
-                      className="w-full h-40 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
-                      <span>No Image</span>
-                    </div>
-                  )}
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.itemname}
+                          className="w-full h-40 object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
+                          <span>No Image</span>
+                        </div>
+                      )}
 
-                     
                       <div className="flex-grow">
-                      <div className="absolute top-30 right-5">
-                        <button
-                          onClick={() => toggleFavorite(item._id)}
-                          className="mt-4 self-start"
-                        >
-                          {isFavorite(item._id) ? (
-                            <FaHeart className="text-red-600 text-2xl" />
-                          ) : (
-                            <FaRegHeart className="text-gray-400 text-2xl" />
-                          )}
-                        </button>
-                      </div>
+                        <div className="absolute top-30 right-5">
+                          <button
+                            onClick={() => toggleFavorite(item._id)}
+                            className="mt-4 self-start"
+                          >
+                            {isFavorite(item._id) ? (
+                              <FaHeart className="text-red-600 text-2xl" />
+                            ) : (
+                              <FaRegHeart className="text-gray-400 text-2xl" />
+                            )}
+                          </button>
+                        </div>
                         <h2 className="text-xl font-bold text-purple-800 mb-2">
                           {item.itemname}
                         </h2>
@@ -283,13 +278,14 @@ const RestaurantMenu = () => {
                               item.remainingItem
                             )
                           }
-                          disabled={item.remainingitem <= 0 || addedToCart[item._id]}
-
+                          disabled={
+                            item.remainingitem <= 0 || addedToCart[item._id]
+                          }
                         >
-                          {item.remainingitem > 0 ? "Add to Cart" : "Out of Stock"}
+                          {item.remainingitem > 0
+                            ? "Add to Cart"
+                            : "Out of Stock"}
                         </button>
-
-                        
 
                         {addedToCart[item._id] && (
                           <div className="flex items-center">
@@ -308,8 +304,15 @@ const RestaurantMenu = () => {
                                   ? "cursor-not-allowed opacity-50"
                                   : ""
                               }`}
-                              onClick={() => incrementItemQuantity(item._id, item.remainingItem)}
-                              disabled={getItemQuantity(item._id) >= item.remainingitem}
+                              onClick={() =>
+                                incrementItemQuantity(
+                                  item._id,
+                                  item.remainingItem
+                                )
+                              }
+                              disabled={
+                                getItemQuantity(item._id) >= item.remainingitem
+                              }
                             >
                               <FaRegPlusSquare />
                             </button>

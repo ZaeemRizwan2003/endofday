@@ -15,7 +15,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode(token);
@@ -27,9 +27,9 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("cart");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("cart");
     setIsLoggedIn(false);
     setUser(null);
     router.push("/login");
@@ -79,7 +79,6 @@ const Navbar = () => {
               </Link>
             </>
           )}
-
 
           <button
             onClick={toggleMenu}

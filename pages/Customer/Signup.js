@@ -41,7 +41,7 @@ const Signup = () => {
       });
 
       if (res.status === 200) {
-        localStorage.setItem("token", res.data.token);
+        sessionStorage.setItem("token", res.data.token);
         setSuccess("signup successful, you can login now");
         setName("");
         setEmail("");

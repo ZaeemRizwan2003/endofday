@@ -24,5 +24,3 @@ const DeliveryPartner =
   mongoose.model("Deliverypartner", deliveryPartnersModel, "deliverypartners");
 
 export default DeliveryPartner;
-
-// export const deliveryPartnersSchema = mongoose.models.Deliverypartner || mongoose.model("Deliverypartner", deliveryPartnersModel, "deliverypartners");

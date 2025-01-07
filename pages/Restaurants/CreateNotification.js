@@ -19,7 +19,7 @@ export default function NotificationForm() {
     e.preventDefault();
 
     try {
-      const userId = localStorage.getItem("userId");
+      const userId = sessionStorage.getItem("userId");
       if (!userId) {
         alert("User ID is missing. Please log in again.");
         return;

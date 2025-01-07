@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import dbConnect from "@/middleware/mongoose"; // Import your DB connection
+import Order from "@/models/Order";
 import RegisteredBakeries from "@/models/RBakerymodel"; // Import your model
 import { verifyToken } from "@/middleware/auth";
 import DashNav from "@/Components/Navbar";
-const Account = ({ user, error }) => {
+import { format } from "date-fns";
+const Account = ({ user, error, orderCount, totalAmount, joinedOn }) => {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
@@ -149,6 +151,18 @@ const Account = ({ user, error }) => {
               <p className="text-gray-800">
                 <strong>Phone Number:</strong> {formData.number}
               </p>
+              <p className="text-gray-800">
+                <strong>Joined On:</strong> {joinedOn}{" "}
+                {/* Display the "Joined On" date */}
+              </p>
+              <div className="mt-6">
+                <p className="text-gray-800">
+                  <strong>Confirmed Orders:</strong> {orderCount} orders
+                </p>
+                <p className="text-gray-800">
+                  <strong>Total Amount:</strong> ${totalAmount.toFixed(1)}
+                </p>
+              </div>
               <button
                 onClick={handleEdit}
                 className="w-full mt-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
@@ -171,13 +185,14 @@ export async function getServerSideProps(context) {
   if (!user) {
     return {
       redirect: {
-        destination: "Restaurants/RLogin",
+        destination: "/Login",
         permanent: false,
       },
     };
   }
 
   try {
+    // Fetch bakery details (including createdAt field)
     const bakeryOwner = await RegisteredBakeries.findById(user.userId)
       .select("-password")
       .lean();
@@ -185,9 +200,32 @@ export async function getServerSideProps(context) {
       return { notFound: true };
     }
 
+    console.log("Bakery ID:", user.userId);
+
+    // Use find() to fetch orders with "Delivered" status
+    const orders = await Order.find({
+      bakeryId: user.userId,
+      status: "Delivered", // Only get orders with "Delivered" status
+    });
+
+    // Calculate totalAmount and orderCount
+    var totalAmount = orders.reduce((acc, order) => acc + order.totalAmount, 0);
+    const orderCount = orders.length;
+    const deliverycharges = orderCount * 150;
+    totalAmount = totalAmount - deliverycharges;
+
+    // Format the 'createdAt' date to a readable format
+    const formattedDate = format(
+      new Date(bakeryOwner.createdAt),
+      "MMMM dd, yyyy"
+    );
+
     return {
       props: {
         user: JSON.parse(JSON.stringify(bakeryOwner)),
+        orderCount,
+        totalAmount,
+        joinedOn: formattedDate, // Pass formatted "joined on" date to the component
       },
     };
   } catch (error) {

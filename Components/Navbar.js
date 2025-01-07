@@ -16,6 +16,7 @@ const DashNav = () => {
       });
       if (response.ok) {
         localStorage.clear();
+        sessionStorage.clear();
         router.push("/Login");
       } else {
         console.error("Logout failed: ", await response.json());

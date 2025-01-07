@@ -53,7 +53,7 @@ const DeliveryOrders = () => {
   };
 
   useEffect(() => {
-    const deliveryData = localStorage.getItem("delivery");
+    const deliveryData = sessionStorage.getItem("delivery");
 
     if (!deliveryData) {
       // Redirect to login if no delivery data
@@ -65,7 +65,7 @@ const DeliveryOrders = () => {
     try {
       parsedData = JSON.parse(deliveryData);
     } catch {
-      localStorage.removeItem("delivery");
+      sessionStorage.removeItem("delivery");
       router.replace("/Login");
       return;
     }

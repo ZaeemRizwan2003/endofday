@@ -55,7 +55,7 @@ const Checkout = () => {
   useEffect(() => {
     const fetchCheckoutData = async () => {
       try {
-        const userId = localStorage.getItem("userId");
+        const userId = sessionStorage.getItem("userId");
         const res = await axios.get(`/api/Customer/checkout?userId=${userId}`);
         const { addresses, userInfo } = res.data;
 
@@ -77,7 +77,7 @@ const Checkout = () => {
   }, []);
 
   const handleNewAddress = async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     if (!newAddress.city || !newAddress.area || !newAddress.addressLine) {
       alert("Please provide all required address fields.");
       return;
@@ -94,7 +94,7 @@ const Checkout = () => {
   };
 
   const handleSetDefaultAddress = async (addressId) => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     await setDefaultAddress(userId, addressId);
     setAddresses((prev) =>
       prev.map((addr) => ({
@@ -106,9 +106,9 @@ const Checkout = () => {
   };
 
   const handleSaveLocation = async (location) => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     if (!userId) {
-      console.error("User ID is missing from localStorage");
+      console.error("User ID is missing from sessionStorage");
       return;
     }
 
@@ -142,7 +142,7 @@ const Checkout = () => {
   };
 
   const handleSubmit = async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     const totalAmount = calculateTotalAmount();
     const finalAmount = totalAmount - discountAmount;
 
@@ -181,11 +181,11 @@ const Checkout = () => {
       const response = await axios.post("/api/Customer/order", orderData);
       const orderId = response.data.order._id;
 
-      localStorage.setItem("lastOrderId", orderId);
+      sessionStorage.setItem("lastOrderId", orderId);
 
       clearCart();
       setCart([]);
-      localStorage.removeItem("cart");
+      sessionStorage.removeItem("cart");
 
       router.push(`/Customer/OrderConfirm?id=${orderId}`);
     } catch (err) {
@@ -198,7 +198,7 @@ const Checkout = () => {
 
   const handleStripePayment = async () => {
     const stripe = await stripePromise;
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     const totalAmount = calculateTotalAmount();
     const finalAmount = totalAmount - discountAmount;
     if (!selectedAddress) {
@@ -235,7 +235,7 @@ const Checkout = () => {
 
   useEffect(() => {
     const fetchLoyaltyPoints = async () => {
-      const userId = localStorage.getItem("userId");
+      const userId = sessionStorage.getItem("userId");
       try {
         const response = await axios.get(
           `/api/Customer/loyalty?userId=${userId}`
