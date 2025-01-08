@@ -30,10 +30,12 @@ const DeliveredOrders = () => {
   };
 
   useEffect(() => {
-    const deliveryData = localStorage.getItem("delivery");
+    const deliveryData = sessionStorage.getItem("delivery");
 
     if (!deliveryData) {
-      console.warn("No delivery data found in localStorage. Redirecting to login...");
+      console.warn(
+        "No delivery data found in sessionStorage. Redirecting to login..."
+      );
       router.push("/Delivery/deliverypartner");
       return;
     }
@@ -42,11 +44,11 @@ const DeliveredOrders = () => {
       parsedData = JSON.parse(deliveryData);
     } catch (error) {
       console.error("Failed to parse delivery data:", error.message);
-      localStorage.removeItem("delivery"); // Clear invalid data
+      sessionStorage.removeItem("delivery"); // Clear invalid data
       router.push("/Delivery/deliverypartner");
       return;
     }
-  
+
     if (parsedData && parsedData._id) {
       getDeliveredOrders(parsedData._id);
     } else {
@@ -80,7 +82,8 @@ const DeliveredOrders = () => {
               <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
                 <div>
                   <h4 className="text-lg font-semibold text-gray-800">
-                    <span className="text-green-700">Name:</span> {order.userId.name}
+                    <span className="text-green-700">Name:</span>{" "}
+                    {order.userId.name}
                   </h4>
                   <p className="text-gray-600">
                     <span className="font-semibold">Contact:</span>{" "}
@@ -89,7 +92,8 @@ const DeliveredOrders = () => {
                 </div>
                 <div>
                   <p className="text-gray-600">
-                    <span className="font-semibold">Amount:</span> Rs.{order.totalAmount}
+                    <span className="font-semibold">Amount:</span> Rs.
+                    {order.totalAmount}
                   </p>
                   <p className="text-gray-600">
                     <span className="font-semibold">Address:</span>{" "}

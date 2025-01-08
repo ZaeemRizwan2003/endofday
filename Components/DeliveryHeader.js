@@ -11,7 +11,7 @@ const DeliveryHeader = () => {
   const pathName = usePathname();
 
   useEffect(() => {
-    let data = localStorage.getItem("delivery");
+    let data = sessionStorage.getItem("delivery");
     if (!data && pathName === "/Delivery/deliverydashboard") {
       router.push("/Delivery/deliverypartner");
     } else if (data && pathName === "/Delivery/deliverypartner") {
@@ -22,7 +22,7 @@ const DeliveryHeader = () => {
   }, [pathName, router]);
 
   const logout = () => {
-    localStorage.clear();
+    sessionStorage.clear();
 
     router.push("/Login");
   };

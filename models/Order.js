@@ -33,9 +33,15 @@ const OrderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    status: {
+    restaurantStatus: {
       type: String,
+      enum: ["Pending", "Preparing", "Ready", "Cancelled","Done"],
       default: "Pending",
+    },
+    deliveryStatus: {
+      type: String,
+      enum: ["Unassigned", "Assigned", "Picked Up", "On the Way", "Delivered", "Failed","Done"],
+      default: "Assigned",
     },
     deliveryBoy_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -46,6 +52,15 @@ const OrderSchema = new mongoose.Schema(
       enum: ["Reviewed", "Not Reviewed"],
       default: "Not Reviewed",
     },
+    estimatedReadyTime: {
+      type: Date,
+    },
+    pickedUpTime: {
+      type: Date,
+    },
+    deliveredTime: {
+      type: Date,
+    }
   },
   { timestamps: true }
 );

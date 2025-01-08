@@ -16,6 +16,7 @@ const DashNav = () => {
       });
       if (response.ok) {
         localStorage.clear();
+        sessionStorage.clear();
         router.push("/Login");
       } else {
         console.error("Logout failed: ", await response.json());
@@ -103,6 +104,18 @@ const DashNav = () => {
                       Reviews
                     </button>
                   </li>
+
+                  <li className="mb-3">
+                    <button
+                      className="text-purple-700 hover:underline"
+                      onClick={() =>
+                        router.push("/Restaurants/RestaurantOrders")
+                      }
+                    >
+                      My Orders
+                    </button>
+                  </li>
+
 
                   <li>
                     <button

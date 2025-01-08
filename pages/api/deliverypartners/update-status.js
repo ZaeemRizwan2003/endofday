@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     await dbConnect();
 
     if (req.method === "PUT") {
-        const { orderId, status } = req.body;
+        const { orderId, deliveryStatus } = req.body;
 
         try {
             const order = await Order.findById(orderId);
@@ -14,7 +14,16 @@ export default async function handler(req, res) {
                 return res.status(404).json({ message: "Order not found" });
             }
 
-            order.status = status; // Update the order status
+            order.deliveryStatus = deliveryStatus;
+
+            if (deliveryStatus === "Picked Up") {
+                order.restaurantStatus = "Done";
+              }
+        
+              if (deliveryStatus === "Delivered") {
+                order.deliveryStatus = "Done";
+              }
+
             await order.save(); // Save the changes
 
             return res.status(200).json({ message: "Order status updated successfully", order });

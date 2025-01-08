@@ -7,7 +7,7 @@ const RestaurantUserReviews = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const userId = localStorage.getItem("userId");
+  const userId = sessionStorage.getItem("userId");
 
   useEffect(() => {
     if (userId) {
@@ -89,7 +89,7 @@ const RestaurantUserReviews = () => {
               </div>
             ) : (
               <p className="text-lg text-gray-600 font-semibold text-center">
-                You have not posted any reviews yet.
+                You have not recieved any reviews yet.
               </p>
             )}
           </div>

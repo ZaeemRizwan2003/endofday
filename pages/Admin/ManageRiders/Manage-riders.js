@@ -24,7 +24,7 @@ export default function ManageRiders() {
         const response = await axios.get("/api/Admin/Riders/manageRiders");
         if (response.data.success) {
           setRiders(response.data.deliveryPartners);
-          setFilteredRiders(response.data.deliveryPartners); 
+          setFilteredRiders(response.data.deliveryPartners); // Initialize filtered riders
         } else {
           console.error("Failed to fetch riders");
         }
@@ -58,7 +58,6 @@ export default function ManageRiders() {
       setFilteredRiders(filtered); // Update filtered riders
     }
   };
-
 
   const handleDeleteRider = async (riderId) => {
     const confirmDelete = confirm(
@@ -131,6 +130,7 @@ export default function ManageRiders() {
           </Link>
         </div>
 
+        {/* Search Input */}
         <div className="mb-6">
           <input
             type="text"
@@ -140,7 +140,6 @@ export default function ManageRiders() {
             className="w-full p-2 border rounded"
           />
         </div>
-
 
         {/* Loading State */}
         {loading ? (
@@ -196,7 +195,7 @@ export default function ManageRiders() {
                       </p>
                     </div>
                     <Link
-                     href={`/Admin/ManageRiders/RiderDetails?userId=${rider._id}`}
+                      href={`/Admin/ManageRiders/RiderDetails?userId=${rider._id}`}
                       className="text-blue-500 hover:text-blue-700 font-medium transition"
                     >
                       View Details &rarr;
@@ -264,13 +263,13 @@ export default function ManageRiders() {
               <div className="flex justify-end space-x-4">
                 <button
                   onClick={() => setEditModalOpen(false)}
-                  className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleEditRider}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
                 >
                   Save Changes
                 </button>

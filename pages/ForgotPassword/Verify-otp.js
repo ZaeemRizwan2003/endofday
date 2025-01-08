@@ -13,7 +13,7 @@ export default function VerifyOTP() {
   const [resendTimer, setResendTimer] = useState(10); // ⏳ Timer starts at 10 seconds
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("forgotPasswordEmail");
+    const storedEmail = sessionStorage.getItem("forgotPasswordEmail");
     if (storedEmail) {
       setEmail(storedEmail);
     } else {

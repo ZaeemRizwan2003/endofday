@@ -5,11 +5,6 @@ import Listings from "@/models/foodlistingmodel";
 export default async function handler(req, res) {
   await dbConnect();
 
-  //   if (req.method !== "GET") {
-  //     res.setHeader("Allow", ["GET"]);
-  //     return res.status(405).end(`Method ${req.method} Not Allowed`);
-  //   }
-
   const { userId } = req.query;
 
   // ✅ Validate userId
@@ -47,7 +42,7 @@ export default async function handler(req, res) {
                 quantity: item.quantity,
               };
             }
-            return null; // Exclude items that don't match the bakeryowner
+            return null; 
           })
         );
 

@@ -22,13 +22,12 @@ const OrderPage = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-
       if (!router.isReady) return;
 
-      const orderId = id || localStorage.getItem("lastOrderId");
+      const orderId = id || sessionStorage.getItem("lastOrderId");
 
       if (!orderId) {
-        console.warn("No order ID found in query or localStorage.");
+        console.warn("No order ID found in query or sessionStorage.");
         setError("No valid order ID provided.");
         setLoading(false);
         return;
@@ -38,6 +37,9 @@ const OrderPage = () => {
         console.log("Fetching order with ID:", id);
         const res = await axios.get(`/api/Customer/order?id=${orderId}`);
         setOrder(res.data);
+        if (res.data.status === "Pending") {
+          await axios.put(`/api/Customer/order/status?id=${orderId}`, { status: "Confirmed" });
+        }
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
@@ -120,7 +122,7 @@ const OrderPage = () => {
 
             {/* Status Animations */}
             <div className="flex justify-center mt-6">
-              {order.status === "Pending" && (
+              {order.deliveryStatus === "Assigned" && (
                 <Player
                   autoplay
                   loop
@@ -128,7 +130,7 @@ const OrderPage = () => {
                   style={{ height: "150px", width: "150px" }}
                 />
               )}
-              {order.status === "Confirmed" && (
+              {order.deliveryStatus === "Assigned" && (
                 <Player
                   autoplay
                   loop
@@ -136,7 +138,7 @@ const OrderPage = () => {
                   style={{ height: "150px", width: "150px" }}
                 />
               )}
-              {order.status === "On The Way" && (
+              {order.deliveryStatus === "On The Way" && (
                 <Player
                   autoplay
                   loop
@@ -145,7 +147,7 @@ const OrderPage = () => {
                 />
               )}
 
-              {order.status === "Delivered" && (
+              {order.deliveryStatus === "Delivered || Done" && (
                 <Player
                   autoplay
                   loop

@@ -9,10 +9,10 @@ const OrdersMade = () => {
   // ✅ Fetch orders for logged-in bakery
   const fetchOrders = async () => {
     try {
-      const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
+      const userId = sessionStorage.getItem("userId");
 
       if (!userId) {
-        throw new Error("User ID not found in localStorage");
+        throw new Error("User ID not found in sessionStorage");
       }
 
       const response = await axios.get("/api/Restaurants/ordersmade", {

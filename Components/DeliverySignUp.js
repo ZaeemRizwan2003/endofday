@@ -15,7 +15,7 @@ const DeliverySignUp = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const delivery = JSON.parse(localStorage.getItem("delivery"));
+    const delivery = JSON.parse(sessionStorage.getItem("delivery"));
     if (delivery) {
       router.push("/Delivery/deliverydashboard");
     }
@@ -53,7 +53,7 @@ const DeliverySignUp = () => {
 
     if (response.ok) {
       alert("Success");
-      localStorage.setItem("delivery", JSON.stringify(result));
+      sessionStorage.setItem("delivery", JSON.stringify(result));
       router.push("/Delivery/deliverydashboard");
     } else {
       alert("Failed to Signup: " + result.message); // Display the server error message

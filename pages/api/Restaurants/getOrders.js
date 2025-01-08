@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       // Find orders for the given bakeryId and populate listing and user data
       const orders = await Order.find({ bakeryId })
         .populate("userId", "email") // Populate user details
-        .populate("deliveryBoy_id", "name email") // Populate listing details
+        .populate("deliveryBoy_id", "name email contact") // Populate listing details
         .exec();
 
       res.status(200).json({ success: true, orders });
