@@ -42,9 +42,10 @@ export default async function handler(req, res) {
       // ✅ Fetch ongoing orders
       if (status === "ongoing") {
         const ongoingOrders = await Order.find({
-          status: { $in: ["Pending", "Confirmed", "On The Way"] },
+          deliveryStatus: { $in: ["Unassigned", "Assigned", "Picked Up", "On the Way"] },
         })
-          .populate("bakeryId") // Populate bakery details
+          .populate("bakeryId")  
+          .populate("userId")
           .sort({ createdAt: -1 }); // Get all ongoing orders
 
         return res.status(200).json({ ongoingOrders }); // Always return 200

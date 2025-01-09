@@ -11,7 +11,7 @@ const getCancelledOrders = (orders) => {
   const currentTime = new Date();
   return orders.filter((order) => {
     // Check if the order is cancelled and updated within the last 24 hours
-    if (order.status === "Cancelled" && order.updatedAt) {
+    if (order.restaurantStatus === "Cancelled" && order.updatedAt) {
       const updatedAt = new Date(order.updatedAt); // Use `updatedAt` field
       const hoursSinceUpdate = (currentTime - updatedAt) / (1000 * 60 * 60); // Calculate time difference in hours
       return hoursSinceUpdate <= 24; // Check if the update happened within the last 24 hours
@@ -36,11 +36,11 @@ const Dashboard = () => {
     if (filter === "all") {
       setFilteredOrders(
         orders.filter(
-          (order) => order.status !== "Ready" && order.status !== "Cancelled"
+          (order) => order.restaurantStatus !== "Ready" && order.restaurantStatus !== "Cancelled"
         )
       );
     } else if (filter === "Ready") {
-      setFilteredOrders(orders.filter((order) => order.status === "Ready"));
+      setFilteredOrders(orders.filter((order) => order.restaurantStatus === "Ready"));
     } else if (filter === "Cancelled") {
       setFilteredOrders(getCancelledOrders(orders)); // Filter orders cancelled in the last 24 hours
     }
@@ -325,7 +325,7 @@ const Dashboard = () => {
                     <ul>
                       {order.items.map((item, index) => (
                         <li key={index} className="text-gray-600">
-                          {item.title} - {item.quantity} x ${item.price}
+                          {item.title} - {item.quantity} x Rs {item.price}
                         </li>
                       ))}
                     </ul>
@@ -340,7 +340,7 @@ const Dashboard = () => {
                       </label>
                       <select
                         id={`status-${order._id}`}
-                        value={order.status}
+                        value={order.restaurantStatus}
                         onChange={(e) =>
                           handleStatusChange(order._id, e.target.value, "restaurantStatus")
                         }
@@ -397,10 +397,10 @@ const Dashboard = () => {
                     {listing.itemname}
                   </h2>
                   <p className="text-lg text-gray-600">
-                    Price: ${listing.price}
+                    Price: Rs. {listing.price}
                   </p>
                   <p className="text-lg text-gray-600">
-                    Discounted Price: ${listing.discountedprice}
+                    Discounted Price: Rs.{listing.discountedprice}
                   </p>
                   <p className="text-lg text-gray-600">
                     Remaining Items: {listing.remainingitem}

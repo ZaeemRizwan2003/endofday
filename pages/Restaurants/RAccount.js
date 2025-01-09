@@ -160,7 +160,7 @@ const Account = ({ user, error, orderCount, totalAmount, joinedOn }) => {
                   <strong>Confirmed Orders:</strong> {orderCount} orders
                 </p>
                 <p className="text-gray-800">
-                  <strong>Total Amount:</strong> ${totalAmount.toFixed(1)}
+                  <strong>Total Amount:</strong> Rs. {totalAmount.toFixed(1)}
                 </p>
               </div>
               <button
@@ -205,7 +205,7 @@ export async function getServerSideProps(context) {
     // Use find() to fetch orders with "Delivered" status
     const orders = await Order.find({
       bakeryId: user.userId,
-      status: "Delivered", // Only get orders with "Delivered" status
+      restaurantStatus: "Ready" || "Done", // Only get orders with "Delivered" status
     });
 
     // Calculate totalAmount and orderCount

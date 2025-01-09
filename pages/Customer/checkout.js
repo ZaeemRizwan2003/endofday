@@ -266,6 +266,11 @@ const Checkout = () => {
     );
   };
 
+  const isValidContact = (value) => {
+    const phoneRegex = /^[0-9]{0,11}$/; 
+    return phoneRegex.test(value);
+  };
+
   return (
     <div>
       <DashNav isCheckout={true} />
@@ -320,9 +325,12 @@ const Checkout = () => {
             type="text"
             name="contact"
             value={userInfo.contact}
-            onChange={(e) =>
-              setUserInfo({ ...userInfo, contact: e.target.value })
-            }
+            onChange={(e) => {
+              const contactValue = e.target.value;
+              if (isValidContact(contactValue)) {
+                setUserInfo({ ...userInfo, contact: contactValue });
+              }
+            }}
             className="p-3 border border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
             placeholder="Contact"
           />

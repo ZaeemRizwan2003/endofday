@@ -3,17 +3,9 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import DashNav from "@/Components/CustomerNavbar";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-
-const Player = dynamic(
-  () => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player),
-  {
-    ssr: false,
-  }
-);
 
 const OrderPage = () => {
-  const [order, setOrder] = useState([]);
+  const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -21,49 +13,63 @@ const OrderPage = () => {
   const { id } = router.query;
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!router.isReady) return;
+    if (!router.isReady) return;
 
-      const orderId = id || sessionStorage.getItem("lastOrderId");
+    const orderId = id || sessionStorage.getItem("lastOrderId");
 
-      if (!orderId) {
-        console.warn("No order ID found in query or sessionStorage.");
-        setError("No valid order ID provided.");
-        setLoading(false);
-        return;
-      }
+    if (!orderId) {
+      setError("No valid order ID provided.");
+      setLoading(false);
+      return;
+    }
 
+    const fetchOrder = async () => {
       try {
-        console.log("Fetching order with ID:", id);
         const res = await axios.get(`/api/Customer/order?id=${orderId}`);
         setOrder(res.data);
-        if (res.data.status === "Pending") {
-          await axios.put(`/api/Customer/order/status?id=${orderId}`, { status: "Confirmed" });
-        }
-      } catch (error) {
-        console.error("Failed to fetch orders:", error);
+      } catch (err) {
+        console.error("Error fetching order:", err);
+        setError("Failed to fetch order.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrders();
+    // Initial fetch
+    fetchOrder();
+
+    // Poll every 5 seconds
+    const interval = setInterval(fetchOrder, 5000);
+    return () => clearInterval(interval);
   }, [id, router.isReady]);
 
-  if (!order || Object.keys(order).length === 0) {
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  if (!order) {
     return <p>No order found.</p>;
   }
+
+  const deliveryStatuses = [
+    "Assigned",
+    "Picked Up",
+    "On the Way",
+    "Delivered",
+    "Done",
+  ];
+  const currentDeliveryStatusIndex = deliveryStatuses.indexOf(order.deliveryStatus);
+
+  const isDelivered = order.deliveryStatus === "Delivered";
+const isDone = order.deliveryStatus === "Done";
 
   const selectedAddress = order.userId.addresses.find(
     (address) => address._id.toString() === order.address.toString()
   );
-
-  const statuses = ["Pending", "Confirmed", "On The Way", "Delivered"];
-  const currentStatusIndex = statuses.indexOf(order.status);
-
-  const handleReviewClick = () => {
-    router.push(`/Customer/ReviewPage?orderId=${order._id}`);
-  };
 
   return (
     <div className="flex items-center justify-center">
@@ -71,7 +77,7 @@ const OrderPage = () => {
       <div className="mt-20 p-10 w-70 shadow-md rounded-md">
         <h1 className="text-3xl font-bold text-purple-800 mb-4 text-center">
           Order Confirmation
-          <Link legacyBehavior href="/Customer/Cdashboard">
+          <Link href="/Customer/Cdashboard" legacyBehavior>
             <a className="ml-8 text-blue-600 hover:underline text-sm">
               Browse Again
             </a>
@@ -80,38 +86,32 @@ const OrderPage = () => {
         <div className="border rounded-lg p-4 mb-4">
           <h2 className="text-xl font-semibold">Order ID: {order._id}</h2>
 
-          {/* Progress Bar with Animations */}
+          {/* Progress Bar */}
           <div className="mt-6">
             <div className="relative w-full bg-gray-200 rounded-full h-4 overflow-hidden">
               <div
-                className="h-full bg-green-500 transition-all duration-500"
+                className="h-full bg-green-500 transition-all duration-500 ${isDelivered ? 'bg-green-500' : 'bg-blue-500'}`"
                 style={{
-                  width: `${
-                    ((currentStatusIndex + 1) / statuses.length) * 100
-                  }%`,
+                  width: `${((currentDeliveryStatusIndex + 1) / deliveryStatuses.length) * 100}%`,
                 }}
               ></div>
             </div>
             <div className="flex justify-between mt-2">
-              {statuses.map((status, index) => (
+              {deliveryStatuses.map((status, index) => (
                 <div
                   key={status}
                   className="flex flex-col items-center text-center w-1/4"
                 >
                   <div
                     className={`w-8 h-8 flex items-center justify-center rounded-full text-white font-bold ${
-                      index <= currentStatusIndex
-                        ? "bg-green-500 animate-pulse"
-                        : "bg-gray-300"
+                      index <= currentDeliveryStatusIndex ? "bg-green-500" : "bg-gray-300"
                     }`}
                   >
                     {index + 1}
                   </div>
                   <span
                     className={`mt-1 text-sm font-semibold ${
-                      index <= currentStatusIndex
-                        ? "text-green-600"
-                        : "text-gray-500"
+                      index <= currentDeliveryStatusIndex ? "text-green-600" : "text-gray-500"
                     }`}
                   >
                     {status}
@@ -119,59 +119,35 @@ const OrderPage = () => {
                 </div>
               ))}
             </div>
-
-            {/* Status Animations */}
-            <div className="flex justify-center mt-6">
-              {order.deliveryStatus === "Assigned" && (
-                <Player
-                  autoplay
-                  loop
-                  src="https://assets8.lottiefiles.com/packages/lf20_q7uarxsb.json"
-                  style={{ height: "150px", width: "150px" }}
-                />
-              )}
-              {order.deliveryStatus === "Assigned" && (
-                <Player
-                  autoplay
-                  loop
-                  src="https://assets6.lottiefiles.com/packages/lf20_jnyb0m8z.json"
-                  style={{ height: "150px", width: "150px" }}
-                />
-              )}
-              {order.deliveryStatus === "On The Way" && (
-                <Player
-                  autoplay
-                  loop
-                  src="https://assets6.lottiefiles.com/packages/lf20_V9t630.json"
-                  style={{ height: "150px", width: "150px" }}
-                />
-              )}
-
-              {order.deliveryStatus === "Delivered || Done" && (
-                <Player
-                  autoplay
-                  loop
-                  src="https://assets6.lottiefiles.com/packages/lf20_5ngs2ksb.json"
-                  style={{ height: "150px", width: "150px" }}
-                />
-              )}
-            </div>
           </div>
 
+          {isDelivered && (
+          <div className="mt-4 text-center">
+            <h3 className="text-2xl font-bold text-green-600">
+              Delivered! Enjoy your meal!
+            </h3>
+          </div>
+        )}
+
+        {isDone && (
+          <div className="mt-4 text-center">
+            <h3 className="text-xl font-semibold text-blue-500">
+              Order is completed (Done).
+            </h3>
+          </div>
+        )}
+        
           <div>
             <p className="mt-4 text-lg text-purple-800 font-semibold text-center mb-3 underline">
-              <Link
-                href={`/Customer/ReviewPage?orderId=${order._id}`}
-                legacyBehavior
-              >
+              <Link href={`/Customer/ReviewPage?orderId=${order._id}`} legacyBehavior>
                 Don't forget to give us a review!
               </Link>
             </p>
           </div>
-          {/* <p>Address: {order.address.addressLine}</p> */}
+
           {selectedAddress ? (
             <p>
-              Address: {selectedAddress.addressLine}, {selectedAddress.area},,{" "}
+              Address: {selectedAddress.addressLine}, {selectedAddress.area},{" "}
               {selectedAddress.city}, {selectedAddress.postalCode}
             </p>
           ) : (

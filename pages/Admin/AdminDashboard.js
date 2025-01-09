@@ -154,7 +154,7 @@ export default function AdminDashboard() {
           value={stats.totalBlogs}
           icon={<FaBlog className="text-red-500 text-4xl" />}
         />
-        <StatCard
+        {/* <StatCard
           title="Pending Orders"
           value={stats.pendingOrders}
           icon={<FaHourglassHalf className="text-yellow-500 text-4xl" />}
@@ -163,17 +163,17 @@ export default function AdminDashboard() {
           title="Completed Orders"
           value={stats.completedOrders}
           icon={<FaCheckCircle className="text-green-500 text-4xl" />}
-        />
+        /> */}
         {/* <StatCard
           title="Cancelled Orders"
           value={stats.cancelledOrders}
           icon={<FaTimesCircle className="text-red-500 text-4xl" />}
         /> */}
-        <StatCard
+        {/* <StatCard
           title="Revenue Generated"
           value={`Rs.${stats.revenueGenerated}`}
           icon={<FaDollarSign className="text-blue-500 text-4xl" />}
-        />
+        /> */}
       </div>
 
       {/* Charts Section */}

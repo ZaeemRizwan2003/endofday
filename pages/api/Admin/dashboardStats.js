@@ -40,12 +40,12 @@ export default async function handler(req, res) {
 
     // New Order Metrics
     const pendingOrders = await Order.countDocuments({
-      status: "pending",
+      deliveryStatus: "Assigned",
       ...dateFilter,
     });
 
     const completedOrders = await Order.countDocuments({
-      status: "Delivered",
+      deliveryStatus: "Delivered || Done",
       ...dateFilter,
     });
 
