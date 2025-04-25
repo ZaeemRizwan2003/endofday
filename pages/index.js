@@ -28,7 +28,7 @@ export default function HomePage() {
         <div className="bg-black bg-opacity-50 p-8 rounded-lg text-center">
           <h2 className="text-5xl font-bold text-white mb-4 animate-fadeIn">Affordable and Delicious Meals Delivered</h2>
           <p className="text-white text-lg mb-6 animate-fadeIn">Experience the taste of fresh and fast food delivery.</p>
-          <a href="/Login" className="bg-purple-800 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-all">Explore Menu</a>
+          <a href="/Login" className="bg-purple-800 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-all">Explore Menu</a>
         </div>
       </section>
 
@@ -92,7 +92,7 @@ export default function HomePage() {
         <h3 className="text-3xl font-bold text-center mb-8">Customer Support</h3>
         <div className="container mx-auto px-6 text-center">
           <p className="text-lg mb-6">Need help? Our support team is available 24/7 to assist you with any inquiries or issues.</p>
-          <a href="/CustomerSupport/Contact" className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all">Contact Support</a>
+          <a href="/CustomerSupport/Contact" className="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-all">Contact Support</a>
         </div>
       </section>
     </div>

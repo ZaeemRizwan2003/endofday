@@ -19,7 +19,6 @@ export default async function handler(req, res) {
     } = req.body;
 
     try {
-      // ✅ Validate User and Address
       const user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -34,7 +33,6 @@ export default async function handler(req, res) {
       const resolvedArea =
         area || extractAreaFromAddress(selectedAddress.addressLine || "");
 
-      // ✅ Rider Assignment
       const availableRiders = await DeliveryPartner.find({ city });
       if (availableRiders.length === 0) {
         return res
@@ -66,7 +64,7 @@ export default async function handler(req, res) {
       let bakeryId = null;
       const something = await Listings.findById(items[0].itemId);
       bakeryId = something.bakeryowner;
-      // ✅ Validate Stock for Items
+     
       for (const item of items) {
         const listing = await Listings.findById(item.itemId);
         if (!listing) {
@@ -85,7 +83,6 @@ export default async function handler(req, res) {
         await listing.save();
       }
 
-      // ✅ Loyalty Points Validation
       if (pointsRedeemed > user.loyaltyPoints) {
         return res
           .status(400)
@@ -95,7 +92,6 @@ export default async function handler(req, res) {
       const finalAmount = totalAmount - pointsRedeemed;
       user.loyaltyPoints -= pointsRedeemed;
 
-      // Earn New Loyalty Points
       const loyaltyPointsEarned = Math.floor(finalAmount / 100);
       user.loyaltyPoints += loyaltyPointsEarned;
 
