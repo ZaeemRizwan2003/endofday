@@ -6,6 +6,8 @@ export default function NotificationForm() {
   const [formData, setFormData] = useState({
     title: "",
     message: "",
+    startDate: "",
+    endDate: "",
   });
 
   const [showPopup, setShowPopup] = useState(false);
@@ -18,6 +20,12 @@ export default function NotificationForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const { startDate, endDate } = formData;
+    if (new Date(startDate) > new Date(endDate)) {
+      alert("End date must be after start date.");
+      return;
+    }
+
     try {
       const userId = sessionStorage.getItem("userId");
       if (!userId) {
@@ -25,7 +33,7 @@ export default function NotificationForm() {
         return;
       }
 
-      const res = await fetch("/api/Notification/createresnotification", {
+      const res = await fetch("/api/Offers/createoffer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,11 +45,11 @@ export default function NotificationForm() {
       const data = await res.json();
 
       if (res.ok) {
-        setShowPopup(true); // Show the popup message
+        setShowPopup(true);
         setTimeout(() => {
-          setShowPopup(false); // Automatically close the popup after a few seconds
+          setShowPopup(false);
           router.push("/Restaurants/RDashboard");
-        }, 3000); // 3-second delay
+        }, 3000);
       } else {
         alert(data.error || "Failed to submit request");
       }
@@ -68,10 +76,10 @@ export default function NotificationForm() {
 
         <form
           onSubmit={handleSubmit}
-          className="max-w-xl mx-auto mt-10 p-8 bg-white shadow-xl rounded-2xl border border-gray-100 transform transition-all hover:scale-105"
-        >
+          className="max-w-xl mx-auto mt-10 p-8 bg-white shadow-xl rounded-2xl border border-gray-100"
+          >
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-            Create Notification
+            Create Special Offer
           </h2>
 
           <label className="block mb-2 text-gray-700 font-semibold">
@@ -80,7 +88,7 @@ export default function NotificationForm() {
           <input
             type="text"
             name="title"
-            placeholder="Notification Title"
+            placeholder="Offer Title"
             value={formData.title}
             onChange={handleChange}
             required
@@ -88,31 +96,64 @@ export default function NotificationForm() {
           />
 
           <label className="block mb-2 text-gray-700 font-semibold">
-            Message
+            Description
           </label>
           <textarea
             name="message"
-            placeholder="Notification Message"
+            placeholder="Offer Description"
             value={formData.message}
             onChange={handleChange}
             required
             rows="5"
+            maxLength={100}
             className="w-full px-4 py-3 mb-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
           ></textarea>
+
+          <label className="block mb-2 text-gray-700 font-semibold">
+            Offer Duration
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                Start Date
+              </label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                End Date
+              </label>
+              <input
+                type="date"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200"
+              />
+            </div>
+          </div>
 
           <button
             type="submit"
             className="w-full py-3 mt-4 text-white font-semibold bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all duration-200"
           >
-            Submit
+            Submit to Admin for Approval
           </button>
         </form>
 
         {/* Popup Message */}
         {showPopup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-              <h3 className="text-2xl font-bold mb-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-md w-full mx-4">
+              <h3 className="text-2xl font-bold mb-4 text-purple-700">
                 Notification Submitted!
               </h3>
               <p className="text-gray-700">

@@ -32,7 +32,7 @@ const DashNav = () => {
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         {/* Logo */}
         <Link
-          href="/Restaurants/RDashboard"
+          href="/Restaurants/Dashboard"
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
           <img src="/mainlogo.png" className="h-8" alt="Logo" />
@@ -42,7 +42,7 @@ const DashNav = () => {
         <div className="flex md:order-2 space-x-3 rtl:space-x-reverse">
           <FaBell
             className="pl-2 mt-1 w-8 h-8 text-yellow-500 cursor-pointer"
-            onClick={() => router.push("/Restaurants/CreateNotification")} // Redirect or show notifications
+            onClick={() => router.push("/Restaurants/CreateOffer")} // Redirect or show notifications
           />
           {/* User Account Menu */}
           <FaUser
@@ -74,6 +74,14 @@ const DashNav = () => {
                       onClick={() => router.push("/Restaurants/RAccount")}
                     >
                       Account Information
+                    </button>
+                  </li>
+                  <li className="mb-3">
+                    <button
+                      className="text-purple-700 hover:underline"
+                      onClick={() => router.push("/Restaurants/RDashboard")}
+                    >
+                     Restaurant Listings
                     </button>
                   </li>
                   <li className="mb-3">
@@ -116,6 +124,16 @@ const DashNav = () => {
                     </button>
                   </li>
 
+                  <li className="mb-3">
+                    <button
+                      className="text-purple-700 hover:underline"
+                      onClick={() =>
+                        router.push("/CustomerSupport/Contact")
+                      }
+                    >
+                     Contact Us
+                    </button>
+                  </li>
 
                   <li>
                     <button

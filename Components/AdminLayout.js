@@ -47,10 +47,17 @@ export default function AdminLayout({ children }) {
       link: "/Admin/Blogs/ManageBlogs",
     },
     {
-      id: "notifications",
-      label: "Notifications",
+      id: "managereturns",
+      label: "Manage Returns",
+      icon: <FaBlog />,
+      link: "/Admin/ManageReturns/AllReturns",
+    },
+    
+    {
+      id: "offers",
+      label: "Restaurant Offers",
       icon: <FaBell />,
-      link: "/Admin/Notification/RequestApproval",
+      link: "/Admin/Offers/RequestApproval",
     },
     {
       id: "Approve Restaurants",

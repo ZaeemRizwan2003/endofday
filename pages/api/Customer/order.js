@@ -6,16 +6,52 @@ import Listings from "@/models/foodlistingmodel";
 import RegisteredBakeries from "@/models/RBakerymodel";
 const Fuse = require("fuse.js");
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
   await dbConnect();
+
+  // ✅ Helper to send confirmation email
+  const sendOrderConfirmationEmail = async ({ to, name, orderId, total }) => {
+    try {
+      const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: `"End of Day" <${process.env.EMAIL_USER}>`,
+        to,
+        subject: "Order Confirmation - End of Day",
+        html: `
+          <div style="font-family: Arial, sans-serif;">
+            <h2>Thank you for your order, ${name}!</h2>
+            <p>Your order has been placed successfully. Here are the details:</p>
+            <ul>
+              <li><strong>Order ID:</strong> ${orderId}</li>
+              <li><strong>Total:</strong> Rs. ${total}</li>
+            </ul>
+            <p>We’ll notify you when it’s on the way.</p>
+            <p>Thank you for using End of Day!</p>
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log("Order confirmation email sent");
+    } catch (err) {
+      console.error("Failed to send confirmation email:", err);
+    }
+  };
 
   // ✅ GET Requests
   if (req.method === "GET") {
     const { id, status } = req.query;
 
     try {
-      // ✅ Fetch a specific order by ID
       if (id) {
         if (!mongoose.Types.ObjectId.isValid(id)) {
           return res.status(400).json({ message: "Invalid order ID format." });
@@ -26,7 +62,7 @@ export default async function handler(req, res) {
             path: "userId",
             populate: { path: "addresses", model: "User" },
           })
-          .populate("bakeryId"); // Populate bakeryId for details
+          .populate("bakeryId");
 
         if (!order) {
           return res.status(404).json({ message: "Order not found" });
@@ -39,16 +75,15 @@ export default async function handler(req, res) {
         return res.status(200).json({ ...order.toObject(), selectedAddress });
       }
 
-      // ✅ Fetch ongoing orders
       if (status === "ongoing") {
         const ongoingOrders = await Order.find({
           deliveryStatus: { $in: ["Unassigned", "Assigned", "Picked Up", "On the Way"] },
         })
-          .populate("bakeryId")  
+          .populate("bakeryId")
           .populate("userId")
-          .sort({ createdAt: -1 }); // Get all ongoing orders
+          .sort({ createdAt: -1 });
 
-        return res.status(200).json({ ongoingOrders }); // Always return 200
+        return res.status(200).json({ ongoingOrders });
       }
 
       return res.status(400).json({ message: "Invalid query parameters" });
@@ -74,25 +109,18 @@ export default async function handler(req, res) {
     }
 
     try {
-      // Validate user and address
       const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+      if (!user) return res.status(404).json({ message: "User not found" });
 
       const selectedAddress = user.addresses.id(addressId);
-      if (!selectedAddress) {
-        return res.status(404).json({ message: "Address not found" });
-      }
+      if (!selectedAddress) return res.status(404).json({ message: "Address not found" });
 
-      // Validate and assign bakeryId
       let bakeryId = null;
       const something = await Listings.findById(items[0].itemId);
       bakeryId = something.bakeryowner;
-      console.log(something);
+
       for (const item of items) {
         const listing = await Listings.findById(item.itemId);
-
         if (!listing) {
           return res
             .status(404)
@@ -105,11 +133,10 @@ export default async function handler(req, res) {
           });
         }
 
-        listing.remainingitem -= item.quantity; // Update stock
+        listing.remainingitem -= item.quantity;
         await listing.save();
       }
 
-      // Assign delivery partner
       const { city, area, addressLine } = selectedAddress || {};
       const resolvedArea =
         area || extractAreaFromAddress(selectedAddress.addressLine || "");
@@ -121,6 +148,7 @@ export default async function handler(req, res) {
         keys: ["area"],
         threshold: 0.3,
       });
+
       const matchedRiders = fuse.search(resolvedArea);
       const ridersInArea = availableRiders.filter(
         (rider) => rider.area === resolvedArea
@@ -138,21 +166,16 @@ export default async function handler(req, res) {
         return res.status(500).json({ message: "No rider could be assigned" });
       }
 
-      // Loyalty points processing
       if (pointsRedeemed > user.loyaltyPoints) {
-        return res
-          .status(400)
-          .json({ message: "Insufficient loyalty points." });
+        return res.status(400).json({ message: "Insufficient loyalty points." });
       }
 
       const finalAmount = totalAmount - pointsRedeemed;
       user.loyaltyPoints -= pointsRedeemed;
       const loyaltyPointsEarned = Math.floor(finalAmount / 100);
       user.loyaltyPoints += loyaltyPointsEarned;
-
       await user.save();
 
-      // Create order
       const newOrder = new Order({
         userId,
         bakeryId,
@@ -166,6 +189,14 @@ export default async function handler(req, res) {
       const savedOrder = await newOrder.save();
       assignedRider.orderId.push(savedOrder._id);
       await assignedRider.save();
+
+      // ✅ Send confirmation email
+      await sendOrderConfirmationEmail({
+        to: user.email,
+        name: user.name || "Customer",
+        orderId: savedOrder._id.toString(),
+        total: finalAmount,
+      });
 
       res.status(201).json({
         success: true,

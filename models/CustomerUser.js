@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema(
     usertype: {
       type: String,
       default: "customer",
-      immutable: true, // This makes sure the value can't be changed after creation
+      immutable: true,
     },
     cart: [CartItemSchema],
     addresses: [AddressSchema],
@@ -53,14 +53,17 @@ const UserSchema = new mongoose.Schema(
     favorites: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Listings", 
+        ref: "Listings",
       },
     ],
-    loyaltyPoints: { type: Number, default: 0 }, 
+    loyaltyPoints: { type: Number, default: 0 },
+    receiveNotifications: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
-
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
 export default User;

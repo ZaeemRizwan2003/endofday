@@ -71,15 +71,29 @@ const AddFoodListing = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+  
+    // Validate manufacture date
+    const selectedDate = new Date(formData.manufacturedate);
+    const currentDate = new Date();
+  
+    // Calculate difference in days
+    const timeDifference = currentDate - selectedDate;
+    const dayDifference = timeDifference / (1000 * 60 * 60 * 24);
+  
+    if (dayDifference > 2) {
+      setError("Product is too old. Please add a fresher product (within 2 days).");
+      return;
+    }
+  
     try {
       let base64Image = "";
       let mimeType = "";
-
+  
       if (selectedImage) {
         base64Image = await convertToBase64(selectedImage);
         mimeType = selectedImage.type;
       }
-
+  
       const payload = {
         itemname: formData.itemname,
         description: formData.description,
@@ -90,21 +104,21 @@ const AddFoodListing = () => {
         image: base64Image,
         contentType: mimeType,
       };
-
+  
       if (edit) {
         payload.id = edit;
       }
-
+  
       const config = {
         headers: {
           "Content-Type": "application/json",
         },
       };
-
+  
       const res = edit
         ? await axios.put("/api/Restaurants/foodlisting", payload, config)
         : await axios.post("/api/Restaurants/foodlisting", payload, config);
-
+  
       if (res.status === 200) {
         router.push("/Restaurants/RDashboard");
       }
@@ -113,7 +127,7 @@ const AddFoodListing = () => {
       setError("Unable to save food listing. Please try again.");
     }
   };
-
+  
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

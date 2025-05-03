@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { LuLoader } from "react-icons/lu";
-
+import DashNav from "@/Components/CustomerNavbar";
 const AccountInfo = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -11,21 +11,50 @@ const AccountInfo = () => {
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     if (!token) {
-      router.push("/Login"); // Redirect to login if no token is found
+      router.push("/Login");
     } else {
       axios
         .get("/api/Customer/user-info", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
-          setUser(res.data.user); // Set the user data
-          setLoading(false); // Stop loading
+          setUser(res.data.user);
+          setLoading(false);
         })
         .catch(() => {
-          router.push("/Login"); // Redirect to login on error
+          router.push("/Login");
         });
     }
   }, [router]);
+
+  const handleCheckboxChange = async () => {
+    const token = sessionStorage.getItem("token");
+    const updatedValue = !user.receiveNotifications;
+
+    try {
+      await axios.put(
+        "/api/Customer/update-notifications",
+        { receiveNotifications: updatedValue },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUser((prevUser) => ({
+        ...prevUser,
+        receiveNotifications: updatedValue,
+      }));
+    } catch (error) {
+      console.error("Failed to update notification preference", error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LuLoader className="animate-spin text-purple-600 text-3xl" />
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -38,6 +67,8 @@ const AccountInfo = () => {
   }
 
   return (
+     <>
+          <DashNav />
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
         <h2 className="text-3xl font-bold mb-6 text-purple-800">
@@ -54,10 +85,21 @@ const AccountInfo = () => {
           </p>
           <p className="mb-4">
             <span className="font-semibold text-gray-700">
-              Your Loyalty Points:
+              Loyalty Points:
             </span>{" "}
             {user.loyaltyPoints}
           </p>
+          <div className="mb-4 flex items-center">
+            <input
+              type="checkbox"
+              checked={user.receiveNotifications}
+              onChange={handleCheckboxChange}
+              className="mr-2"
+            />
+            <label className="text-gray-700">
+              Receive notifications regarding new offers and discounts
+            </label>
+          </div>
         </div>
         <button
           onClick={() => {
@@ -70,6 +112,7 @@ const AccountInfo = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

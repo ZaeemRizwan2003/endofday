@@ -50,7 +50,7 @@ const Login = () => {
           await fetchUserCart(userId); // Set cart for the customer
           router.push("/Customer/Cdashboard");
         } else if (userType === "bakery") {
-          router.push("/Restaurants/RDashboard");
+          router.push("/Restaurants/Dashboard");
         } else if (userType === "delivery") {
           sessionStorage.setItem("delivery", JSON.stringify(userData));
           router.push("/Delivery/deliverydashboard");
@@ -158,7 +158,7 @@ const Login = () => {
               <p className="text-sm text-black font-light">
                 Don’t have an account yet?{" "}
                 <Link
-                  href="/Customer/Signup"
+                  href="/Signup"
                   className="font-medium text-black hover:underline"
                 >
                   Sign up
